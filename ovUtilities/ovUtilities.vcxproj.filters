@@ -19,6 +19,12 @@
     <ClCompile Include="src\ovVector2I.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ovMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovRadian.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovPlatformDefines.h">
@@ -31,6 +37,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ovVector2I.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovMath.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovRadian.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
