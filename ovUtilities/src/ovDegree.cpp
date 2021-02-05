@@ -1,5 +1,5 @@
 #include "ovDegree.h"
-#include "ovRadian.h"
+#include "ovMath.h"
 
 namespace ovEngineSDK {
 
@@ -18,6 +18,11 @@ namespace ovEngineSDK {
 
   float Degree::toDegrees() const {
     return m_degree;
+  }
+
+  float Degree::toRadians() const
+  {
+      return m_degree * Math::DEG2RAD;
   }
 
   const Degree& Degree::operator+() const {

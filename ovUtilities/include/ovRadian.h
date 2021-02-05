@@ -44,7 +44,7 @@ namespace ovEngineSDK {
     Radian
     operator + (const Radian& r) const;
 
-    Radian&
+    Radian
     operator + (const Degree& d) const;
 
     Radian&

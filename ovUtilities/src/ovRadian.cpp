@@ -1,44 +1,75 @@
 #include "ovRadian.h"
+#include "ovMath.h"
 
 namespace ovEngineSDK {
   Radian::Radian(const Degree& d) : m_radian(d.toRadians()) {}
 
-  Radian& Radian::operator=(const Degree& d) {
+  Radian&
+  Radian::operator=(const Degree& d) {
     m_radian = d.toRadians();
     return *this;
   }
 
-  float Radian::toRadians() const {
+  float
+  Radian::toDegrees() const
+  {
+    return m_radian * Math::RAD2DEG;
+  }
+
+  float
+  Radian::toRadians() const {
     return m_radian;
   }
 
-  Radian Radian::operator+(const Radian& r) const {
+  const Radian&
+  Radian::operator+() const {
+    return *this;
+  }
+
+  Radian
+  Radian::operator+(const Radian& r) const {
     return Radian(m_radian + r.m_radian);
   }
 
-  Radian& Radian::operator+(const Degree& d) const {
+  Radian
+  Radian::operator+(const Degree& d) const {
     return Radian(m_radian + d.toRadians());
   }
 
-  Radian& Radian::operator+=(const Radian& r) {
+  Radian&
+  Radian::operator+=(const Radian& r) {
     m_radian += r.m_radian;
     return *this;
   }
 
-  Radian& Radian::operator+=(const Degree& d) {
-    // TODO: insert return statement here
+  Radian&
+  Radian::operator+=(const Degree& d) {
+    m_radian += d.toRadians();
+    return *this;
   }
 
-  Radian Radian::operator-() const {
+  Radian
+  Radian::operator-() const {
     return Radian(-m_radian);
   }
 
-  Radian Radian::operator-(const Radian& r) const {
+  Radian
+  Radian::operator-(const Radian& r) const {
     return Radian(m_radian - r.m_radian);
+  }
+
+  Radian
+  Radian::operator-(const Degree& d) const {
+    return Radian(m_radian - d.toRadians());
   }
 
   Radian& Radian::operator-=(const Radian& r) {
     m_radian -= r.m_radian;
+    return *this;
+  }
+
+  Radian& Radian::operator-=(const Degree& d) {
+    m_radian -= d.toRadians();
     return *this;
   }
 
