@@ -26,7 +26,7 @@ namespace ovEngineSDK {
 
   int32
   Math::round(float F) {
-    return floor(F + 0.5f);
+    return static_cast<int32>(floor(F + 0.5f));
   }
 
   float

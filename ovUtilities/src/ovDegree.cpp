@@ -3,8 +3,8 @@
 
 namespace ovEngineSDK {
 
-  Degree::Degree(const Radian& r)
-  {
+  Degree::Degree(const Radian& r) {
+    m_degree = r.toDegrees();
   }
 
   Degree& Degree::operator=(const float& f) {
