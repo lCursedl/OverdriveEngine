@@ -11,8 +11,7 @@ namespace ovEngineSDK {
   }
 
   float
-  Radian::toDegrees() const
-  {
+  Radian::toDegrees() const {
     return m_radian * Math::RAD2DEG;
   }
 

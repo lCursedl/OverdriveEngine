@@ -14,6 +14,7 @@ namespace ovEngineSDK {
 
   Degree& Degree::operator=(const Radian& r) {
     m_degree = r.toDegrees();
+    return *this;
   }
 
   float Degree::toDegrees() const {

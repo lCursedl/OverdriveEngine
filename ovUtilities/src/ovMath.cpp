@@ -7,6 +7,7 @@ namespace ovEngineSDK {
   const float Math::HALF_PI = static_cast<float>(0.5f * PI);
   const float Math::DEG2RAD = static_cast<float>(PI / 180.0f);
   const float Math::RAD2DEG = static_cast<float>(180.0f / PI);
+  const float Math::LOG2 = static_cast<float>(std::log(2.0f));
 
   int32
   Math::trunc(float F) {
