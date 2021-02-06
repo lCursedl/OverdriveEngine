@@ -1,6 +1,10 @@
 #include "ovVector2.h"
+#include "ovVector3.h"
 
 namespace ovEngineSDK {
+
+  const Vector2 Vector2::ZERO = Vector2(0, 0);
+
   Vector2::Vector2(float InX, float InY) {
     x = InX;
     y = InY;
@@ -12,7 +16,8 @@ namespace ovEngineSDK {
   }
 
   Vector2::Vector2(const Vector3& V) {
-    
+    x = V.x;
+    y = V.y;
   }
 
   Vector2
@@ -87,5 +92,9 @@ namespace ovEngineSDK {
 
   float Vector2::dot(const Vector2& vec) const {
     return x * vec.x + y * vec.y;
+  }
+
+  float Vector2::magnitude() {
+    return std::sqrtf(x * x + y * y);
   }
 }

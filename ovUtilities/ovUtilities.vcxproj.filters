@@ -28,6 +28,12 @@
     <ClCompile Include="src\ovDegree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ovVector3I.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovVector3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovPlatformDefines.h">
@@ -49,6 +55,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ovDegree.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovVector3I.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovVector3.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

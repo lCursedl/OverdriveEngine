@@ -1,6 +1,9 @@
 #include "ovVector2I.h"
 
 namespace ovEngineSDK {
+
+  const Vector2I Vector2I::ZERO = Vector2I(0, 0);
+
   Vector2I::Vector2I(int32 InX, int32 InY) {
     x = InX;
     y = InY;

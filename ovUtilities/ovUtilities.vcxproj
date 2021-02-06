@@ -179,6 +179,8 @@
     <ClCompile Include="src\ovRadian.cpp" />
     <ClCompile Include="src\ovVector2.cpp" />
     <ClCompile Include="src\ovVector2I.cpp" />
+    <ClCompile Include="src\ovVector3.cpp" />
+    <ClCompile Include="src\ovVector3I.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovDegree.h" />
@@ -188,6 +190,8 @@
     <ClInclude Include="include\ovRadian.h" />
     <ClInclude Include="include\ovVector2.h" />
     <ClInclude Include="include\ovVector2I.h" />
+    <ClInclude Include="include\ovVector3.h" />
+    <ClInclude Include="include\ovVector3I.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

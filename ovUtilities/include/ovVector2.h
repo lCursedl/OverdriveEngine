@@ -148,6 +148,13 @@ namespace ovEngineSDK {
     float
     dot(const Vector2 & vec) const;
 
+    /**
+    * @brief      Calculates the lenght of the vector
+    * @return     length of the vector
+    */
+    float
+    magnitude();
+
   public:
     float x;
     float y;
