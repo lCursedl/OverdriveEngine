@@ -2,12 +2,13 @@
 #include "ovMath.h"
 
 namespace ovEngineSDK {
-  Radian::Radian(const Degree& d) : m_radian(d.toRadians()) {}
 
-  Radian&
-  Radian::operator=(const Degree& d) {
+  Radian::Radian(float r) {
+    m_radian = r;
+  }
+
+  Radian::Radian(const Degree& d) {
     m_radian = d.toRadians();
-    return *this;
   }
 
   float
@@ -30,20 +31,9 @@ namespace ovEngineSDK {
     return Radian(m_radian + r.m_radian);
   }
 
-  Radian
-  Radian::operator+(const Degree& d) const {
-    return Radian(m_radian + d.toRadians());
-  }
-
   Radian&
   Radian::operator+=(const Radian& r) {
     m_radian += r.m_radian;
-    return *this;
-  }
-
-  Radian&
-  Radian::operator+=(const Degree& d) {
-    m_radian += d.toRadians();
     return *this;
   }
 
@@ -57,41 +47,13 @@ namespace ovEngineSDK {
     return Radian(m_radian - r.m_radian);
   }
 
-  Radian
-  Radian::operator-(const Degree& d) const {
-    return Radian(m_radian - d.toRadians());
-  }
-
   Radian& Radian::operator-=(const Radian& r) {
     m_radian -= r.m_radian;
     return *this;
   }
 
-  Radian& Radian::operator-=(const Degree& d) {
-    m_radian -= d.toRadians();
-    return *this;
-  }
-
-  Radian Radian::operator*(float f) const {
-    return Radian(m_radian * f);
-  }
-
   Radian Radian::operator*(const Radian& f) const {
     return Radian(m_radian * f.m_radian);
-  }
-
-  Radian& Radian::operator*=(float f) {
-    m_radian *= f;
-    return *this;
-  }
-
-  Radian Radian::operator/(float f) const {
-    return Radian(m_radian / f);
-  }
-
-  Radian& Radian::operator/=(float f) {
-    m_radian /= f;
-    return *this;
   }
 
   bool Radian::operator<(const Radian& r) {
@@ -116,29 +78,5 @@ namespace ovEngineSDK {
 
   bool Radian::operator>(const Radian& r) const {
     return m_radian > r.m_radian;
-  }
-
-  bool Radian::operator<(const float& v) const {
-    return m_radian < v;
-  }
-
-  bool Radian::operator<=(const float& v) const {
-    return m_radian <= v;
-  }
-
-  bool Radian::operator==(const float& v) const {
-    return m_radian == v;
-  }
-
-  bool Radian::operator!=(const float& v) const {
-    return m_radian != v;
-  }
-
-  bool Radian::operator>=(const float& v) const {
-    return m_radian >= v;
-  }
-
-  bool Radian::operator>(const float& v) const {
-    return m_radian > v;
   }
 }

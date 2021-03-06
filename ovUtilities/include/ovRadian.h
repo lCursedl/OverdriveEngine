@@ -14,23 +14,14 @@ namespace ovEngineSDK {
    public:
     Radian() = default;
 
-    constexpr Radian(const Radian&) = default;
+    Radian(const Radian&) = default;
 
-    constexpr explicit Radian(float r) : m_radian(r) {}
+    Radian(float r);
 
     Radian(const Degree& d);
 
-    constexpr Radian&
-    operator=(const float& f) {
-      m_radian = f;
-      return *this;
-    }
-
-    constexpr Radian&
-    operator = (const Radian&) = default;
-
     Radian&
-    operator = (const Degree& d);
+    operator = (const Radian&) = default;
 
     float
     toDegrees() const;
@@ -44,14 +35,8 @@ namespace ovEngineSDK {
     Radian
     operator + (const Radian& r) const;
 
-    Radian
-    operator + (const Degree& d) const;
-
     Radian&
     operator += (const Radian& r);
-
-    Radian&
-    operator += (const Degree &d);
 
     Radian
     operator - () const;
@@ -59,29 +44,11 @@ namespace ovEngineSDK {
     Radian
     operator - (const Radian& r) const;
 
-    Radian
-    operator - (const Degree& d) const;
-
     Radian&
     operator -= (const Radian& r);
 
-    Radian&
-    operator -= (const Degree& d);
-
-    Radian
-    operator * (float f) const;
-
     Radian
     operator * (const Radian& f) const;
-
-    Radian&
-    operator *= (float f);
-
-    Radian
-    operator / (float f) const;
-
-    Radian&
-    operator /= (float f);
 
     bool
     operator < (const Radian& r);
@@ -101,25 +68,7 @@ namespace ovEngineSDK {
     bool
     operator > (const Radian& r) const;
 
-    bool
-    operator < (const float& v) const;
-
-    bool
-    operator <= (const float& v) const;
-
-    bool
-    operator == (const float& v) const;
-
-    bool
-    operator != (const float& v) const;
-
-    bool
-    operator >= (const float& v) const;
-
-    bool
-    operator > (const float& v) const;
-
-    private:
-     float m_radian = 0.0f;
+   private:
+    float m_radian = 0.0f;
   };
 }

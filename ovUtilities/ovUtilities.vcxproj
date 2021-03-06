@@ -97,17 +97,20 @@
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>OV_UTILITY_EXPORTS</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName)</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">
@@ -129,7 +132,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName)</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|x64'">
@@ -137,17 +140,20 @@
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>OV_UTILITY_EXPORTS</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName)</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|x64'">
@@ -169,29 +175,36 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName)</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\deleteme.cpp" />
     <ClCompile Include="src\ovDegree.cpp" />
     <ClCompile Include="src\ovMath.cpp" />
+    <ClCompile Include="src\ovMatrix4.cpp" />
     <ClCompile Include="src\ovRadian.cpp" />
     <ClCompile Include="src\ovVector2.cpp" />
     <ClCompile Include="src\ovVector2I.cpp" />
     <ClCompile Include="src\ovVector3.cpp" />
     <ClCompile Include="src\ovVector3I.cpp" />
+    <ClCompile Include="src\ovVector4.cpp" />
+    <ClCompile Include="src\ovVector4I.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovDegree.h" />
     <ClInclude Include="include\ovMath.h" />
+    <ClInclude Include="include\ovMatrix4.h" />
     <ClInclude Include="include\ovPlatformDefines.h" />
     <ClInclude Include="include\ovPlatformTypes.h" />
+    <ClInclude Include="include\ovPrerequisitesUtil.h" />
     <ClInclude Include="include\ovRadian.h" />
+    <ClInclude Include="include\ovStdHeaders.h" />
     <ClInclude Include="include\ovVector2.h" />
     <ClInclude Include="include\ovVector2I.h" />
     <ClInclude Include="include\ovVector3.h" />
     <ClInclude Include="include\ovVector3I.h" />
+    <ClInclude Include="include\ovVector4.h" />
+    <ClInclude Include="include\ovVector4I.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

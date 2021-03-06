@@ -15,11 +15,6 @@ namespace ovEngineSDK {
     y = static_cast<float>(In.y);
   }
 
-  Vector2::Vector2(const Vector3& V) {
-    x = V.x;
-    y = V.y;
-  }
-
   Vector2
   Vector2::operator+(const Vector2& Other) const {
     return Vector2(*this) += Other;

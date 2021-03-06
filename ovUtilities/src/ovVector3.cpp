@@ -15,6 +15,12 @@ namespace ovEngineSDK {
     z = Value;
   }
 
+  Vector3::Vector3(Vector3I In) {
+    x = static_cast<float>(In.x);
+    y = static_cast<float>(In.y);
+    z = static_cast<float>(In.z);
+  }
+
   Vector3
   Vector3::operator+(const Vector3& Other) const {
     return Vector3(*this) += Other;

@@ -11,7 +11,6 @@
 #include "ovPlatformTypes.h"
 #include "ovDegree.h"
 #include "ovRadian.h"
-#include "ovMath.h"
 #include <cmath>
 
 namespace ovEngineSDK {
@@ -111,6 +110,12 @@ namespace ovEngineSDK {
 
      static Radian
      atan2(float Y, float X);
+
+     template<class T>
+     static T
+     square(const T Value) {
+       return Value * Value;
+     }
 
      /**
      * @brief     Generic Lineal Interpolation function

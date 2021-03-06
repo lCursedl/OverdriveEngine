@@ -39,6 +39,12 @@ namespace ovEngineSDK {
      Vector3(Vector2 & Vec, float Value);
 
      /**
+     * @brief     Constructs a Vector3 from a Vector3I
+     * @param[in] In Integer point used to set the new vector
+     */
+     explicit Vector3(Vector3I In);
+
+     /**
       * @brief    Get the result of addition on this vector.
       * @param    Other The other vector to add to this.
       * @return   A new combined vector.

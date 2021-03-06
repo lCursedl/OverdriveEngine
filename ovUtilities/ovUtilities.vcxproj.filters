@@ -10,9 +10,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\deleteme.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ovVector2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -34,13 +31,19 @@
     <ClCompile Include="src\ovVector3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ovVector4I.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovVector4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovMatrix4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovPlatformDefines.h">
       <Filter>Source Files\Prerequisites</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ovPlatformTypes.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ovVector2.h">
       <Filter>Source Files</Filter>
@@ -61,6 +64,24 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ovVector3.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovPlatformTypes.h">
+      <Filter>Source Files\Prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovPrerequisitesUtil.h">
+      <Filter>Source Files\Prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovStdHeaders.h">
+      <Filter>Source Files\Prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovVector4I.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovVector4.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovMatrix4.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

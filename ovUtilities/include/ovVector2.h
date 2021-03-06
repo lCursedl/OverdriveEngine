@@ -18,10 +18,9 @@
 namespace ovEngineSDK {
   class Vector3;
 
-  class Vector2
+  class OV_UTILITY_EXPORT Vector2
   {
-    public:
-  public:
+   public:
     /**
     * @brief     Default constructor (no initialization).
     */
@@ -39,12 +38,6 @@ namespace ovEngineSDK {
     * @param[in] InPos Integer point used to set the new vector
     */
     explicit Vector2(Vector2I In);
-
-    /**
-    * @brief     Constructor a Vector2 from a Vector3
-    * @param[in] V Vector to copy from
-    */
-    explicit Vector2(const Vector3& V);
 
     /**
      * @brief    Get the result of addition on this vector.
@@ -155,7 +148,7 @@ namespace ovEngineSDK {
     float
     magnitude();
 
-  public:
+   public:
     float x;
     float y;
 

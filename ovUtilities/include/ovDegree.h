@@ -14,20 +14,12 @@ namespace ovEngineSDK {
     public:
     Degree() = default;
 
-    constexpr Degree(const Degree& d) = default;
+    Degree(float d);
 
-    constexpr explicit Degree(float d) : m_degree(d) {}
-
-    constexpr Degree&
+    Degree&
     operator = (const Degree& d) = default;
 
     Degree(const Radian& r);
-
-    Degree&
-    operator = (const float& f);
-
-    Degree&
-    operator = (const Radian& r);
 
     float
     toDegrees() const;
@@ -35,50 +27,20 @@ namespace ovEngineSDK {
     float
     toRadians() const;
 
-    void
-    unwindDegrees();
-
     const Degree&
     operator+() const;
 
     Degree
     operator+(const Degree& d) const;
 
-    Degree
-    operator+(const Radian& r) const;
-
     Degree&
     operator+=(const Degree& d);
-
-    Degree&
-    operator+=(const Radian& r);
 
     Degree
     operator-() const;
 
     Degree
     operator-(const Degree& d) const;
-
-    Degree
-    operator-(const Radian& r) const;
-
-    Degree&
-    operator-=(const Radian& r);
-
-    Degree
-    operator*(float f) const;
-
-    Degree
-    operator*(const Degree& f) const;
-
-    Degree&
-    operator*=(float f);
-
-    Degree
-    operator/(float f) const;
-
-    Degree&
-    operator/=(float f);
 
     bool
     operator<(const Degree& d) const;
@@ -98,25 +60,7 @@ namespace ovEngineSDK {
     bool
     operator>(const Degree& d) const;
 
-    bool
-    operator<(const float& v) const;
-
-    bool
-    operator<=(const float& v) const;
-
-    bool
-    operator==(const float& v) const;
-
-    bool
-    operator!=(const float& v) const;
-
-    bool
-    operator>=(const float& v) const;
-
-    bool
-    operator>(const float& v) const;
-
-    private:
+   private:
     float m_degree = 0.0f;
   };
 }
