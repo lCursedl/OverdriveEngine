@@ -58,6 +58,9 @@ namespace ovEngineSDK {
     bool
     operator!=(const Matrix4& Mat);
 
+    void
+    operator=(const Matrix4& Mat);
+
     Matrix4
     transpose()const;
 

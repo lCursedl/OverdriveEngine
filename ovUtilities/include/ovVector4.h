@@ -23,8 +23,8 @@ namespace ovEngineSDK {
   {
   public:
     /**
-       * @brief     Default constructor (no initialization).
-       */
+    * @brief     Default constructor (no initialization).
+    */
     Vector4() = default;
 
     /**
@@ -52,8 +52,8 @@ namespace ovEngineSDK {
     Vector4(Vector3& Vec, float W);
 
     /**
-    * @brief      Constructs a Vector4 from a Vector4I
-    * @param[in]  In Integer point used to set the new vector
+    * @brief     Constructs a Vector4 from a Vector4I
+    * @param[in] In Integer point used to set the new vector
     */
     explicit Vector4(Vector4I& Vec);
 
@@ -74,34 +74,34 @@ namespace ovEngineSDK {
     operator-(const Vector4& Other) const;
 
     /**
-    * @brief    Get the result of division on this vector.
-    * @param[in]Other The other vector to subtract from this.
-    * @return   A new subtracted vector.
+    * @brief     Get the result of division on this vector.
+    * @param[in] Other The other vector to subtract from this.
+    * @return    A new subtracted vector.
     */
     Vector4
     operator/(const Vector4& Other) const;
 
     /**
-     * @brief Add another vector component-wise to this vector.
-     * @param Other The vector to add to this vector.
-     * @return Reference to this vector after addition.
-     */
+    * @brief     Add another vector component-wise to this vector.
+    * @param[in] Other The vector to add to this vector.
+    * @return    Reference to this vector after addition.
+    */
     Vector4&
     operator+=(const Vector4& Other);
 
     /**
-     * @brief Subtract another vector component-wise from this vector.
-     * @param Other The vector to subtract from this vector.
-     * @return Reference to this vector after subtraction.
-     */
+    * @brief     Subtract another vector component-wise from this vector.
+    * @param[in] Other The vector to subtract from this vector.
+    * @return    Reference to this vector after subtraction.
+    */
     Vector4&
     operator-=(const Vector4& Other);
 
     /**
-     * @brief Divide this vector component-wise by another vector.
-     * @param Other The vector to divide with.
-     * @return Reference to this vector after division.
-     */
+    * @brief     Divide this vector component-wise by another vector.
+    * @param[in] Other The vector to divide with.
+    * @return    Reference to this vector after division.
+    */
     Vector4&
     operator/=(const Vector4& Other);
 
@@ -122,50 +122,50 @@ namespace ovEngineSDK {
     operator!=(const Vector4& Other) const;
 
     /**
-     * @brief Get the result of scaling on this vector.
-     * @param Scale What to multiply the vector by.
-     * @return a new scaled vector.
-     */
+    * @brief     Get the result of scaling on this vector.
+    * @param     Scale What to multiply the vector by.
+    * @return    a new scaled vector.
+    */
     Vector4
     operator*(float Scale) const;
 
     /**
-     * @brief Get the result of division on this vector.
-     * @param Divisor What to divide the vector by.
-     * @return a new divided vector.
-     */
+    * @brief     Get the result of division on this vector.
+    * @param     Divisor What to divide the vector by.
+    * @return    a new divided vector.
+    */
     Vector4
     operator/(float Divisor) const;
 
     /**
-     * @brief Scale this vector.
-     * @param Scale What to multiply the vector by.
-     * @return reference to this vector after multiplication.
-     */
+    * @brief     Scale this vector.
+    * @param     Scale What to multiply the vector by.
+    * @return    reference to this vector after multiplication.
+    */
     Vector4&
     operator*=(float Scale);
 
     /**
-     * @brief Divide this vector by a scalar.
-     * @param Divisor What to divide the vector by.
-     * @return reference to this vector after division.
-     */
+    * @brief     Divide this vector by a scalar.
+    * @param     Divisor What to divide the vector by.
+    * @return    reference to this vector after division.
+    */
     Vector4&
     operator/=(float Divisor);
 
     /**
-     * @brief     Calculates the dot (scalar) product of this vector with another.
-     * @param[in] Other Vector4I to realize dot product
-     * @return    the range of similarity from one vector to the other
-     */
+    * @brief     Calculates the dot (scalar) product of this vector with another.
+    * @param[in] Other Vector4I to realize dot product
+    * @return    the range of similarity from one vector to the other
+    */
     float
     dot(const Vector4& vec) const;
 
     /**
-     * @brief     Calculates the cross (product) vector of this vector with another.
-     * @param[in] Other Vector4I to realize dot product
-     * @return    product vector
-     */
+    * @brief     Calculates the cross (product) vector of this vector with another.
+    * @param[in] Other Vector4I to realize dot product
+    * @return    product vector
+    */
     Vector4
     cross(const Vector4& vec) const;
 

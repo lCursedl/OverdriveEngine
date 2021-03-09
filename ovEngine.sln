@@ -6,6 +6,14 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ovUtilities", "ovUtilities\ovUtilities.vcxproj", "{6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ovUtilities_UnitTest", "ovUtilities_UnitTest\ovUtilities_UnitTest.vcxproj", "{BC02E159-5A39-4F66-9D4E-4958413E4119}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C} = {6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ovCore", "ovCore\ovCore.vcxproj", "{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C} = {6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +59,22 @@ Global
 		{BC02E159-5A39-4F66-9D4E-4958413E4119}.Release|x64.Build.0 = Release|x64
 		{BC02E159-5A39-4F66-9D4E-4958413E4119}.Release|x86.ActiveCfg = Release|Win32
 		{BC02E159-5A39-4F66-9D4E-4958413E4119}.Release|x86.Build.0 = Release|Win32
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Debug_DLL|x64.ActiveCfg = Release_DLL|x64
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Debug_DLL|x64.Build.0 = Release_DLL|x64
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Debug_DLL|x86.ActiveCfg = Debug_DLL|Win32
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Debug_DLL|x86.Build.0 = Debug_DLL|Win32
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Debug|x64.ActiveCfg = Debug_DLL|x64
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Debug|x64.Build.0 = Debug_DLL|x64
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Debug|x86.ActiveCfg = Debug_DLL|Win32
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Debug|x86.Build.0 = Debug_DLL|Win32
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Release_DLL|x64.ActiveCfg = Release_DLL|x64
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Release_DLL|x64.Build.0 = Release_DLL|x64
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Release_DLL|x86.ActiveCfg = Release_DLL|Win32
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Release_DLL|x86.Build.0 = Release_DLL|Win32
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Release|x64.ActiveCfg = Release_DLL|x64
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Release|x64.Build.0 = Release_DLL|x64
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Release|x86.ActiveCfg = Release_DLL|Win32
+		{C40C20AC-4BD0-45CB-8ED7-F2208715FF16}.Release|x86.Build.0 = Release_DLL|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

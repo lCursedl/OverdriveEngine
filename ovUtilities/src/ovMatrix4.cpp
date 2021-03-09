@@ -85,6 +85,13 @@ namespace ovEngineSDK {
     return !(*this == Mat);
   }
 
+  void Matrix4::operator=(const Matrix4& Mat) {
+    xVector = Mat.xVector;
+    yVector = Mat.yVector;
+    zVector = Mat.zVector;
+    wVector = Mat.wVector;
+  }
+
   Matrix4 Matrix4::transpose() const {
     Matrix4 Result;
     Result.xVector.x = xVector.x;
