@@ -18,30 +18,51 @@
     <ClCompile Include="src\Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ovDXBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovDXInputLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovDXPixelShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovDXSamplerState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovDXTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovDXVertexShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ovDXGraphicsAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ovFormats.h">
+    <ClInclude Include="include\ovDXBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ovTexture.h">
+    <ClInclude Include="include\ovDXInputLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ovBuffer.h">
+    <ClInclude Include="include\ovDXPixelShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ovInputLayout.h">
+    <ClInclude Include="include\ovDXSamplerState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ovShader.h">
+    <ClInclude Include="include\ovDXShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ovShaderProgram.h">
+    <ClInclude Include="include\ovDXTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ovSamplerState.h">
+    <ClInclude Include="include\ovDXVertexShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ovGraphicsAPI.h">
+    <ClInclude Include="include\ovDXGraphicsAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

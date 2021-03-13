@@ -101,7 +101,7 @@ namespace ovEngineSDK {
   * @brief       FIFO data structure.
   */
   template<typename T, typename A = std::allocator<T>>
-  using Queue = std::queue<T, std:.deque<T, A>>;
+  using Queue = std::queue<T, std::deque<T, A>>;
 
   /**
    * @brief      Associative container containing an ordered set of elements.
