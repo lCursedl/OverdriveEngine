@@ -1,5 +1,5 @@
 #pragma once
-#include <ovPrerequisitesUtil.h>
+#include <ovPrerequisitesCore.h>
 #include <ovFormats.h>
 
 namespace ovEngineSDK {

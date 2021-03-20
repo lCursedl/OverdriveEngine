@@ -5,146 +5,149 @@
 #include <ovDXInputLayout.h>
 #include <ovDXSamplerState.h>
 #include <wincodec.h>
-#include <wincodec.h>
 
 namespace ovEngineSDK {
-  //bool DXGraphicsAPI::init(HWND window) {
-  //  D3D_DRIVER_TYPE m_DriverType = D3D_DRIVER_TYPE_nullptr;
-  //  D3D_FEATURE_LEVEL m_FeatureLevel = D3D_FEATURE_LEVEL_11_0;
-  //  m_device = nullptr;
-  //  m_deviceContext = nullptr;
-  //  m_swapChain = nullptr;
+  bool DXGraphicsAPI::init(void* window) {
+    HWND wHandle = static_cast<HWND>(window);
+    if (nullptr == wHandle) {
+      return false;
+    }
+    D3D_DRIVER_TYPE m_DriverType = D3D_DRIVER_TYPE_NULL;
+    D3D_FEATURE_LEVEL m_FeatureLevel = D3D_FEATURE_LEVEL_11_0;
+    m_device = nullptr;
+    m_deviceContext = nullptr;
+    m_swapChain = nullptr;
 
-  //  HRESULT hr = S_OK;
-  //  RECT rc;
-  //  GetClientRect(window, &rc);
+    HRESULT hr = S_OK;
+    RECT rc;
+    GetClientRect(wHandle, &rc);
 
-  //  uint32 width = rc.right - rc.left;
-  //  uint32 height = rc.bottom - rc.top;
+    uint32 width = rc.right - rc.left;
+    uint32 height = rc.bottom - rc.top;
 
-  //  uint32 createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+    uint32 createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
 
-  //  D3D_DRIVER_TYPE driverTypes[] = {
-  //    D3D_DRIVER_TYPE_HARDWARE,
-  //    D3D_DRIVER_TYPE_WARP,
-  //    D3D_DRIVER_TYPE_REFERENCE,
-  //  };
-  //  uint32 numDriverTypes = ARRAYSIZE(driverTypes);
+    D3D_DRIVER_TYPE driverTypes[] = {
+      D3D_DRIVER_TYPE_HARDWARE,
+      D3D_DRIVER_TYPE_WARP,
+      D3D_DRIVER_TYPE_REFERENCE,
+    };
+    uint32 numDriverTypes = ARRAYSIZE(driverTypes);
 
-  //  D3D_FEATURE_LEVEL featureLevels[] = {
-  //    D3D_FEATURE_LEVEL_11_0,
-  //    D3D_FEATURE_LEVEL_10_1,
-  //    D3D_FEATURE_LEVEL_10_0,
-  //  };
-  //  uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
+    D3D_FEATURE_LEVEL featureLevels[] = {
+      D3D_FEATURE_LEVEL_11_0,
+      D3D_FEATURE_LEVEL_10_1,
+      D3D_FEATURE_LEVEL_10_0,
+    };
+    uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
 
-  //  DXGI_SWAP_CHAIN_DESC sd;
-  //  ZeroMemory(&sd, sizeof(sd));
-  //  sd.BufferCount = 1;
-  //  sd.BufferDesc.Width = width;
-  //  sd.BufferDesc.Height = height;
-  //  sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-  //  sd.BufferDesc.RefreshRate.Numerator = 60;
-  //  sd.BufferDesc.RefreshRate.Denominator = 1;
-  //  sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-  //  sd.OutputWindow = window;
-  //  sd.SampleDesc.Count = 1;
-  //  sd.SampleDesc.Quality = 0;
-  //  sd.Windowed = true;
+    DXGI_SWAP_CHAIN_DESC sd;
+    ZeroMemory(&sd, sizeof(sd));
+    sd.BufferCount = 1;
+    sd.BufferDesc.Width = width;
+    sd.BufferDesc.Height = height;
+    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    sd.BufferDesc.RefreshRate.Numerator = 60;
+    sd.BufferDesc.RefreshRate.Denominator = 1;
+    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    sd.OutputWindow = wHandle;
+    sd.SampleDesc.Count = 1;
+    sd.SampleDesc.Quality = 0;
+    sd.Windowed = true;
 
-  //  for (uint32 driverTypeIndex = 0;
-  //    driverTypeIndex < numDriverTypes;
-  //    driverTypeIndex++) {
-  //    m_DriverType = driverTypes[driverTypeIndex];
-  //    hr = D3D11CreateDeviceAndSwapChain(nullptr,
-  //      m_DriverType,
-  //      nullptr,
-  //      createDeviceFlags,
-  //      featureLevels,
-  //      numFeatureLevels,
-  //      D3D11_SDK_VERSION,
-  //      &sd,
-  //      &m_swapChain,
-  //      &m_device,
-  //      &m_FeatureLevel,
-  //      &m_deviceContext);
-  //    if (SUCCEEDED(hr))
-  //      break;
-  //  }
-  //  if (FAILED(hr)) {
-  //    return false;
-  //  }
+    for (uint32 driverTypeIndex = 0;
+      driverTypeIndex < numDriverTypes;
+      driverTypeIndex++) {
+      m_DriverType = driverTypes[driverTypeIndex];
+      hr = D3D11CreateDeviceAndSwapChain(nullptr,
+        m_DriverType,
+        nullptr,
+        createDeviceFlags,
+        featureLevels,
+        numFeatureLevels,
+        D3D11_SDK_VERSION,
+        &sd,
+        &m_swapChain,
+        &m_device,
+        &m_FeatureLevel,
+        &m_deviceContext);
+      if (SUCCEEDED(hr))
+        break;
+    }
+    if (FAILED(hr)) {
+      return false;
+    }
 
-  //  DXTexture* backBuffer = new DXTexture();
+    DXTexture* backBuffer = new DXTexture();
 
-  //  //Create RTV
-  //  hr = m_swapChain->GetBuffer(0,
-  //    __uuidof(ID3D11Texture2D),
-  //    (LPVOID*)
-  //    &backBuffer->m_texture);
-  //  if (FAILED(hr)) {
-  //    delete backBuffer;
-  //    return false;
-  //  }
+    //Create RTV
+    hr = m_swapChain->GetBuffer(0,
+      __uuidof(ID3D11Texture2D),
+      (LPVOID*)
+      &backBuffer->m_texture);
+    if (FAILED(hr)) {
+      delete backBuffer;
+      return false;
+    }
 
-  //  hr = m_device->CreateRenderTargetView(
-  //    backBuffer->m_texture,
-  //    nullptr, &backBuffer->m_rtv);
-  //  if (FAILED(hr)) {
-  //    delete backBuffer;
-  //    return false;
-  //  }
+    hr = m_device->CreateRenderTargetView(
+      backBuffer->m_texture,
+      nullptr, &backBuffer->m_rtv);
+    if (FAILED(hr)) {
+      delete backBuffer;
+      return false;
+    }
 
-  //  DXTexture* depthTexture = new DXTexture();
+    DXTexture* depthTexture = new DXTexture();
 
-  //  //Create depth stencil texture
-  //  D3D11_TEXTURE2D_DESC descDepth;
-  //  ZeroMemory(&descDepth, sizeof(descDepth));
-  //  descDepth.Width = width;
-  //  descDepth.Height = height;
-  //  descDepth.MipLevels = 1;
-  //  descDepth.ArraySize = 1;
-  //  descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-  //  descDepth.SampleDesc.Count = 1;
-  //  descDepth.SampleDesc.Quality = 0;
-  //  descDepth.Usage = D3D11_USAGE_DEFAULT;
-  //  descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-  //  descDepth.CPUAccessFlags = 0;
-  //  descDepth.MiscFlags = 0;
-  //  hr = m_device->CreateTexture2D(&descDepth, nullptr, &depthTexture->m_texture);
-  //  if (FAILED(hr)) {
-  //    delete backBuffer;
-  //    delete depthTexture;
-  //    return false;
-  //  }
+    //Create depth stencil texture
+    D3D11_TEXTURE2D_DESC descDepth;
+    ZeroMemory(&descDepth, sizeof(descDepth));
+    descDepth.Width = width;
+    descDepth.Height = height;
+    descDepth.MipLevels = 1;
+    descDepth.ArraySize = 1;
+    descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    descDepth.SampleDesc.Count = 1;
+    descDepth.SampleDesc.Quality = 0;
+    descDepth.Usage = D3D11_USAGE_DEFAULT;
+    descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    descDepth.CPUAccessFlags = 0;
+    descDepth.MiscFlags = 0;
+    hr = m_device->CreateTexture2D(&descDepth, nullptr, &depthTexture->m_texture);
+    if (FAILED(hr)) {
+      delete backBuffer;
+      delete depthTexture;
+      return false;
+    }
 
-  //  //Create depth stencil view
-  //  D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-  //  ZeroMemory(&descDSV, sizeof(descDSV));
-  //  descDSV.Format = descDepth.Format;
-  //  descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-  //  descDSV.Texture2D.MipSlice = 0;
-  //  hr = m_device->CreateDepthStencilView(depthTexture->m_texture,
-  //    &descDSV,
-  //    &depthTexture->m_dsv);
-  //  if (FAILED(hr)) {
-  //    delete backBuffer;
-  //    delete depthTexture;
-  //    return false;
-  //  }
+    //Create depth stencil view
+    D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+    ZeroMemory(&descDSV, sizeof(descDSV));
+    descDSV.Format = descDepth.Format;
+    descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    descDSV.Texture2D.MipSlice = 0;
+    hr = m_device->CreateDepthStencilView(depthTexture->m_texture,
+      &descDSV,
+      &depthTexture->m_dsv);
+    if (FAILED(hr)) {
+      delete backBuffer;
+      delete depthTexture;
+      return false;
+    }
 
-  //  //Set main RTV and DSV by default
-  //  m_deviceContext->OMSetRenderTargets(1, &backBuffer->m_rtv, depthTexture->m_pDSV);
+    //Set main RTV and DSV by default
+    m_deviceContext->OMSetRenderTargets(1, &backBuffer->m_rtv, depthTexture->m_dsv);
 
-  //  m_backBuffer = backBuffer;
-  //  m_depthStencil = depthTexture;
+    m_backBuffer = backBuffer;
+    m_depthStencil = depthTexture;
 
-  //  fillFormats();
+    fillFormats();
 
-  //  return true;
-  //}
+    return true;
+  }
 
-  void DXGraphicsAPI::shutdown() {
+void DXGraphicsAPI::shutdown() {
     m_deviceContext->ClearState();
     delete m_depthStencil;
     delete m_backBuffer;
@@ -431,7 +434,7 @@ namespace ovEngineSDK {
     DXInputLayout* ILayout = new DXInputLayout();
 
     if (FAILED(m_device->CreateInputLayout(layout.data(),
-                                           layout.size(),
+                                           static_cast<UINT>(layout.size()),
                                            VS->m_blob->GetBufferPointer(),
                                            VS->m_blob->GetBufferSize(),
                                            &ILayout->m_InputLayout))) {
@@ -557,12 +560,12 @@ namespace ovEngineSDK {
 
   void DXGraphicsAPI::setViewport(int32 topLeftX, int32 topLeftY, int32 width, int32 height) {
     D3D11_VIEWPORT vp;
-    vp.Width = width;
-    vp.Height = height;
+    vp.Width = static_cast<FLOAT>(width);
+    vp.Height = static_cast<FLOAT>(height);
     vp.MinDepth = 0.f;
     vp.MaxDepth = 1.f;
-    vp.TopLeftX = topLeftX;
-    vp.TopLeftY = topLeftY;
+    vp.TopLeftX = static_cast<FLOAT>(topLeftX);
+    vp.TopLeftY = static_cast<FLOAT>(topLeftY);
     m_deviceContext->RSSetViewports(1, &vp);
   }
 

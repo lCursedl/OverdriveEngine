@@ -1,14 +1,16 @@
 #pragma once
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include <ovPrerequisitesUtil.h>
+#include <windows.h>
+
+#include <ovPrerequisitesCore.h>
 #include <ovGraphicsAPI.h>
 
 namespace ovEngineSDK {
   class DXGraphicsAPI final : public GraphicsAPI
   {
    public:
-    //bool init(HWND window)                                    override;
+    bool init(void* window)                                           override;
     void shutdown()                                                   override;
     //glm::mat4 matrix4Policy(const glm::mat4& mat)             override;
 

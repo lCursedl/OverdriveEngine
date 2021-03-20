@@ -26,7 +26,7 @@ namespace ovEngineSDK {
     }
   }
 
-  /*bool OGLGraphicsAPI::init(HWND window) {
+  bool OGLGraphicsAPI::init(void* window) {
     PIXELFORMATDESCRIPTOR pfd =
     {
       sizeof(PIXELFORMATDESCRIPTOR),
@@ -47,7 +47,7 @@ namespace ovEngineSDK {
       0, 0, 0
     };
 
-    m_handle = GetDC(window);
+    m_handle = GetDC(static_cast<HWND>(window));
     int32 pixelFormat = ChoosePixelFormat(m_handle, &pfd);
 
     SetPixelFormat(m_handle, pixelFormat, &pfd);
@@ -64,7 +64,7 @@ namespace ovEngineSDK {
     fillFormats();
 
     return true;
-  }*/
+  }
 
   void OGLGraphicsAPI::shutdown() {
     wglDeleteContext(oglRenderContext);

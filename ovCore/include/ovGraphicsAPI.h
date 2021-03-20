@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ovPrerequisitesUtil.h>
+#include <ovPrerequisitesCore.h>
 
 #include <ovTexture.h>
 #include <ovShader.h>
@@ -8,7 +8,6 @@
 #include <ovShaderProgram.h>
 #include <ovInputLayout.h>
 #include <ovSamplerState.h>
-#include <windows.h>
 
 namespace ovEngineSDK {
   /**
@@ -51,9 +50,9 @@ namespace ovEngineSDK {
      /**
      * @fn       bool init(HWND window)
      * @brief    Initializes and creates the necesary elements for basic rendering.
-     * @param[in]window HWND properly created for use.
+     * @param[in]window Window handler of the window properly created for use.
      */
-     //virtual bool init(HWND window) = 0;
+     virtual bool init(void* window) = 0;
 
      /** 
      * @fn       void shutdown()
