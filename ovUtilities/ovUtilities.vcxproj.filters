@@ -84,5 +84,8 @@
     <ClInclude Include="include\ovMatrix4.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ovModule.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

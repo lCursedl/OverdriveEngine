@@ -190,6 +190,7 @@
     <ClInclude Include="include\ovDegree.h" />
     <ClInclude Include="include\ovMath.h" />
     <ClInclude Include="include\ovMatrix4.h" />
+    <ClInclude Include="include\ovModule.h" />
     <ClInclude Include="include\ovPlatformDefines.h" />
     <ClInclude Include="include\ovPlatformTypes.h" />
     <ClInclude Include="include\ovPrerequisitesUtil.h" />
