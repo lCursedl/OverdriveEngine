@@ -10,6 +10,9 @@ namespace ovEngineSDK {
   class DXGraphicsAPI final : public GraphicsAPI
   {
    public:
+    DXGraphicsAPI() = default;
+    ~DXGraphicsAPI() = default;
+
     bool init(void* window)                                           override;
     void shutdown()                                                   override;
     //glm::mat4 matrix4Policy(const glm::mat4& mat)             override;
@@ -87,4 +90,10 @@ namespace ovEngineSDK {
                                   ID3DBlob** ppBlobOut);
     void fillFormats();
   };
+
+  extern "C" OV_PLUGIN_EXPORT DXGraphicsAPI*
+  createGraphicsAPI() {
+    auto pDX = new DXGraphicsAPI();
+    return pDX;
+  }
 }

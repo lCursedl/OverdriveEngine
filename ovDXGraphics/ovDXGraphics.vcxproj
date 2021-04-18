@@ -176,7 +176,6 @@
     <ClCompile Include="src\ovDXSamplerState.cpp" />
     <ClCompile Include="src\ovDXTexture.cpp" />
     <ClCompile Include="src\ovDXVertexShader.cpp" />
-    <ClCompile Include="src\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovDXBuffer.h" />

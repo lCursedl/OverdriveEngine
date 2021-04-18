@@ -8,6 +8,7 @@
 #include <ovShaderProgram.h>
 #include <ovInputLayout.h>
 #include <ovSamplerState.h>
+#include <ovModule.h>
 
 namespace ovEngineSDK {
   /**
@@ -44,7 +45,7 @@ namespace ovEngineSDK {
   * @class       CGraphicsAPI
   *	@brief       Class which serves as an interface for CDXGraphicsAPI & COGLGraphicsAPI.
   */
-  class GraphicsAPI
+  class GraphicsAPI : public Module<GraphicsAPI>
   {
    public:
      /**
@@ -52,13 +53,21 @@ namespace ovEngineSDK {
      * @brief    Initializes and creates the necesary elements for basic rendering.
      * @param[in]window Window handler of the window properly created for use.
      */
-     virtual bool init(void* window) = 0;
+     virtual bool init(void* window) {return false;}
 
      /** 
      * @fn       void shutdown()
      * @brief    Releases memory and deletes all resources created by the API.
      */
-     virtual void shutdown() = 0;
+     virtual void shutdown() {};
+
+     /**
+     * @fn
+     */
+     FORCEINLINE void
+     setObject(GraphicsAPI* _api) {
+      GraphicsAPI::_instance() = _api;
+     }
 
      /**
      * @fn       glm::mat4 matrix4Policy(const glm::mat4 & mat)
@@ -85,22 +94,21 @@ namespace ovEngineSDK {
      virtual Texture* createTexture(int32 width,
                                     int32 height,
                                     TEXTURE_BINDINGS::E binding,
-                                    FORMATS::E format) = 0;
-
+                                    FORMATS::E format) { return nullptr;}
      /**
      * @fn       Texture* createTextureFromFile(std::string path)
      * @brief    Loads a texture file and returns a CTexture pointer with its data.
      * @param[in]path The path to the file.
      * @return   Texture pointer for the corresponding API with data.
      */
-     virtual Texture* createTextureFromFile(std::string path) = 0;
+     //virtual Texture* createTextureFromFile(std::string path) = 0;
 
      /**
      * @fn       ShaderProgram* createShaderProgram()
      * @brief    Creates a shader program and returns it.
      * @return   ShaderProgram pointer of the corresponding API.
      */
-     virtual ShaderProgram* createShaderProgram() = 0;
+     virtual ShaderProgram* createShaderProgram() {return nullptr;}
 
      /**
      * @fn       CBuffer* createBuffer(const void * data, int32 size, BUFFER_TYPE type)
@@ -113,7 +121,7 @@ namespace ovEngineSDK {
      */
      virtual Buffer* createBuffer(const void* data,
                                   uint32 size,
-                                  BUFFER_TYPE::E type) = 0;
+                                  BUFFER_TYPE::E type) {return nullptr;}
 
      /**
      * @fn       InputLayout* createInputLayout(CShaderProgram* program, LAYOUT_DESC desc)
@@ -123,7 +131,7 @@ namespace ovEngineSDK {
      * @return   InputLayout pointer of the corresponding API.
      */
      virtual InputLayout* createInputLayout(ShaderProgram* program,
-                                            LAYOUT_DESC desc) = 0;
+                                            LAYOUT_DESC desc) {return nullptr;}
 
      /**
      * @fn       SamplerState* createSamplerState(FILTER_LEVEL mag, FILTER_LEVEL min,
@@ -142,7 +150,7 @@ namespace ovEngineSDK {
                                               FILTER_LEVEL::E min,
                                               FILTER_LEVEL::E mip,
                                               uint32 anisotropic,
-                                              WRAPPING::E wrapMode) = 0;
+                                              WRAPPING::E wrapMode) {return nullptr;}
 
      /**
      * @fn       CVertexShader* createVertexShader(std::wstring file)
@@ -150,7 +158,7 @@ namespace ovEngineSDK {
      * @param[in]file Filename of the vertex shader.
      * @return   VertexShader pointer of the corresponding API.
      */
-     virtual VertexShader* createVertexShader(std::wstring file) = 0;
+     virtual VertexShader* createVertexShader(std::wstring file) {return nullptr;};
 
      /**
      * @fn       PixelShader* createPixelShader(std::wstring file)
@@ -158,7 +166,7 @@ namespace ovEngineSDK {
      * @param[in]file Filename of the pixel shader.
      * @return   PixelShader pointer of the corresponding API.
      */
-     virtual PixelShader* createPixelShader(std::wstring file) = 0;
+     virtual PixelShader* createPixelShader(std::wstring file) {return nullptr;}
 
      /***********************************************************************************/
      /*----------------------------DEVICE CONTEXT---------------------------------------*/
@@ -168,7 +176,7 @@ namespace ovEngineSDK {
      * @fn       void setBackBuffer()
      * @brief    Sets the default render target view and depth stencil view as current.
      */
-     virtual void setBackBuffer() = 0;
+     virtual void setBackBuffer() {}
 
      /**
      * @fn       setViewport(int32 topLeftX, int32 topLeftY, int32 width, int32 height)
@@ -181,21 +189,21 @@ namespace ovEngineSDK {
      virtual void setViewport(int32 topLeftX,
                               int32 topLeftY,
                               int32 width,
-                              int32 height) = 0;
+                              int32 height) {}
 
      /**
      * @fn void  drawIndexed(uint32 indices)
      * @brief    Makes a draw call with the specified amount of indices.
      * @param[in]indices Amount of indices in geometry to draw.
      */
-     virtual void drawIndexed(uint32 indices) = 0;
+     virtual void drawIndexed(uint32 indices) {}
 
      /**	\fn void draw()
      *	\brief Makes a draw call with the currently bound vertex buffer.
      *	@param[in] count Amount of vertices.
      *	@param[in] first Start location to read the vertices.
      */
-     virtual void draw(uint32 count, uint32 first) = 0;
+     virtual void draw(uint32 count, uint32 first) {}
 
      /**
      * @fn       void setShaders(CShaderProgram* program)
@@ -203,21 +211,21 @@ namespace ovEngineSDK {
      *	         as current.
      * @param[in]program CShaderProgram pointer from where to take shaders.
      */
-     virtual void setShaders(ShaderProgram* program) = 0;
+     virtual void setShaders(ShaderProgram* program) {}
 
      /**
      * @fn       void setInputLayout(CInputLayout* layout)
      * @brief    Receives an input layout and sets it as current.
      * @param[in] layout CInputLayout pointer from where to take the layout.
      */
-     virtual void setInputLayout(InputLayout* layout) = 0;
+     virtual void setInputLayout(InputLayout* layout) {}
 
      /**
      * @fn       void clearBackBuffer(COLOR color)
      * @brief    Clears default render target with specified color and depth stencil.
      * @param[in]color Color in which to clear the render target.
      */
-     virtual void clearBackBuffer(COLOR color) = 0;
+     virtual void clearBackBuffer(COLOR color) {}
 
      /** 
      * @fn       void setRenderTarget(CTexture* texture, CTexture* depth)
@@ -226,7 +234,7 @@ namespace ovEngineSDK {
      * @param[in]depth CTexture pointer which contains the depth stencil.
      *	         depth can be nullptr if only render target wants to be set.
      */
-     virtual void setRenderTarget(Texture* texture, Texture* depth) = 0;
+     virtual void setRenderTarget(Texture* texture, Texture* depth) {}
 
      /**
      * @fn       void updateBuffer(CBuffer* buffer, const void * data)
@@ -234,7 +242,7 @@ namespace ovEngineSDK {
      * @param[in]buffer Buffer to update.
      * @param[in]data Pointer of the data to assign to buffer.
      */
-     virtual void updateBuffer(Buffer* buffer, const void* data) = 0;
+     virtual void updateBuffer(Buffer* buffer, const void* data) {}
 
      /**
      * @fn       void setVertexBuffer(CBuffer* buffer)
@@ -246,7 +254,7 @@ namespace ovEngineSDK {
      */
      virtual void setVertexBuffer(Buffer* buffer,
                                   uint32 stride,
-                                  uint32 offset) = 0;
+                                  uint32 offset) {}
 
      /**
      * @fn       void setIndexBuffer(CBuffer* buffer)
@@ -254,7 +262,7 @@ namespace ovEngineSDK {
      * @param[in]buffer Buffer to set.
      * @warning  If buffer is nullptr, no operations are done.
      */
-     virtual void setIndexBuffer(Buffer* buffer) = 0;
+     virtual void setIndexBuffer(Buffer* buffer) {}
 
      /** 
      * @fn       void setSamplerState(CTexture* texture, CSamplerState* sampler)
@@ -265,7 +273,7 @@ namespace ovEngineSDK {
      */
      virtual void setSamplerState(uint32 slot,
                                   Texture* texture,
-                                  SamplerState* sampler) = 0;
+                                  SamplerState* sampler) {}
 
      /**
      * @fn       void setConstantBuffer(uint32 slot, CBuffer* buffer,
@@ -278,7 +286,7 @@ namespace ovEngineSDK {
      */
      virtual void setConstantBuffer(uint32 slot,
                                     Buffer* buffer,
-                                    SHADER_TYPE::E shaderType) = 0;
+                                    SHADER_TYPE::E shaderType) {}
 
      /**
      * @fn       void clearRenderTarget(CTexture* rt, COLOR color)
@@ -286,13 +294,13 @@ namespace ovEngineSDK {
      * @param[in] rt Render target to clear.
      * @param[in] color COLOR to use for clearing.
      */
-     virtual void clearRenderTarget(Texture* rt, COLOR color) = 0;
+     virtual void clearRenderTarget(Texture* rt, COLOR color) {}
 
      /**
      * @fn       void clearDepthStencil(CTexture* ds)
      * @brief    Clears the specified depth stencil.
      */
-     virtual void clearDepthStencil(Texture* ds) = 0;
+     virtual void clearDepthStencil(Texture* ds) {}
 
      /**
      * @fn       void setTexture(uint32 slot, CTexture* texture)
@@ -300,14 +308,14 @@ namespace ovEngineSDK {
      * @param[in]slot Index of the texture in the shader.
      * @param[in]texture Texture to set.
      */
-     virtual void setTexture(uint32 slot, Texture* texture) = 0;
+     virtual void setTexture(uint32 slot, Texture* texture) {}
 
      /**
      * @fn       void setTopology(TOPOLOGY topology)
      * @brief    Sets the topology type for vertex data.
      * @param[in]topology TOPOLOGY type to set.
      */
-     virtual void setTopology(TOPOLOGY::E topology) = 0;
+     virtual void setTopology(TOPOLOGY::E topology) {}
 
      //SWAPCHAIN
 
@@ -315,7 +323,7 @@ namespace ovEngineSDK {
      * @fn       void swapBuffer()
      * @brief    Swaps the back buffer with the front buffer and presents it.
      */
-     virtual void swapBuffer() = 0;
+     virtual void swapBuffer() {}
 
      /**
      * @fn       void resizeBackBuffer(uint32 width, uint32 height)
@@ -323,6 +331,11 @@ namespace ovEngineSDK {
      * @param[in]width New X dimension for back buffer.
      * @param[in]height New Y dimension for back buffer.
      */
-     virtual void resizeBackBuffer(uint32 width, uint32 height) = 0;
+     virtual void resizeBackBuffer(uint32 width, uint32 height) {}
   };
+
+  OV_CORE_EXPORT GraphicsAPI&
+  g_graphicsAPI();
+
+  using funCreateGraphicsAPI = GraphicsAPI * (*)();
 }

@@ -63,6 +63,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <chrono>
+
 namespace ovEngineSDK {
   /**
   * @brief       Double ended queue for fast insertion and removal at
@@ -135,4 +137,8 @@ namespace ovEngineSDK {
     typename P = std::less<K>,
     typename A = std::allocator<std::pair<const K, V>>>
     using MultiMap = std::multimap<K, V, P, A>;
+
+  using String = std::string;
+
+  using WString = std::wstring;
 }
