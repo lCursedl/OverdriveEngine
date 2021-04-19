@@ -91,7 +91,7 @@ namespace ovEngineSDK {
     void fillFormats();
   };
 
-  extern "C" OV_PLUGIN_EXPORT DXGraphicsAPI*
+  extern "C" OV_PLUGIN_EXPORT GraphicsAPI*
   createGraphicsAPI() {
     auto pDX = new DXGraphicsAPI();
     return pDX;

@@ -15,7 +15,6 @@ namespace ovEngineSDK {
     virtual ~BaseApp() = default;
     int32
     run();
-    void eventHandler(sf::Event event);
    protected:
     
     /*
@@ -48,9 +47,6 @@ namespace ovEngineSDK {
 
    private:
     void
-    createWindow();
-
-    void
     update(float delta);
 
     void
@@ -61,9 +57,16 @@ namespace ovEngineSDK {
 
     void
     destroySystems();
+
+    void
+    createWindow();
+
    protected:
     WindowHandle m_windowHandle;
     Plugin m_directXPlugin;
     GraphicsAPI* m_graphicsAPI = nullptr;
+    bool m_runApp = false;
+
+    static LRESULT CALLBACK WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam);
   };
 }

@@ -4,12 +4,23 @@ namespace ovEngineSDK {
   int32
   BaseApp::run() {
     initSystems();
+    createWindow();
+    m_graphicsAPI->init(m_windowHandle);
+    onCreate();
+    MSG msg = {};
+    while (WM_QUIT != msg.message) {
+      if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+      }
+      else {
+        update(0.f);
+        render();
+      }      
+    }      
+    onClear();
+    destroySystems();
     return 0;
-  }
-
-  void
-  BaseApp::eventHandler(sf::Event event) {
-    
   }
 
   void
@@ -26,14 +37,13 @@ namespace ovEngineSDK {
 
   void BaseApp::onClear() {
   }
-
-  void BaseApp::createWindow() {
-  }
-
+  
   void BaseApp::update(float delta) {
+    onUpdate();
   }
 
   void BaseApp::render() {
+    onRender();
   }
 
   void BaseApp::initSystems() {
@@ -43,13 +53,56 @@ namespace ovEngineSDK {
       GraphicsAPI::startUp();
       GraphicsAPI* graphicAPI = createGraphicsAPI();
       g_graphicsAPI().setObject(graphicAPI);
-      m_graphicsAPI = &g_graphicsAPI();
-      m_graphicsAPI->init(m_windowHandle);
+      m_graphicsAPI = &g_graphicsAPI();      
     }
   }
 
   void
   BaseApp::destroySystems() {
+    m_graphicsAPI->shutdown();
     g_graphicsAPI().shutDown();
+  }
+
+  void BaseApp::createWindow() {
+    //Register window class
+    WNDCLASS wc = {};
+    wc.lpfnWndProc = WndProc;
+    wc.hInstance = GetModuleHandle(0);
+    wc.lpszClassName = "overdrive";
+
+    RegisterClass(&wc);
+
+    //Create window
+    HWND hwnd = CreateWindowEx(
+      0,
+      "overdrive",
+      "Overdrive Engine",
+      WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT,
+      CW_USEDEFAULT,
+      800,
+      600,
+      nullptr,
+      nullptr,
+      wc.hInstance,
+      nullptr);
+
+    ShowWindow(hwnd, 10);
+    m_windowHandle = hwnd;
+  }
+  LRESULT BaseApp::WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam) {
+    PAINTSTRUCT ps;
+    HDC hdc;
+
+    switch (message)
+    {
+    case WM_DESTROY:
+      PostQuitMessage(0);
+      break;
+    default:
+      return DefWindowProc(hWnd, message, wParam, lParam);
+      break;
+    }
+    return 0;
   }
 }

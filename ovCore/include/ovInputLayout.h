@@ -56,7 +56,7 @@ namespace ovEngineSDK {
     *	@param[in] offset	int with value for the layout offset
     *	@param[in] elements	int with value for the amount of elements in layout
     */
-    void addToDesc(SEMANTIC::E semantic, FORMATS::E format, int offset, int elements)
+    void addToDesc(SEMANTIC::E semantic, FORMATS::E format, int32 offset, int32 elements)
     {
       LAYOUT L(semantic, format, offset, elements);
       v_Layout.push_back(L);
