@@ -96,11 +96,39 @@ namespace ovEngineSDK {
     return *this;
   }
 
+  Vector3
+  Vector3::operator^(const Vector3& v) const {
+      return Vector3(y * v.z - z * v.y,
+                     z * v.x - x * v.z,
+                     x * v.y - y * v.x);
+  }
+
+  Vector3 Vector3::operator-() const {
+      return Vector3(-x, -y, -z);
+  }
+
   float Vector3::dot(const Vector3& vec) const {
     return x * vec.x + y * vec.y + z * vec.z;
   }
 
+  Vector3
+  Vector3::cross(const Vector3& a, const Vector3& b) {
+    return a ^ b;
+  }
+
   float Vector3::magnitude() {
     return static_cast<float>(std::sqrtf(x * x + y * y + z * z));
+  }
+
+  bool Vector3::normalize(float tolerance) {
+    const float SquareSum = (x * x) + (y * y) + (z * z);
+    if (SquareSum > tolerance) {
+      const float Scale = Math::invSqrt(SquareSum);
+      x *= Scale;
+      y *= Scale;
+      z *= Scale;
+      return true;
+    }
+    return false;
   }
 }

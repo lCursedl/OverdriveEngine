@@ -70,6 +70,10 @@ namespace ovEngineSDK {
     wglDeleteContext(oglRenderContext);
   }
 
+  Matrix4 OGLGraphicsAPI::matrix4Policy(const Matrix4& mat) {
+      return mat;
+  }
+
   /*glm::mat4 OGLGraphicsAPI::matrix4Policy(const glm::mat4& mat)
   {
     return glm::transpose(mat);
@@ -624,7 +628,7 @@ namespace ovEngineSDK {
   }
 
   void OGLGraphicsAPI::swapBuffer() {
-    //SwapBuffers(m_handle);
+    SwapBuffers(m_handle);
   }
 
   void OGLGraphicsAPI::resizeBackBuffer(uint32 width, uint32 height) {}

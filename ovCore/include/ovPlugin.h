@@ -30,6 +30,7 @@ namespace ovEngineSDK {
       destroy();
       return false;
     }
+    return true;
   }
 
   inline void*

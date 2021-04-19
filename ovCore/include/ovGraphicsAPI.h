@@ -9,6 +9,7 @@
 #include <ovInputLayout.h>
 #include <ovSamplerState.h>
 #include <ovModule.h>
+#include <ovMatrix4.h>
 
 namespace ovEngineSDK {
   /**
@@ -49,7 +50,7 @@ namespace ovEngineSDK {
   {
    public:
      /**
-     * @fn       bool init(HWND window)
+     * @fn       bool init(void* window)
      * @brief    Initializes and creates the necesary elements for basic rendering.
      * @param[in]window Window handler of the window properly created for use.
      */
@@ -60,6 +61,14 @@ namespace ovEngineSDK {
      * @brief    Releases memory and deletes all resources created by the API.
      */
      virtual void shutdown() {};
+
+     /**
+     * @fn       Matrix4 matrixPolicy(const Matrix4& mat)
+     * @brief    Returns an API compatible Matrix4.
+     * @param[in]mat A Matrix4 to convert.
+     * @return   the received matrix in the correct order.
+     */
+     virtual Matrix4 matrix4Policy(const Matrix4& mat) {return Matrix4();}
 
      /**
      * @fn

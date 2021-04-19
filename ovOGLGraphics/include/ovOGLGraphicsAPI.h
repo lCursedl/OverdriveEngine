@@ -13,7 +13,7 @@ namespace ovEngineSDK {
    public:
     bool init(void* window)                                           override;
     void shutdown()                                                   override;
-    //glm::mat4 matrix4Policy(const glm::mat4& mat)             override;
+    Matrix4 matrix4Policy(const Matrix4& mat)                         override;
 
     //DEVICE
 
@@ -82,4 +82,9 @@ namespace ovEngineSDK {
     void fillFormats();
     uint32 m_topology;
   };
+  extern "C" OV_PLUGIN_EXPORT GraphicsAPI *
+    createGraphicsAPI() {
+    auto pDX = new OGLGraphicsAPI();
+    return pDX;
+  }
 }

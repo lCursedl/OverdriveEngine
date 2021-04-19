@@ -15,7 +15,7 @@ namespace ovEngineSDK {
 
     bool init(void* window)                                           override;
     void shutdown()                                                   override;
-    //glm::mat4 matrix4Policy(const glm::mat4& mat)             override;
+    Matrix4 matrix4Policy(const Matrix4& mat)                         override;
 
     //DEVICE
 
@@ -77,11 +77,11 @@ namespace ovEngineSDK {
     void resizeBackBuffer(uint32 width, uint32 height)                override;
 
    private:
-    ID3D11Device* m_device;
-    ID3D11DeviceContext* m_deviceContext;
-    IDXGISwapChain* m_swapChain;
-    Texture* m_backBuffer;
-    Texture* m_depthStencil;
+    ID3D11Device* m_device = nullptr;
+    ID3D11DeviceContext* m_deviceContext = nullptr;
+    IDXGISwapChain* m_swapChain = nullptr;
+    Texture* m_backBuffer = nullptr;
+    Texture* m_depthStencil = nullptr;
 
     std::map<FORMATS::E, DXGI_FORMAT> m_formats;
 

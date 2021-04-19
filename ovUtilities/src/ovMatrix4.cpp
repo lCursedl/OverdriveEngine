@@ -115,4 +115,49 @@ namespace ovEngineSDK {
     Result.wVector.w = wVector.w;
     return Result;
   }
+
+  LookAtMatrix::LookAtMatrix(const Vector3& EyePosition,
+                             const Vector3& LookAtPosition,
+                             const Vector3& UpVector) {
+    Vector3 ZAxis = LookAtPosition - EyePosition;
+    ZAxis.normalize();
+    Vector3 XAxis = UpVector ^ ZAxis;
+    XAxis.normalize();
+    Vector3 YAxis = ZAxis ^ XAxis;
+
+    xVector.x = (XAxis.x);
+    xVector.y = (YAxis.x);
+    xVector.z = (ZAxis.x);
+    xVector.w = 0.f;
+
+    yVector.x = (XAxis.y);
+    yVector.y = (YAxis.y);
+    yVector.z = (ZAxis.y);
+    yVector.w = 0.f;
+
+    zVector.x = (XAxis.z);
+    zVector.y = (YAxis.z);
+    zVector.z = (ZAxis.z);
+    zVector.w = 0.f;
+
+    Vector3 negEyePos = -EyePosition;
+    wVector.x = negEyePos.dot(XAxis);
+    wVector.y = negEyePos.dot(YAxis);
+    wVector.z = negEyePos.dot(ZAxis);
+    wVector.w = 1.f;
+  }
+
+  PerspectiveMatrix::PerspectiveMatrix(float FOV,
+                                       float Width,
+                                       float Height,
+                                       float MinZ,
+                                       float MaxZ) {
+    float yScale = Math::cot(FOV / 2);
+    float xScale = yScale / (Width / Height);
+
+    xVector = Vector4(xScale, 0.f, 0.f, 0.f);
+    yVector = Vector4(0.f, yScale, 0.f, 0.f);
+    zVector = Vector4(0.f, 0.f, MaxZ / (MaxZ - MinZ), 1.f);
+    wVector = Vector4(0.f, 0.f, -MinZ * MaxZ / (MaxZ - MinZ), 0.f);
+  }
 }

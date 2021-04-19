@@ -9,6 +9,9 @@ namespace ovEngineSDK {
   const float Math::RAD2DEG = static_cast<float>(180.0f / PI);
   const float Math::LOG2 = static_cast<float>(std::log(2.0f));
 
+  const float Math::SMALL_NUMBER = (1.e-6f);
+  const float Math::BIG_NUMBER = (3.4e+38f);
+
   int32
   Math::trunc(float F) {
     return static_cast<int32>(F);
@@ -179,5 +182,9 @@ namespace ovEngineSDK {
   Radian
   Math::atan2(float Y, float X) {
     return Radian(std::atan2f(Y, X));
+  }
+
+  float Math::cot(float Value) {
+      return cos(Value) / sin(Value);
   }
 }

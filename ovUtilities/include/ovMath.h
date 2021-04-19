@@ -117,6 +117,9 @@ namespace ovEngineSDK {
        return Value * Value;
      }
 
+     static float
+     cot(float Value);
+
      /**
      * @brief     Generic Lineal Interpolation function
      * @param[in] x0 Starting value
@@ -139,5 +142,8 @@ namespace ovEngineSDK {
      static const float DEG2RAD;
      static const float RAD2DEG;
      static const float LOG2;
+
+     static const float SMALL_NUMBER;
+     static const float BIG_NUMBER;
   };
 }

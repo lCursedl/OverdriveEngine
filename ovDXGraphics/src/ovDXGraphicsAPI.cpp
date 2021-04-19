@@ -156,6 +156,11 @@ void DXGraphicsAPI::shutdown() {
     m_device->Release();
   }
 
+Matrix4
+DXGraphicsAPI::matrix4Policy(const Matrix4& mat) {
+    return mat.transpose();
+}
+
   /*glm::mat4 DXGraphicsAPI::matrix4Policy(const glm::mat4& mat)
   {
     return glm::transpose(mat);

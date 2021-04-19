@@ -140,6 +140,12 @@ namespace ovEngineSDK {
      Vector3&
      operator/=(float Divisor);
 
+     Vector3
+     operator^(const Vector3& v) const;
+
+     Vector3
+     operator-() const;
+
      /**
       * @brief     Calculates the dot (scalar) product of this vector with another.
       * @param[in] Other Vector2 to realize dot product
@@ -148,12 +154,24 @@ namespace ovEngineSDK {
      float
      dot(const Vector3 & vec) const;
 
+     Vector3
+     cross(const Vector3& a, const Vector3& b);
+
      /**
      * @brief      Calculates the lenght of the vector
      * @return     length of the vector
      */
      float
      magnitude();
+
+     /**
+     * @brief    Normalize this vector if it is large enough, otherwise set to
+     *           (0, 0, 0).
+     * @param[in]Tolerance Minimum squared lenght of vector for normalization.
+     * @return   true if the vector was normalized correctly, otherwise false.
+     */
+     bool
+     normalize(float tolerance = Math::SMALL_NUMBER);
 
    public:
     float x;

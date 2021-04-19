@@ -72,4 +72,23 @@ namespace ovEngineSDK {
 
     static const Matrix4 IDENTITY;
   };
+
+  class OV_UTILITY_EXPORT LookAtMatrix : public Matrix4
+  {
+   public:
+    LookAtMatrix(const Vector3& EyePosition,
+                 const Vector3& LookAtPosition,
+                 const Vector3& UpVector);
+  };
+
+  class OV_UTILITY_EXPORT PerspectiveMatrix : public Matrix4
+  {
+    #define Z_PRECISION 0.f
+   public:
+    PerspectiveMatrix(float FOV,
+                      float Width,
+                      float Height,
+                      float MinZ,
+                      float MaxZ);
+  };
 }

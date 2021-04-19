@@ -62,7 +62,7 @@ namespace ovEngineSDK {
     createWindow();
 
    protected:
-    WindowHandle m_windowHandle;
+    WindowHandle m_windowHandle = 0;
     Plugin m_directXPlugin;
     GraphicsAPI* m_graphicsAPI = nullptr;
     bool m_runApp = false;
