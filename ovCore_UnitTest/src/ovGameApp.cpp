@@ -73,15 +73,15 @@ void GameApp::onCreate() {
   indices.push_back(23); indices.push_back(20); indices.push_back(22);
   //Create vertex buffer
   m_vertexBuffer = m_graphicsAPI->createBuffer(vertices.data(),
-    sizeof(Vertex) * vertices.size(),
+    static_cast<int32>(sizeof(Vertex) * vertices.size()),
     BUFFER_TYPE::VERTEX_BUFFER);
   //Create index buffer
   m_indexBuffer = m_graphicsAPI->createBuffer(indices.data(),
-    sizeof(uint32) * indices.size(),
+    static_cast<int32>(sizeof(uint32) * indices.size()),
     BUFFER_TYPE::INDEX_BUFFER);
   //Create constant buffer
   m_cBuffer = m_graphicsAPI->createBuffer(nullptr,
-                                          sizeof(Matrices),
+                                          static_cast<int32>(sizeof(Matrices)),
                                           BUFFER_TYPE::CONST_BUFFER);
   //Create structure to update constant buffer
   Matrices mat{};
@@ -98,7 +98,7 @@ void GameApp::onCreate() {
   m_graphicsAPI->updateBuffer(m_cBuffer, &mat);
 
   m_graphicsAPI->setInputLayout(m_layout);
-  m_graphicsAPI->setVertexBuffer(m_vertexBuffer, sizeof(Vertex), 0);
+  m_graphicsAPI->setVertexBuffer(m_vertexBuffer, static_cast<int32>(sizeof(Vertex)), 0);
   m_graphicsAPI->setIndexBuffer(m_indexBuffer);
   m_graphicsAPI->setConstantBuffer(0, m_cBuffer, SHADER_TYPE::VERTEX_SHADER);
   m_graphicsAPI->setConstantBuffer(0, m_cBuffer, SHADER_TYPE::PIXEL_SHADER);

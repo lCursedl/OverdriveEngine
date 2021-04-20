@@ -47,7 +47,7 @@ namespace ovEngineSDK {
 
    private:
     void
-    update(float delta);
+    update();
 
     void
     render();

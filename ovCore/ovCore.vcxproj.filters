@@ -18,9 +18,6 @@
     <ClCompile Include="src\ovBaseApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\ovGraphicsAPI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ovPlugin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

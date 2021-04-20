@@ -77,10 +77,10 @@ namespace ovEngineSDK {
    private:
     Map<FORMATS::E, std::pair<int32, int32>> m_formats;
     void readShaderFile(std::wstring file, std::string& source);
-    HDC m_handle;
-    HGLRC oglRenderContext;
+    HDC m_handle = 0;
+    HGLRC oglRenderContext = 0;
     void fillFormats();
-    uint32 m_topology;
+    uint32 m_topology = 0;
   };
   extern "C" OV_PLUGIN_EXPORT GraphicsAPI *
     createGraphicsAPI() {

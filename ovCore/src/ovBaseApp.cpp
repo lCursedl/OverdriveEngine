@@ -14,7 +14,7 @@ namespace ovEngineSDK {
         DispatchMessage(&msg);
       }
       else {
-        update(0.f);
+        update();
         render();
       }      
     }      
@@ -38,7 +38,7 @@ namespace ovEngineSDK {
   void BaseApp::onClear() {
   }
   
-  void BaseApp::update(float delta) {
+  void BaseApp::update() {
     onUpdate();
   }
 
@@ -47,7 +47,7 @@ namespace ovEngineSDK {
   }
 
   void BaseApp::initSystems() {
-    if (m_directXPlugin.loadPlugin("ovOGLGraphics_d.dll")) {
+    if (m_directXPlugin.loadPlugin("ovDXGraphics_d.dll")) {
       auto createGraphicsAPI = reinterpret_cast<funCreateGraphicsAPI>(
                                m_directXPlugin.getProcedureByName("createGraphicsAPI"));
       GraphicsAPI::startUp();
@@ -60,7 +60,7 @@ namespace ovEngineSDK {
   void
   BaseApp::destroySystems() {
     m_graphicsAPI->shutdown();
-    g_graphicsAPI().shutDown();
+    m_graphicsAPI->shutDown();
   }
 
   void BaseApp::createWindow() {
@@ -94,8 +94,11 @@ namespace ovEngineSDK {
     PAINTSTRUCT ps;
     HDC hdc;
 
-    switch (message)
-    {
+    switch (message) {
+    case WM_PAINT:
+      hdc = BeginPaint(hWnd, &ps);
+      EndPaint(hWnd, &ps);
+      break;
     case WM_DESTROY:
       PostQuitMessage(0);
       break;

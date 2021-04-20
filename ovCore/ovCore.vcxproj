@@ -169,7 +169,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\ovGraphicsAPI.cpp" />
     <ClCompile Include="src\ovBaseApp.cpp" />
     <ClCompile Include="src\ovGraphicsAPI.cpp" />
     <ClCompile Include="src\ovPlugin.cpp" />

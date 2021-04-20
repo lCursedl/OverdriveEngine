@@ -700,6 +700,7 @@ DXGraphicsAPI::matrix4Policy(const Matrix4& mat) {
   void DXGraphicsAPI::setSamplerState(uint32 slot,
                                       Texture* texture,
                                       SamplerState* sampler) {
+    texture;
     if (!sampler) {
       OutputDebugStringA("Invalid sampler received.");
       return;
