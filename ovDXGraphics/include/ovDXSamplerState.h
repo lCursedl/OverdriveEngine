@@ -1,6 +1,6 @@
 #pragma once
 #include <ovSamplerState.h>
-#include <d3d11.h>
+#include <ovPrerequisitesDX.h>
 
 namespace ovEngineSDK {
   /**

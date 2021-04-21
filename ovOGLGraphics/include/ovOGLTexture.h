@@ -1,7 +1,6 @@
 #pragma once
+#include <ovPrerequisitesOGL.h>
 #include <ovTexture.h>
-#include <glad/glad.h>
-#include <ovPrerequisitesUtil.h>
 
 namespace ovEngineSDK {
   /**
@@ -23,7 +22,7 @@ namespace ovEngineSDK {
     /**
     * @fn        ~OGLTexture()
     *	@brief     Class destructor.
-    *            if m_iTexture or m_iFramebuffer was used, release memory 
+    *            if m_texture or m_framebuffer was used, release memory 
     *	           before deleting object.
     */
     ~OGLTexture();

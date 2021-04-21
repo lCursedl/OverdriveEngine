@@ -1,7 +1,6 @@
 #pragma once
+#include <ovPrerequisitesOGL.h>
 #include <ovBuffer.h>
-#include <glad/glad.h>
-#include <ovPrerequisitesUtil.h>
 
 namespace ovEngineSDK {
   /**
@@ -28,9 +27,9 @@ namespace ovEngineSDK {
     OGLBuffer() = default;
    private:
 
-    uint32 m_type = 0;    /**< unsigned int for buffer type storing. */
+    uint32 m_type = 0;            /**< unsigned int for buffer type storing. */
     int32 m_size = 0;             /**< int for buffer size storing. */
-    uint32 m_buffer = 0;  /**< unsigned int for OpenGL buffer index */
+    uint32 m_buffer = 0;          /**< unsigned int for OpenGL buffer index */
 
     friend class OGLGraphicsAPI;
   };

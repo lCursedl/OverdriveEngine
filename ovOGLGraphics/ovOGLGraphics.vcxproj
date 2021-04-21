@@ -105,7 +105,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ovUtilities_d.lib;opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ovUtilities_d.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary />
     </Link>
   </ItemDefinitionGroup>
@@ -126,7 +126,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ovUtilities.lib;opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ovUtilities.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary />
     </Link>
   </ItemDefinitionGroup>
@@ -164,7 +164,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ovUtilities.lib;opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ovUtilities.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary />
     </Link>
   </ItemDefinitionGroup>
@@ -188,6 +188,7 @@
     <ClInclude Include="include\ovOGLShaderProgram.h" />
     <ClInclude Include="include\ovOGLTexture.h" />
     <ClInclude Include="include\ovOGLVertexShader.h" />
+    <ClInclude Include="include\ovPrerequisitesOGL.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

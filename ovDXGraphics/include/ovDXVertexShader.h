@@ -1,6 +1,6 @@
 #pragma once
 #include <ovShader.h>
-#include <d3d11.h>
+#include <ovPrerequisitesDX.h>
 
 namespace ovEngineSDK {
   /**

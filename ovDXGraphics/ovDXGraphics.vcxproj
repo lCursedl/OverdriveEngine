@@ -186,6 +186,7 @@
     <ClInclude Include="include\ovDXShaderProgram.h" />
     <ClInclude Include="include\ovDXTexture.h" />
     <ClInclude Include="include\ovDXVertexShader.h" />
+    <ClInclude Include="include\ovPrerequisitesDX.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

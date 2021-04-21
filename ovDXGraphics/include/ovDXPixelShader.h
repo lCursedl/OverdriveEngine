@@ -1,6 +1,6 @@
 #pragma once
 #include <ovShader.h>
-#include <d3d11.h>
+#include <ovPrerequisitesDX.h>
 
 namespace ovEngineSDK {
   /**
@@ -14,7 +14,7 @@ namespace ovEngineSDK {
     /**
     * @fn        ~DXPixelShader()
     * @brief     Class destructor.
-    *            If m_PS or m_Blob was used, release memory before deleting object.
+    *            If m_ps or m_blob was used, release memory before deleting object.
     */
     ~DXPixelShader();
 
@@ -23,7 +23,7 @@ namespace ovEngineSDK {
     /**
     * @fn        DXPixelShader()
     * @brief     Class constructor.
-    *            Sets m_PS & m_Blob as nullptr.
+    *            Sets m_ps & m_blob as nullptr.
     */
     DXPixelShader();
 

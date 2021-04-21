@@ -1,6 +1,6 @@
 #pragma once
 #include <ovTexture.h>
-#include <d3d11.h>
+#include <ovPrerequisitesDX.h>
 
 namespace ovEngineSDK {
   /**
@@ -14,7 +14,7 @@ namespace ovEngineSDK {
     /**
     * @fn        DXTexture()
     *	@brief     Class constructor.
-    *            Sets m_pTexture, m_pRTV, m_pDSV and m_pSRV as nullptr;
+    *            Sets m_texture, m_rtv, m_dsv and m_srv as nullptr;
     */
     DXTexture();
 
@@ -22,8 +22,8 @@ namespace ovEngineSDK {
 
     /**
     * @fn        ~DXTexture()
-    *	@brief     Class destructor.
-    *            If m_pTexture, m_pRTV, m_pDSV or m_pSRV was used, release memory before
+    *	@brief     Class destructor. 
+    *            If m_texture, m_rtv, m_dsv or m_srv was used, release memory before
     *	           deleting object.
     */
     ~DXTexture();

@@ -2,12 +2,12 @@
 
 namespace ovEngineSDK {
   DXInputLayout::DXInputLayout() {
-    m_InputLayout = nullptr;
+    m_inputLayout = nullptr;
   }
 
   DXInputLayout::~DXInputLayout() {
-    if (nullptr != m_InputLayout) {
-      m_InputLayout->Release();
+    if (nullptr != m_inputLayout) {
+      m_inputLayout->Release();
     }
   }
 }

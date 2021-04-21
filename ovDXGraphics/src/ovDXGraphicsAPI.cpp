@@ -395,7 +395,7 @@ DXGraphicsAPI::matrix4Policy(const Matrix4& mat) {
 
     D3D11_INPUT_ELEMENT_DESC D;
 
-    for (int32 i = 0; i < desc.v_Layout.size(); i++) {
+    for (uint32 i = 0; i < desc.v_Layout.size(); i++) {
       //SEMANTIC NAME & INDEX
       switch (desc.v_Layout[i].m_semantic) {
       case SEMANTIC::POSITION:
@@ -442,7 +442,7 @@ DXGraphicsAPI::matrix4Policy(const Matrix4& mat) {
                                            static_cast<UINT>(layout.size()),
                                            VS->m_blob->GetBufferPointer(),
                                            VS->m_blob->GetBufferSize(),
-                                           &ILayout->m_InputLayout))) {
+                                           &ILayout->m_inputLayout))) {
       delete ILayout;
       return nullptr;
     }
@@ -603,8 +603,8 @@ DXGraphicsAPI::matrix4Policy(const Matrix4& mat) {
   void DXGraphicsAPI::setInputLayout(InputLayout* layout) {
     if (layout) {
       DXInputLayout* dxlayout = dynamic_cast<DXInputLayout*>(layout);
-      if (dxlayout->m_InputLayout) {
-        m_deviceContext->IASetInputLayout(dxlayout->m_InputLayout);
+      if (dxlayout->m_inputLayout) {
+        m_deviceContext->IASetInputLayout(dxlayout->m_inputLayout);
       }
       else {
         OutputDebugStringA("Input layout invalid.");

@@ -1,7 +1,6 @@
 #pragma once
+#include <ovPrerequisitesOGL.h>
 #include <ovInputLayout.h>
-#include <glad/glad.h>
-#include <ovPrerequisitesUtil.h>
 
 namespace ovEngineSDK {
   /**

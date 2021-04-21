@@ -8,7 +8,8 @@
 #include <ovOGLPixelShader.h>
 
 namespace ovEngineSDK {
-  void OGLGraphicsAPI::readShaderFile(std::wstring file, std::string& source)
+  void
+  OGLGraphicsAPI::readShaderFile(std::wstring file, std::string& source)
   {
     std::ifstream shaderFile;
 
@@ -26,7 +27,8 @@ namespace ovEngineSDK {
     }
   }
 
-  bool OGLGraphicsAPI::init(void* window) {
+  bool
+  OGLGraphicsAPI::init(void* window) {
     PIXELFORMATDESCRIPTOR pfd =
     {
       sizeof(PIXELFORMATDESCRIPTOR),
@@ -66,11 +68,13 @@ namespace ovEngineSDK {
     return true;
   }
 
-  void OGLGraphicsAPI::shutdown() {
+  void
+  OGLGraphicsAPI::shutdown() {
     wglDeleteContext(oglRenderContext);
   }
 
-  Matrix4 OGLGraphicsAPI::matrix4Policy(const Matrix4& mat) {
+  Matrix4
+  OGLGraphicsAPI::matrix4Policy(const Matrix4& mat) {
       return mat;
   }
 
@@ -79,7 +83,8 @@ namespace ovEngineSDK {
     return glm::transpose(mat);
   }*/
 
-  Texture* OGLGraphicsAPI::createTexture(int32 width,
+  Texture*
+  OGLGraphicsAPI::createTexture(int32 width,
                                         int32 height,
                                         TEXTURE_BINDINGS::E binding,
                                         FORMATS::E format) {
@@ -177,7 +182,8 @@ namespace ovEngineSDK {
   //  }
   //}
 
-  std::wstring getFileNameOGL(std::wstring vsfile)
+  std::wstring
+  getFileNameOGL(std::wstring vsfile)
   {
     size_t realPos = 0;
     size_t posInvSlash = vsfile.rfind('\\');
@@ -202,15 +208,17 @@ namespace ovEngineSDK {
     return vsfile.substr(realPos, vsfile.length() - realPos);
   }
 
-  ShaderProgram* OGLGraphicsAPI::createShaderProgram() {
+  ShaderProgram*
+  OGLGraphicsAPI::createShaderProgram() {
     OGLShaderProgram* shaderProgram = new OGLShaderProgram();
     shaderProgram->m_program = glCreateProgram();
     return shaderProgram;
   }
 
-  Buffer* OGLGraphicsAPI::createBuffer(const void* data,
-                                      uint32 size,
-                                      BUFFER_TYPE::E type) {
+  Buffer*
+  OGLGraphicsAPI::createBuffer(const void* data,
+                               uint32 size,
+                               BUFFER_TYPE::E type) {
     if (size != 0) {
       OGLBuffer* buffer = new OGLBuffer();
 
@@ -238,20 +246,19 @@ namespace ovEngineSDK {
       glBindBuffer(buffer->m_type, 0);
       return buffer;
     }
-    else
-    {
+    else {
       OutputDebugStringA("Invalid size for buffer");
       return nullptr;
     }
   }
 
-  InputLayout* OGLGraphicsAPI::createInputLayout(ShaderProgram* program,
+  InputLayout*
+  OGLGraphicsAPI::createInputLayout(ShaderProgram* program,
     LAYOUT_DESC desc) {
     OGLInputLayout* ILayout = new OGLInputLayout();
     glGenVertexArrays(1, &ILayout->m_vao);
     glBindVertexArray(ILayout->m_vao);
-    for (int32 i = 0; i < desc.v_Layout.size(); i++)
-    {
+    for (uint32 i = 0; i < desc.v_Layout.size(); i++) {
       glVertexAttribFormat(i,
         desc.v_Layout[i].m_numElements,
         GL_FLOAT, GL_FALSE,
@@ -263,7 +270,8 @@ namespace ovEngineSDK {
     return ILayout;
   }
 
-  SamplerState* OGLGraphicsAPI::createSamplerState(FILTER_LEVEL::E mag,
+  SamplerState*
+  OGLGraphicsAPI::createSamplerState(FILTER_LEVEL::E mag,
                                                   FILTER_LEVEL::E min,
                                                   FILTER_LEVEL::E mip,
                                                   uint32 anisotropic,
@@ -291,7 +299,6 @@ namespace ovEngineSDK {
       mode = GL_MIRROR_CLAMP_TO_EDGE;
       break;
     }
-
 
     glSamplerParameteri(sampler->m_sampler,
       GL_TEXTURE_WRAP_S, mode);
@@ -343,7 +350,8 @@ namespace ovEngineSDK {
     return sampler;
   }
 
-  VertexShader* OGLGraphicsAPI::createVertexShader(std::wstring file) {
+  VertexShader*
+  OGLGraphicsAPI::createVertexShader(std::wstring file) {
     std::wstring realFileName = getFileNameOGL(file) + L"_OGL.glsl";
     std::string source;
     int32 result;
@@ -366,7 +374,8 @@ namespace ovEngineSDK {
     return vs;
   }
 
-  PixelShader* OGLGraphicsAPI::createPixelShader(std::wstring file) {
+  PixelShader*
+  OGLGraphicsAPI::createPixelShader(std::wstring file) {
     std::wstring realFileName = getFileNameOGL(file) + L"_OGL.glsl";
     std::string source;
     int32 result;
@@ -389,37 +398,45 @@ namespace ovEngineSDK {
     return ps;
   }
 
-  void OGLGraphicsAPI::setBackBuffer() {
+  void
+  OGLGraphicsAPI::setBackBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
 
-  void OGLGraphicsAPI::setViewport(int32 topLeftX, int32 topLeftY, int32 width, int32 height) {
+  void
+  OGLGraphicsAPI::setViewport(int32 topLeftX, int32 topLeftY, int32 width, int32 height) {
     glViewport(topLeftX, topLeftY, width, height);
   }
 
-  void OGLGraphicsAPI::setShaders(ShaderProgram* program) {
+  void
+  OGLGraphicsAPI::setShaders(ShaderProgram* program) {
     OGLShaderProgram* ShaderProgram = dynamic_cast<OGLShaderProgram*>(program);
     glUseProgram(ShaderProgram->m_program);
   }
 
-  void OGLGraphicsAPI::drawIndexed(uint32 indices) {
+  void
+  OGLGraphicsAPI::drawIndexed(uint32 indices) {
     glDrawElements(m_topology, indices, GL_UNSIGNED_INT, 0);
   }
 
-  void OGLGraphicsAPI::draw(uint32 count, uint32 first) {
+  void
+  OGLGraphicsAPI::draw(uint32 count, uint32 first) {
     glDrawArrays(m_topology, first, count);
   }
 
-  void OGLGraphicsAPI::clearBackBuffer(COLOR color) {
+  void
+  OGLGraphicsAPI::clearBackBuffer(COLOR color) {
     glClearColor(color.red, color.green, color.blue, color.alpha);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
-  void OGLGraphicsAPI::setInputLayout(InputLayout* layout) {
+  void
+  OGLGraphicsAPI::setInputLayout(InputLayout* layout) {
     glBindVertexArray(dynamic_cast<OGLInputLayout*>(layout)->m_vao);
   }
 
-  void OGLGraphicsAPI::setRenderTarget(Texture* texture, Texture* depth) {
+  void
+  OGLGraphicsAPI::setRenderTarget(Texture* texture, Texture* depth) {
     if (texture) {
       OGLTexture* tex = dynamic_cast<OGLTexture*>(texture);
       if (tex->m_framebuffer != 0) {
@@ -453,19 +470,20 @@ namespace ovEngineSDK {
     }
   }
 
-  void OGLGraphicsAPI::updateBuffer(Buffer* buffer, const void* data) {
+  void
+  OGLGraphicsAPI::updateBuffer(Buffer* buffer, const void* data) {
     if (!buffer) {
-      OutputDebugStringA("Invalid buffer received.");
+      OutputDebugStringA("Invalid buffer received.\n");
       return;
     }
     if (!data) {
-      OutputDebugStringA("Invalid data received.");
+      OutputDebugStringA("Invalid data received.\n");
       return;
     }
 
     OGLBuffer* buff = dynamic_cast<OGLBuffer*>(buffer);
     if (buff->m_buffer == 0) {
-      OutputDebugStringA("Buffer not initalized, can't update data.");
+      OutputDebugStringA("Buffer not initalized, can't update data.\n");
       return;
     }
     glBindBuffer(buff->m_type, buff->m_buffer);
@@ -473,16 +491,14 @@ namespace ovEngineSDK {
     glBindBuffer(buff->m_type, 0);
   }
 
-  void OGLGraphicsAPI::setVertexBuffer(Buffer* buffer,
-                                      uint32 stride,
-                                      uint32 offset) {
+  void
+  OGLGraphicsAPI::setVertexBuffer(Buffer* buffer, uint32 stride, uint32 offset) {
     if (buffer != nullptr) {
       OGLBuffer* buff = dynamic_cast<OGLBuffer*>(buffer);
       if (buff->m_buffer != 0) {
         glBindVertexBuffer(0, buff->m_buffer, offset, stride);
       }
-      else
-      {
+      else {
         OutputDebugStringA("Buffer missing initialization.");
       }
     }
@@ -491,7 +507,8 @@ namespace ovEngineSDK {
     }
   }
 
-  void OGLGraphicsAPI::setIndexBuffer(Buffer* buffer) {
+  void
+  OGLGraphicsAPI::setIndexBuffer(Buffer* buffer) {
     if (buffer != nullptr) {
       OGLBuffer* buff = dynamic_cast<OGLBuffer*>(buffer);
       if (buff->m_buffer != 0) {
@@ -506,7 +523,8 @@ namespace ovEngineSDK {
     }
   }
 
-  void OGLGraphicsAPI::setSamplerState(uint32 slot,
+  void
+  OGLGraphicsAPI::setSamplerState(uint32 slot,
                                       Texture* texture,
                                       SamplerState* sampler) {
     if (!texture) {
@@ -535,7 +553,8 @@ namespace ovEngineSDK {
     glBindSampler(tex->m_texture, samp->m_sampler);
   }
 
-  void OGLGraphicsAPI::setConstantBuffer(uint32 slot,
+  void
+  OGLGraphicsAPI::setConstantBuffer(uint32 slot,
                                         Buffer* buffer,
                                         SHADER_TYPE::E shaderType) {
     if (buffer) {
@@ -552,7 +571,8 @@ namespace ovEngineSDK {
     }
   }
 
-  void OGLGraphicsAPI::clearRenderTarget(Texture* rt, COLOR color) {
+  void
+  OGLGraphicsAPI::clearRenderTarget(Texture* rt, COLOR color) {
     if (!rt) {
       OutputDebugStringA("Invalid Render Target received.");
       return;
@@ -567,7 +587,8 @@ namespace ovEngineSDK {
     glClear(GL_COLOR_BUFFER_BIT);
   }
 
-  void OGLGraphicsAPI::clearDepthStencil(Texture* ds) {
+  void
+  OGLGraphicsAPI::clearDepthStencil(Texture* ds) {
     if (!ds) {
       OutputDebugStringA("Invalid Depth Stencil received.");
       return;
@@ -581,7 +602,8 @@ namespace ovEngineSDK {
     glClear(GL_DEPTH_BUFFER_BIT);
   }
 
-  void OGLGraphicsAPI::setTexture(uint32 slot, Texture* texture) {
+  void
+  OGLGraphicsAPI::setTexture(uint32 slot, Texture* texture) {
     OGLTexture* tex = dynamic_cast<OGLTexture*>(texture);
     if (!tex) {
       OutputDebugStringA("Texture received was nullptr.");
@@ -595,7 +617,8 @@ namespace ovEngineSDK {
     glBindTexture(GL_TEXTURE_2D, tex->m_texture);
   }
 
-  void OGLGraphicsAPI::setTopology(TOPOLOGY::E topology) {
+  void
+  OGLGraphicsAPI::setTopology(TOPOLOGY::E topology) {
     switch (topology) {
     case TOPOLOGY::E::POINTS:
       m_topology = GL_POINTS;
@@ -627,13 +650,16 @@ namespace ovEngineSDK {
     }
   }
 
-  void OGLGraphicsAPI::swapBuffer() {
+  void
+  OGLGraphicsAPI::swapBuffer() {
     SwapBuffers(m_handle);
   }
 
-  void OGLGraphicsAPI::resizeBackBuffer(uint32 width, uint32 height) {}
+  void
+  OGLGraphicsAPI::resizeBackBuffer(uint32 width, uint32 height) {}
 
-  void OGLGraphicsAPI::fillFormats() {
+  void
+  OGLGraphicsAPI::fillFormats() {
     m_formats.insert(std::make_pair(FORMATS::E::R8_SNORM,
       std::make_pair(GL_R8_SNORM, GL_RED)));
     m_formats.insert(std::make_pair(FORMATS::E::R16_SNORM,

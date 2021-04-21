@@ -54,13 +54,15 @@ namespace ovEngineSDK {
      * @brief    Initializes and creates the necesary elements for basic rendering.
      * @param[in]window Window handler of the window properly created for use.
      */
-     virtual bool init(void*) {return false;}
+     virtual bool
+     init(void*) {return false;}
 
      /** 
      * @fn       void shutdown()
      * @brief    Releases memory and deletes all resources created by the API.
      */
-     virtual void shutdown() {};
+     virtual void
+     shutdown() {};
 
      /**
      * @fn       Matrix4 matrixPolicy(const Matrix4& mat)
@@ -68,7 +70,8 @@ namespace ovEngineSDK {
      * @param[in]mat A Matrix4 to convert.
      * @return   the received matrix in the correct order.
      */
-     virtual Matrix4 matrix4Policy(const Matrix4&) {return Matrix4();}
+     virtual Matrix4
+     matrix4Policy(const Matrix4&) {return Matrix4();}
 
      /**
      * @fn
@@ -100,10 +103,13 @@ namespace ovEngineSDK {
      * @param[in]format	Specifies the texture format.
      * @return   Texture pointer of the corresponding API.
      */
-     virtual Texture* createTexture(int32,
-                                    int32,
-                                    TEXTURE_BINDINGS::E,
-                                    FORMATS::E) { return nullptr;}
+     virtual Texture*
+     createTexture(int32,
+                   int32,
+                   TEXTURE_BINDINGS::E,
+                   FORMATS::E) {
+      return nullptr;
+     }
      /**
      * @fn       Texture* createTextureFromFile(std::string path)
      * @brief    Loads a texture file and returns a CTexture pointer with its data.
@@ -117,7 +123,10 @@ namespace ovEngineSDK {
      * @brief    Creates a shader program and returns it.
      * @return   ShaderProgram pointer of the corresponding API.
      */
-     virtual ShaderProgram* createShaderProgram() {return nullptr;}
+     virtual ShaderProgram*
+     createShaderProgram() {
+      return nullptr;
+     }
 
      /**
      * @fn       CBuffer* createBuffer(const void * data, int32 size, BUFFER_TYPE type)
@@ -128,9 +137,12 @@ namespace ovEngineSDK {
      *            INDEX_BUFFER, CONST_BUFFER).
      * @return   Buffer pointer of the corresponding API.
      */
-     virtual Buffer* createBuffer(const void*,
-                                  uint32,
-                                  BUFFER_TYPE::E) {return nullptr;}
+     virtual Buffer*
+     createBuffer(const void*,
+                  uint32,
+                  BUFFER_TYPE::E) {
+      return nullptr;
+     }
 
      /**
      * @fn       InputLayout* createInputLayout(CShaderProgram* program, LAYOUT_DESC desc)
@@ -139,8 +151,11 @@ namespace ovEngineSDK {
      * @param[in]desc The layout descriptor.
      * @return   InputLayout pointer of the corresponding API.
      */
-     virtual InputLayout* createInputLayout(ShaderProgram*,
-                                            LAYOUT_DESC) {return nullptr;}
+     virtual InputLayout*
+     createInputLayout(ShaderProgram*,
+                       LAYOUT_DESC) {
+      return nullptr;
+     }
 
      /**
      * @fn       SamplerState* createSamplerState(FILTER_LEVEL mag, FILTER_LEVEL min,
@@ -155,11 +170,14 @@ namespace ovEngineSDK {
                  CLAMP, BORDER, MIRROR_ONCE ).
      * @return   SamplerState pointer of the corresponding API.
      */
-     virtual SamplerState* createSamplerState(FILTER_LEVEL::E,
-                                              FILTER_LEVEL::E,
-                                              FILTER_LEVEL::E,
-                                              uint32,
-                                              WRAPPING::E) {return nullptr;}
+     virtual SamplerState*
+     createSamplerState(FILTER_LEVEL::E,
+                        FILTER_LEVEL::E,
+                        FILTER_LEVEL::E,
+                        uint32,
+                        WRAPPING::E) {
+      return nullptr;
+     }
 
      /**
      * @fn       CVertexShader* createVertexShader(std::wstring file)
@@ -167,7 +185,10 @@ namespace ovEngineSDK {
      * @param[in]file Filename of the vertex shader.
      * @return   VertexShader pointer of the corresponding API.
      */
-     virtual VertexShader* createVertexShader(std::wstring) {return nullptr;};
+     virtual VertexShader*
+     createVertexShader(std::wstring) {
+      return nullptr;
+     }
 
      /**
      * @fn       PixelShader* createPixelShader(std::wstring file)
@@ -175,7 +196,10 @@ namespace ovEngineSDK {
      * @param[in]file Filename of the pixel shader.
      * @return   PixelShader pointer of the corresponding API.
      */
-     virtual PixelShader* createPixelShader(std::wstring) {return nullptr;}
+     virtual PixelShader*
+     createPixelShader(std::wstring) {
+      return nullptr;
+     }
 
      /***********************************************************************************/
      /*----------------------------DEVICE CONTEXT---------------------------------------*/

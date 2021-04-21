@@ -17,36 +17,36 @@ namespace ovEngineSDK {
      virtual ~ShaderProgram() = default;
 
      /**
-     * @fn       CVertexShader* getVerteShader()
+     * @fn       VertexShader* getVerteShader()
      * @brief    Obtains the pointer to the VertexShader member
-     * @return	 CVertexshader pointer
+     * @return	 Vertexshader pointer
      */
      VertexShader* getVertexShader() {
        return m_pVertexShader;
      }
 
      /**
-     * @fn       CPixelShader* getPixelShader()
+     * @fn       PixelShader* getPixelShader()
      * @brief    Obtains the pointer to the PixelShader member
-     * @return   CPixelShader pointer
+     * @return   PixelShader pointer
      */
      PixelShader* getPixelShader() {
        return m_pPixelShader;
      }
 
      /**
-     * @fn       virtual void setVertexShader(CVertexShader* vertexShader)
+     * @fn       virtual void setVertexShader(VertexShader* vertexShader)
      * @brief    Sets the received VS pointer as the one to store.
-     * @param[in]vertexShader CVertexShader pointer to store
+     * @param[in]vertexShader VertexShader pointer to store
      */
      virtual void setVertexShader(VertexShader* vertexShader) {
        m_pVertexShader = vertexShader;
      }
 
      /**
-     * @fn       virtual void setPixelShader(CPixelShader* pixelShader)
+     * @fn       virtual void setPixelShader(PixelShader* pixelShader)
      * @brief    Sets the received PS pointer as the one to store.
-     * @param[in]pixelShader CPixelShader pointer to store
+     * @param[in]pixelShader PixelShader pointer to store
      */
      virtual void setPixelShader(PixelShader* pixelShader) {
        m_pPixelShader = pixelShader;
@@ -59,7 +59,7 @@ namespace ovEngineSDK {
      virtual void linkProgram() {}
 
    protected:
-    VertexShader* m_pVertexShader = nullptr;	/**< CVertexShader pointer */
-    PixelShader* m_pPixelShader = nullptr;		/**< CPixelShader pointer */
+    VertexShader* m_pVertexShader = nullptr;	/**< VertexShader pointer */
+    PixelShader* m_pPixelShader = nullptr;		/**< PixelShader pointer */
   };
 }

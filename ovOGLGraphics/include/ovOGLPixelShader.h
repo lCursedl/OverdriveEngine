@@ -1,7 +1,6 @@
 #pragma once
+#include <ovPrerequisitesOGL.h>
 #include <ovShader.h>
-#include <ovPrerequisitesUtil.h>
-#include <glad/glad.h>
 
 namespace ovEngineSDK {
   /**

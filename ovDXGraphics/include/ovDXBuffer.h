@@ -1,10 +1,10 @@
 #pragma once
+#include <ovPrerequisitesDX.h>
 #include <ovBuffer.h>
-#include <d3d11.h>
 
 namespace ovEngineSDK {
   /**
-  * @class       CDXBuffer
+  * @class       DXBuffer
   * @brief       Class which holds info for a D3D11's buffer.
   */
   class DXBuffer final : public Buffer
@@ -12,18 +12,18 @@ namespace ovEngineSDK {
    public:
 
     /** 
-    * @fn        ~CDXBuffer()
+    * @fn        ~DXBuffer()
     * @brief     Class destructor.
-    *            If m_Buffer was used, release memory before deleting object.
+    *            If m_buffer was used, release memory before deleting object.
     */
     ~DXBuffer();
 
    protected:
 
     /**
-    * @fn        CDXBuffer()
+    * @fn        DXBuffer()
     * @brief     Class constructor.
-    *            Sets m_Buffer as nullptr.
+    *            Sets m_buffer as nullptr.
     */
     DXBuffer();
    private:

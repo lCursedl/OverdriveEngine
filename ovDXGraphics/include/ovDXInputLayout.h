@@ -1,10 +1,10 @@
 #pragma once
 #include <ovInputLayout.h>
-#include <d3d11.h>
+#include <ovPrerequisitesDX.h>
 
 namespace ovEngineSDK {
   /**
-  * @class       DXInputLayout
+  * @class       XInputLayout
   * @brief       Class which holds info for a D3D11's input layout.
   */
   class DXInputLayout final : public InputLayout
@@ -12,10 +12,10 @@ namespace ovEngineSDK {
    public:
 
     /**
-    * @fn        ~CDXInputLayout()
-    * @brief     Class destructor.
+    * @fn        ~DXInputLayout()
+    * @brief     Class destructor. 
     *
-    *            If m_InputLayout was used, release memory before deleting object.
+    *            If m_inputLayout was used, release memory before deleting object.
     */
     ~DXInputLayout();
 
@@ -23,15 +23,15 @@ namespace ovEngineSDK {
 
     /** 
     * @fn        DXInputLayout()
-    * @brief     Class constructor.
+    * @brief     Class constructor. 
     *
-    *            Sets m_InputLayout as nullptr.
+    *            Sets m_inputLayout as nullptr.
     */
     DXInputLayout();
 
   private:
 
-    ID3D11InputLayout* m_InputLayout;   /**< ID3D11InputLayout pointer */
+    ID3D11InputLayout* m_inputLayout;   /**< ID3D11InputLayout pointer */
 
     friend class DXGraphicsAPI;
   };

@@ -6,7 +6,7 @@
 namespace ovEngineSDK {
   /**
   * @class       DXShaderProgram
-  * @brief       Class which instantiates the Vertex and Pixel shader pointers.
+  * @brief       Class which instantiates the Vertex and Pixel shader pointers. 
   *              Because D3D11 doesn't have the concept of ShaderProgram, functionality
   *              of this class is limited
   */

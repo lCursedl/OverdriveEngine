@@ -8,7 +8,7 @@ using sf::WindowHandle;
 using sf::Event;
 
 namespace ovEngineSDK {
-  class OV_PLUGIN_EXPORT BaseApp
+  class OV_CORE_EXPORT BaseApp
   {
    public:
     BaseApp() = default;
