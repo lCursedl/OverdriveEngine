@@ -6,8 +6,8 @@ void GameApp::onCreate() {
   GetClientRect(m_windowHandle, &rc);
   m_graphicsAPI->setViewport(0, 0, rc.right, rc.bottom);
   //Compile and create vertex / pixel shader
-  m_vs = m_graphicsAPI->createVertexShader(L"D:/UAD/ovEngine/bin/x64/VS");
-  m_ps = m_graphicsAPI->createPixelShader(L"D:/UAD/ovEngine/bin/x64/PS");
+  m_vs = m_graphicsAPI->createVertexShader(L"D:/UAD/ovEngine/bin/resources/shaders/VS");
+  m_ps = m_graphicsAPI->createPixelShader(L"D:/UAD/ovEngine/bin/resources/shaders/PS");
   //Create shader program
   m_shaderProgram = m_graphicsAPI->createShaderProgram();
   //Attach shaders to program
@@ -118,7 +118,6 @@ void GameApp::onUpdate() {
 void GameApp::onRender() {
  m_graphicsAPI->clearBackBuffer(m_color);
  m_graphicsAPI->drawIndexed(36);
- m_graphicsAPI->swapBuffer();
 }
 
 void GameApp::onClear() {
