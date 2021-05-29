@@ -4,6 +4,7 @@
 #include <ovVector3.h>
 #include <ovVector2.h>
 #include <ovMatrix4.h>
+#include <ovModel.h>
 
 using namespace ovEngineSDK;
 
@@ -34,6 +35,7 @@ class GameApp : public BaseApp
   Buffer* m_vertexBuffer = nullptr;
   Buffer* m_indexBuffer = nullptr;
   COLOR m_color;
+  Model* myModel = nullptr;
 
   struct Matrices {
     Matrix4 World;

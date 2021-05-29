@@ -1,3 +1,6 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 #include <ovOGLGraphicsAPI.h>
 #include <ovOGLTexture.h>
 #include <ovOGLBuffer.h>
@@ -78,11 +81,6 @@ namespace ovEngineSDK {
       return mat;
   }
 
-  /*glm::mat4 OGLGraphicsAPI::matrix4Policy(const glm::mat4& mat)
-  {
-    return glm::transpose(mat);
-  }*/
-
   Texture*
   OGLGraphicsAPI::createTexture(int32 width,
                                         int32 height,
@@ -127,60 +125,52 @@ namespace ovEngineSDK {
     return Tex;
   }
 
-  //Texture* OGLGraphicsAPI::createTextureFromFile(std::string path) {
-  //  int32 width, height, components;
-  //  unsigned char* data = stbi_load(path.c_str(), &width, &height, &components, 4);
-  //  if (data) {
-  //    DXTexture* texture = new DXTexture();
-  //    D3D11_TEXTURE2D_DESC desc;
-  //    ZeroMemory(&desc, sizeof(desc));
+  Texture* OGLGraphicsAPI::createTextureFromFile(String path) {
+    int32 width, height, components;
+    uint8* data = stbi_load(path.c_str(), &width, &height, &components, 0);
+    if (data) {
+      GLenum format = GL_ZERO;
+      if (components == 1) {
+        format = GL_RED;
+      }
+      else if (components == 2) {
+        format = GL_RG;
+      }
+      else if (components == 3) {
+        format = GL_RGB;
+      }
+      else if (components == 4) {
+        format = GL_RGBA;
+      }
 
-  //    desc.Width = width;
-  //    desc.Height = height;
-  //    desc.MipLevels = 1;
-  //    desc.ArraySize = 1;
-  //    desc.SampleDesc.Count = 1;
-  //    desc.SampleDesc.Quality = 0;
-  //    desc.Usage = D3D11_USAGE_DEFAULT;
-  //    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-  //    desc.MiscFlags = 0;
-  //    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+      OGLTexture* texture = new OGLTexture();
+      glGenTextures(1, &texture->m_texture);
+      glBindTexture(GL_TEXTURE_2D, texture->m_texture);
+      glTexImage2D(GL_TEXTURE_2D,
+                   0,
+                   format,
+                   width,
+                   height,
+                   0,
+                   format,
+                   GL_UNSIGNED_BYTE,
+                   data);
+      glGenerateMipmap(GL_TEXTURE_2D);
 
-  //    //Texture data
-  //    D3D11_SUBRESOURCE_DATA initData;
-  //    ZeroMemory(&initData, sizeof(initData));
-  //    initData.pSysMem = data;
-  //    initData.SysMemPitch = width * 4;
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  //    if (FAILED(m_device->CreateTexture2D(&desc,
-  //                                         &initData,
-  //                                         &texture->m_texture))) {
-  //      delete texture;
-  //      stbi_image_free(data);
-  //      return nullptr;
-  //    }
+      glBindTexture(GL_TEXTURE_2D, 0);
 
-  //    //Shader resource data
-  //    D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-  //    ZeroMemory(&viewDesc, sizeof(viewDesc));
-  //    viewDesc.Format = desc.Format;
-  //    viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-  //    viewDesc.Texture2D.MostDetailedMip = 0;
-  //    viewDesc.Texture2D.MipLevels = 1;
+      stbi_image_free(data);
 
-  //    if (FAILED(m_device->CreateShaderResourceView(texture->m_texture,
-  //                                                  &viewDesc,
-  //                                                  &texture->m_srv))) {
-  //      delete texture;
-  //      stbi_image_free(data);
-  //      return nullptr;
-  //    }
-  //    return texture;
-  //  }
-  //  else {
-  //    return nullptr;
-  //  }
-  //}
+      return texture;
+    }
+    stbi_image_free(data);
+    return nullptr;
+  }
 
   std::wstring
   getFileNameOGL(std::wstring vsfile)

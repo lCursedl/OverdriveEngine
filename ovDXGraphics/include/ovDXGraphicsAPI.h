@@ -26,7 +26,7 @@ namespace ovEngineSDK {
                            TEXTURE_BINDINGS::E binding,
                            FORMATS::E format)                         override;
 
-    //Texture* createTextureFromFile(std::string path)                  override;
+    Texture* createTextureFromFile(String path)                       override;
 
     ShaderProgram*
     createShaderProgram()                                             override;

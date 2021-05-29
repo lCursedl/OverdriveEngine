@@ -1,9 +1,13 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 #include <ovDXGraphicsAPI.h>
 #include <ovDXTexture.h>
 #include <ovDXBuffer.h>
 #include <ovDXShaderProgram.h>
 #include <ovDXInputLayout.h>
 #include <ovDXSamplerState.h>
+
 #include <wincodec.h>
 
 namespace ovEngineSDK {
@@ -147,7 +151,7 @@ namespace ovEngineSDK {
     return true;
   }
 
-void DXGraphicsAPI::shutdown() {
+  void DXGraphicsAPI::shutdown() {
     m_deviceContext->ClearState();
     delete m_depthStencil;
     delete m_backBuffer;
@@ -156,15 +160,10 @@ void DXGraphicsAPI::shutdown() {
     m_device->Release();
   }
 
-Matrix4
-DXGraphicsAPI::matrix4Policy(const Matrix4& mat) {
+  Matrix4
+  DXGraphicsAPI::matrix4Policy(const Matrix4& mat) {
     return mat.transpose();
-}
-
-  /*glm::mat4 DXGraphicsAPI::matrix4Policy(const glm::mat4& mat)
-  {
-    return glm::transpose(mat);
-  }*/
+  }
 
   Texture* DXGraphicsAPI::createTexture(int32 width,
                                         int32 height,
@@ -257,60 +256,58 @@ DXGraphicsAPI::matrix4Policy(const Matrix4& mat) {
     }
   }
 
-  //Texture* DXGraphicsAPI::createTextureFromFile(std::string path) {
-  //  int32 width, height, components;
-  //  unsigned char* data = stbi_load(path.c_str(), &width, &height, &components, 4);
-  //  if (data) {
-  //    DXTexture* texture = new DXTexture();
-  //    D3D11_TEXTURE2D_DESC desc;
-  //    ZeroMemory(&desc, sizeof(desc));
+  Texture* DXGraphicsAPI::createTextureFromFile(String path) {
+    int32 width, height, components;
+    uint8* data = stbi_load(path.c_str(), &width, &height, &components, 4);
+    if (data) {
+      DXTexture* texture = new DXTexture();
+      D3D11_TEXTURE2D_DESC desc;
+      ZeroMemory(&desc, sizeof(desc));
 
-  //    desc.Width = width;
-  //    desc.Height = height;
-  //    desc.MipLevels = 1;
-  //    desc.ArraySize = 1;
-  //    desc.SampleDesc.Count = 1;
-  //    desc.SampleDesc.Quality = 0;
-  //    desc.Usage = D3D11_USAGE_DEFAULT;
-  //    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-  //    desc.MiscFlags = 0;
-  //    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+      desc.Width = width;
+      desc.Height = height;
+      desc.MipLevels = 1;
+      desc.ArraySize = 1;
+      desc.SampleDesc.Count = 1;
+      desc.SampleDesc.Quality = 0;
+      desc.Usage = D3D11_USAGE_DEFAULT;
+      desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+      desc.MiscFlags = 0;
+      desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-  //    //Texture data
-  //    D3D11_SUBRESOURCE_DATA initData;
-  //    ZeroMemory(&initData, sizeof(initData));
-  //    initData.pSysMem = data;
-  //    initData.SysMemPitch = width * 4;
+      //Texture data
+      D3D11_SUBRESOURCE_DATA initData;
+      ZeroMemory(&initData, sizeof(initData));
+      initData.pSysMem = data;
+      initData.SysMemPitch = width * 4;
 
-  //    if (FAILED(m_device->CreateTexture2D(&desc,
-  //                                         &initData,
-  //                                         &texture->m_texture))) {
-  //      delete texture;
-  //      stbi_image_free(data);
-  //      return nullptr;
-  //    }
+      if (FAILED(m_device->CreateTexture2D(&desc,
+                                           &initData,
+                                           &texture->m_texture))) {
+        delete texture;
+        stbi_image_free(data);
+        return nullptr;
+      }
 
-  //    //Shader resource data
-  //    D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-  //    ZeroMemory(&viewDesc, sizeof(viewDesc));
-  //    viewDesc.Format = desc.Format;
-  //    viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-  //    viewDesc.Texture2D.MostDetailedMip = 0;
-  //    viewDesc.Texture2D.MipLevels = 1;
+      //Shader resource data
+      D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+      ZeroMemory(&viewDesc, sizeof(viewDesc));
+      viewDesc.Format = desc.Format;
+      viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+      viewDesc.Texture2D.MostDetailedMip = 0;
+      viewDesc.Texture2D.MipLevels = 1;
 
-  //    if (FAILED(m_device->CreateShaderResourceView(texture->m_texture,
-  //                                                  &viewDesc,
-  //                                                  &texture->m_srv))) {
-  //      delete texture;
-  //      stbi_image_free(data);
-  //      return nullptr;
-  //    }
-  //    return texture;
-  //  }
-  //  else {
-  //    return nullptr;
-  //  }
-  //}
+      if (FAILED(m_device->CreateShaderResourceView(texture->m_texture,
+                                                    &viewDesc,
+                                                    &texture->m_srv))) {
+        delete texture;
+        stbi_image_free(data);
+        return nullptr;
+      }
+      return texture;
+    }
+    return nullptr;
+  }
 
   std::wstring getFileName(std::wstring vsfile)
   {

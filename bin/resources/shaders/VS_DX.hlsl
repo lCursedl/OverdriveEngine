@@ -17,8 +17,11 @@ cbuffer ConstantBuffer : register( b0 )
 //--------------------------------------------------------------------------------------
 struct VS_INPUT
 {
-    float3 Pos : POSITION;
-    float2 Tex : TEXCOORD0;
+    float3 Pos 		: POSITION;
+	float2 Tex 		: TEXCOORD0;
+	float3 Normal 	: NORMAL0;
+	float3 Tangent : TANGENT0;
+	float3 Binormal : BINORMAL0;
 };
 //--------------------------------------------------------------------------------------
 struct PS_INPUT

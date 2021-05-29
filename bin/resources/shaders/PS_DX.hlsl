@@ -3,7 +3,8 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //--------------------------------------------------------------------------------------
-
+Texture2D txDiffuse : register (t0);
+SamplerState samp : register (s0);
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
@@ -26,5 +27,5 @@ struct PS_INPUT
 //--------------------------------------------------------------------------------------
 float4 main( PS_INPUT input) : SV_Target
 {
-    return vMeshColor;
+    return txDiffuse.Sample(samp, input.Tex);
 }

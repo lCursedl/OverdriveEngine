@@ -48,7 +48,7 @@ namespace ovEngineSDK {
   }
 
   void BaseApp::initSystems() {
-    if (m_directXPlugin.loadPlugin("ovDXGraphics_d.dll")) {
+    if (m_directXPlugin.loadPlugin("ovOGLGraphics.dll")) {
       auto createGraphicsAPI = reinterpret_cast<funCreateGraphicsAPI>(
                                m_directXPlugin.getProcedureByName("createGraphicsAPI"));
       GraphicsAPI::startUp();

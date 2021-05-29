@@ -19,10 +19,15 @@ void GameApp::onCreate() {
   LAYOUT_DESC lDesc;
   lDesc.addToDesc(SEMANTIC::POSITION, FORMATS::RGB32_FLOAT, 0, 3);
   lDesc.addToDesc(SEMANTIC::TEXCOORD, FORMATS::RG32_FLOAT, 12, 2);
+  lDesc.addToDesc(SEMANTIC::NORMAL,   FORMATS::RGB32_FLOAT, 20, 3);
+  lDesc.addToDesc(SEMANTIC::TANGENT,  FORMATS::RGB32_FLOAT, 36, 3);
+  lDesc.addToDesc(SEMANTIC::BINORMAL, FORMATS::RGB32_FLOAT, 48, 3);
   //Create input layout
   m_layout = m_graphicsAPI->createInputLayout(m_shaderProgram, lDesc);
+
   //Define vertex buffer
-  Vector<Vertex>vertices;
+
+  /*Vector<Vertex>vertices;
   vertices.push_back({ Vector3(-1.0f, 1.0f, -1.0f),	Vector2(0.0f, 0.0f) });
   vertices.push_back({ Vector3(1.0f, 1.0f, -1.0f),  Vector2(1.0f, 0.0f) });
   vertices.push_back({ Vector3(1.0f, 1.0f, 1.0f),	  Vector2(1.0f, 1.0f) });
@@ -51,9 +56,11 @@ void GameApp::onCreate() {
   vertices.push_back({ Vector3(-1.0f, -1.0f, 1.0f), Vector2(0.0f, 0.0f) });
   vertices.push_back({ Vector3(1.0f, -1.0f, 1.0f),	Vector2(1.0f, 0.0f) });
   vertices.push_back({ Vector3(1.0f, 1.0f, 1.0f),	  Vector2(1.0f, 1.0f) });
-  vertices.push_back({ Vector3(-1.0f, 1.0f, 1.0f),	Vector2(0.0f, 1.0f) });
+  vertices.push_back({ Vector3(-1.0f, 1.0f, 1.0f),	Vector2(0.0f, 1.0f) });*/
+
   //Define index buffer
-  Vector<uint32>indices;
+
+  /*Vector<uint32>indices;
   indices.push_back(3); indices.push_back(1); indices.push_back(0);
   indices.push_back(2); indices.push_back(1); indices.push_back(3);
 
@@ -70,15 +77,20 @@ void GameApp::onCreate() {
   indices.push_back(18); indices.push_back(17); indices.push_back(19);
 
   indices.push_back(22); indices.push_back(20); indices.push_back(21);
-  indices.push_back(23); indices.push_back(20); indices.push_back(22);
+  indices.push_back(23); indices.push_back(20); indices.push_back(22);*/
+
   //Create vertex buffer
-  m_vertexBuffer = m_graphicsAPI->createBuffer(vertices.data(),
+
+  /*m_vertexBuffer = m_graphicsAPI->createBuffer(vertices.data(),
     static_cast<int32>(sizeof(Vertex) * vertices.size()),
-    BUFFER_TYPE::VERTEX_BUFFER);
+    BUFFER_TYPE::VERTEX_BUFFER);*/
+
   //Create index buffer
-  m_indexBuffer = m_graphicsAPI->createBuffer(indices.data(),
+
+  /*m_indexBuffer = m_graphicsAPI->createBuffer(indices.data(),
     static_cast<int32>(sizeof(uint32) * indices.size()),
-    BUFFER_TYPE::INDEX_BUFFER);
+    BUFFER_TYPE::INDEX_BUFFER);*/
+
   //Create constant buffer
   m_cBuffer = m_graphicsAPI->createBuffer(nullptr,
                                           static_cast<int32>(sizeof(Matrices)),
@@ -90,7 +102,7 @@ void GameApp::onCreate() {
   mat.View = m_graphicsAPI->matrix4Policy(LookAtMatrix(Vector3(0.f, 3.f, -6.f),
                                                        Vector3(0.f, 1.f, 0.f),
                                                        Vector3(0.f, 1.f, 0.f)));
-  mat.Projection = m_graphicsAPI->matrix4Policy(PerspectiveMatrix(90.f,
+  mat.Projection = m_graphicsAPI->matrix4Policy(PerspectiveMatrix(70.f,
                                                                   800.f,
                                                                   600.f,
                                                                   0.01f,
@@ -98,8 +110,8 @@ void GameApp::onCreate() {
   m_graphicsAPI->updateBuffer(m_cBuffer, &mat);
 
   m_graphicsAPI->setInputLayout(m_layout);
-  m_graphicsAPI->setVertexBuffer(m_vertexBuffer, static_cast<int32>(sizeof(Vertex)), 0);
-  m_graphicsAPI->setIndexBuffer(m_indexBuffer);
+  //m_graphicsAPI->setVertexBuffer(m_vertexBuffer, static_cast<int32>(sizeof(Vertex)), 0);
+  //m_graphicsAPI->setIndexBuffer(m_indexBuffer);
   m_graphicsAPI->setConstantBuffer(0, m_cBuffer, SHADER_TYPE::VERTEX_SHADER);
   m_graphicsAPI->setConstantBuffer(0, m_cBuffer, SHADER_TYPE::PIXEL_SHADER);
   m_graphicsAPI->setShaders(m_shaderProgram);
@@ -110,14 +122,18 @@ void GameApp::onCreate() {
   m_color.alpha = 1.f;
 
   m_graphicsAPI->setBackBuffer();
+
+  //initialize model and load it
+  myModel = new Model();
+  myModel->load("D:/UAD/ovEngine/bin/resources/models/silly_dancing.fbx");
 }
 
 void GameApp::onUpdate() {
 }
 
 void GameApp::onRender() {
- m_graphicsAPI->clearBackBuffer(m_color);
- m_graphicsAPI->drawIndexed(36);
+  m_graphicsAPI->clearBackBuffer(m_color);
+  myModel->draw();
 }
 
 void GameApp::onClear() {
@@ -128,4 +144,5 @@ void GameApp::onClear() {
   delete m_shaderProgram;
   delete m_vs;
   delete m_ps;
+  delete myModel;
 }

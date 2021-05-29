@@ -81,14 +81,6 @@ namespace ovEngineSDK {
       GraphicsAPI::_instance() = _api;
      }
 
-     /**
-     * @fn       glm::mat4 matrix4Policy(const glm::mat4 & mat)
-     * @brief    Returns an API compatible matrix of 4 x 4 dimensions
-     * @param[in]mat A glm::mat4 to make compatible.
-     * @return   The received matrix in the correct order.
-     */
-     //virtual glm::mat4 matrix4Policy(const glm::mat4& mat) = 0;
-
      /***********************************************************************************/
      /*----------------------------------DEVICE-----------------------------------------*/
      /***********************************************************************************/
@@ -116,7 +108,9 @@ namespace ovEngineSDK {
      * @param[in]path The path to the file.
      * @return   Texture pointer for the corresponding API with data.
      */
-     //virtual Texture* createTextureFromFile(std::string path) = 0;
+     virtual Texture* createTextureFromFile(String){
+      return nullptr;
+     }
 
      /**
      * @fn       ShaderProgram* createShaderProgram()
