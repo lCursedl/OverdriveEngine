@@ -389,6 +389,8 @@ namespace ovEngineSDK {
     uint32 normalindex = 0;
     uint32 binormalindex = 0;
     uint32 tangentindex = 0;
+    uint32 blendindex = 0;
+    uint32 weightindex = 0;
 
     D3D11_INPUT_ELEMENT_DESC D;
 
@@ -419,6 +421,14 @@ namespace ovEngineSDK {
         D.SemanticName = "TANGENT";
         D.SemanticIndex = tangentindex;
         tangentindex++;
+        break;
+      case SEMANTIC::BLENDINDICES:
+        D.SemanticName = "BLENDINDICES";
+        D.SemanticIndex = blendindex;
+        break;
+      case SEMANTIC::BLENDWEIGHT:
+        D.SemanticName = "BLENDWEIGHT";
+        D.SemanticIndex = weightindex;
         break;
       }
       //FORMAT

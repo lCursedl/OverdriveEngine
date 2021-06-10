@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
+#define MAX_BONES 100
 cbuffer ConstantBuffer : register( b0 )
 {
 	matrix World;
@@ -17,11 +18,13 @@ cbuffer ConstantBuffer : register( b0 )
 //--------------------------------------------------------------------------------------
 struct VS_INPUT
 {
-    float3 Pos 		: POSITION;
-	float2 Tex 		: TEXCOORD0;
-	float3 Normal 	: NORMAL0;
-	float3 Tangent : TANGENT0;
+    float3 Pos 		 : POSITION;
+	float2 Tex 		 : TEXCOORD0;
+	float3 Normal 	 : NORMAL0;
+	float3 Tangent  : TANGENT0;
 	float3 Binormal : BINORMAL0;
+	int4  BoneID   : BLENDINDICES0;
+	float4 Weights  : BLENDWEIGHT0;
 };
 //--------------------------------------------------------------------------------------
 struct PS_INPUT

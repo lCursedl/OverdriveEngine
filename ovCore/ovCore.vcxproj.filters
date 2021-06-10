@@ -71,5 +71,17 @@
     <ClInclude Include="include\ovMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ovActor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovGameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovSceneGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

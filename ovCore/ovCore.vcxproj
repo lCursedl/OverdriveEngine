@@ -176,16 +176,20 @@
     <ClCompile Include="src\ovPlugin.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ovActor.h" />
     <ClInclude Include="include\ovBaseApp.h" />
     <ClInclude Include="include\ovBuffer.h" />
+    <ClInclude Include="include\ovComponent.h" />
     <ClInclude Include="include\ovFormats.h" />
     <ClInclude Include="include\ovGraphicsAPI.h" />
     <ClInclude Include="include\ovInputLayout.h" />
     <ClInclude Include="include\ovMesh.h" />
     <ClInclude Include="include\ovModel.h" />
+    <ClInclude Include="include\ovGameObject.h" />
     <ClInclude Include="include\ovPlugin.h" />
     <ClInclude Include="include\ovPrerequisitesCore.h" />
     <ClInclude Include="include\ovSamplerState.h" />
+    <ClInclude Include="include\ovSceneGraph.h" />
     <ClInclude Include="include\ovShader.h" />
     <ClInclude Include="include\ovShaderProgram.h" />
     <ClInclude Include="include\ovTexture.h" />

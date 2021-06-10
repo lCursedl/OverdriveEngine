@@ -67,6 +67,31 @@ namespace ovEngineSDK {
                                                           WRAPPING::WRAP);
   }
 
+  void Model::transformBones(float delta, Vector<Matrix4>& Transforms) {
+    Matrix4 identity = Matrix4::IDENTITY;
+    int32 totalBones = 0;
+    for (uint32 i = 0; i < m_meshes.size(); i++) {
+      totalBones += m_meshes[i]->m_numBones;
+    }
+    float ticksPerSec = m_modelAnimation->mTicksPerSecond != 0 ?
+                        m_modelAnimation->mTicksPerSecond : 25.f;
+    float timeInTicks = delta * ticksPerSec;
+    float animTime = Math::fmod(timeInTicks, m_modelAnimation->mDuration);
+
+    for (uint32 i = 0; i < m_meshes.size(); i++) {
+      readNodeHierarchy(animTime, , Matrix4::IDENTITY, m_meshes[i]);
+    }
+    Transforms.resize(totalBones);
+    for (uint32 i = 0; i < totalBones; i++) {
+      for (uint32 j = 0; j < m_meshes.size(); j++) {
+        for (uint32 k = 0; k < m_meshes[j]->m_boneInfo.size(); k++) {
+          Transforms[i] = m_meshes[j]->m_boneInfo[k].FinalTransform;
+          i++;
+        }
+      }
+    }
+  }
+
   void
   Model::processNode(aiNode* node, const aiScene* scene) {
     //Process each mesh located at the current node
@@ -124,10 +149,11 @@ namespace ovEngineSDK {
         indices->push_back(face.mIndices[j]);
       }
     }
+
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     Vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    return new Mesh(vertices, indices, textures);
+    return new Mesh(vertices, indices, textures, mesh);
   }
 
   Vector<MeshTexture>
@@ -156,5 +182,116 @@ namespace ovEngineSDK {
       }
     }
     return textures;
+  }
+  void
+  Model::readNodeHierarchy(float animTime,
+                           const aiNode* node,
+                           const Matrix4 tParent,
+                           Mesh* modelMesh) {
+    String nodeName(node->mName.data);
+    
+    //Transpose
+    Matrix4 Transform;
+    Transform.xVector.x = node->mTransformation.a1;
+    Transform.xVector.y = node->mTransformation.a2;
+    Transform.xVector.z = node->mTransformation.a3;
+    Transform.xVector.w = node->mTransformation.a4;
+
+    Transform.yVector.x = node->mTransformation.b1;
+    Transform.yVector.y = node->mTransformation.b2;
+    Transform.yVector.z = node->mTransformation.b3;
+    Transform.yVector.w = node->mTransformation.b4;
+
+    Transform.zVector.x = node->mTransformation.c1;
+    Transform.zVector.y = node->mTransformation.c2;
+    Transform.zVector.z = node->mTransformation.c3;
+    Transform.zVector.w = node->mTransformation.c4;
+
+    Transform.wVector.x = node->mTransformation.d1;
+    Transform.wVector.y = node->mTransformation.d2;
+    Transform.wVector.z = node->mTransformation.d3;
+    Transform.wVector.w = node->mTransformation.d4;
+
+    Transform = Transform.transpose();
+
+    const aiNodeAnim* animNode = findAnimationNode(m_modelAnimation, nodeName);
+    if (animNode) {
+      //Interpolate scaling and generate scaling transformation matrix
+
+    }
+    Matrix4 globalTransform = tParent * Transform;
+    if (modelMesh->m_boneMapping.find(nodeName) != modelMesh->m_boneMapping.end()) {
+      uint32 boneIndex = modelMesh->m_boneMapping[nodeName];
+      modelMesh->m_boneInfo[boneIndex].FinalTransform =
+                                globalTransform * modelMesh->m_boneInfo[boneIndex].BoneOffset;
+    }
+    for (uint32 i = 0; i < node->mNumChildren; i++) {
+      readNodeHierarchy(animTime, node->mChildren[i], globalTransform, modelMesh);
+    }
+  }
+  uint32
+  Model::findPosition(float animTime, const aiNodeAnim* nodeAnimation) {
+    for (uint32 i = 0; i < nodeAnimation->mNumPositionKeys - 1; i++) {
+      if (animTime < static_cast<float>(nodeAnimation->mPositionKeys[i + 1].mTime)) {
+        return i;
+      }
+    }
+    assert(0);
+    return 0;
+  }
+  uint32
+  Model::findRotation(float animTime, const aiNodeAnim* nodeAnimation) {
+    assert(nodeAnimation->mNumRotationKeys > 0);
+    for (uint32 i = 0; i < nodeAnimation->mNumRotationKeys - 1; i++) {
+      if (animTime < static_cast<float>(nodeAnimation->mRotationKeys[i + 1].mTime)) {
+        return i;
+      }
+    }
+    assert(0);
+    return 0;
+  }
+  uint32
+  Model::findScaling(float animTime, const aiNodeAnim* nodeAnimation) {
+    assert(nodeAnimation->mNumScalingKeys > 0);
+    for (uint32 i = 0; i < nodeAnimation->mNumScalingKeys - 1; i++) {
+      if (animTime < static_cast<float>(nodeAnimation->mScalingKeys[i + 1].mTime)) {
+        return i;
+      }
+    }
+    assert(0);
+    return 0;
+  }
+  void
+  Model::calcInterpolatedPos(aiVector3D& Out,
+                             float animTime,
+                             const aiNodeAnim* nodeAnimation) {
+    if (nodeAnimation->mNumPositionKeys == 1) {
+      Out = nodeAnimation->mPositionKeys[0].mValue;
+      return;
+    }
+    uint32 posIndex = findPosition(animTime, nodeAnimation);
+    uint32 nextPosIndex = posIndex + 1;
+    assert(nextPosIndex < nodeAnimation->mNumPositionKeys);
+    float delta = static_cast<float>(nodeAnimation->mPositionKeys[nextPosIndex].mTime - 
+                                     nodeAnimation->mPositionKeys[posIndex].mTime);
+    float factor = animTime -
+                   static_cast<float>(nodeAnimation->mPositionKeys[posIndex].mTime / delta);
+    assert(factor >= 0.f && factor <= 1.f);
+    const aiVector3D& Start = nodeAnimation->mPositionKeys[posIndex].mValue;
+    const aiVector3D& End = nodeAnimation->mPositionKeys[nextPosIndex].mValue;
+    aiVector3D dTime = End - Start;
+    Out = Start + factor * dTime;
+  }
+  void
+  Model::calcInterpolatedRot(aiQuaternion& Out,
+                             float animTime,
+                             const aiNodeAnim* nodeAnimation) {
+    
+  }
+  void
+  Model::calcInterpolatedScale(aiVector3D& Out,
+                               float animTime,
+                               const aiNodeAnim* nodeAnimation) {
+    
   }
 }

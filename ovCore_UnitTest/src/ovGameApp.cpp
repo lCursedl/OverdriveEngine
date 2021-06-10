@@ -22,6 +22,8 @@ void GameApp::onCreate() {
   lDesc.addToDesc(SEMANTIC::NORMAL,   FORMATS::RGB32_FLOAT, 20, 3);
   lDesc.addToDesc(SEMANTIC::TANGENT,  FORMATS::RGB32_FLOAT, 36, 3);
   lDesc.addToDesc(SEMANTIC::BINORMAL, FORMATS::RGB32_FLOAT, 48, 3);
+  lDesc.addToDesc(SEMANTIC::BLENDINDICES, FORMATS::RGBA32_INT, 60, 4);
+  lDesc.addToDesc(SEMANTIC::BLENDWEIGHT, FORMATS::RGBA32_FLOAT, 72, 4);
   //Create input layout
   m_layout = m_graphicsAPI->createInputLayout(m_shaderProgram, lDesc);
 

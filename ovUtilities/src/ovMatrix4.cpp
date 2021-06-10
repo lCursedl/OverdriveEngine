@@ -7,6 +7,23 @@ namespace ovEngineSDK {
                                             0.0f, 0.0f, 1.0f, 0.0f,
                                             0.0f, 0.0f, 0.0f, 1.0f);
 
+  Matrix4::Matrix4(float value) {
+    xVector.x = value;
+    xVector.y = value;
+    xVector.z = value;
+    xVector.w = value;
+
+    yVector.x = value;
+    yVector.y = value;
+    yVector.z = value;
+    yVector.w = value;
+
+    zVector.x = value;
+    zVector.y = value;
+    zVector.z = value;
+    zVector.w = value;
+  }
+
   Matrix4::Matrix4(float _xx, float _xy, float _xz, float _xw,
                    float _yx, float _yy, float _yz, float _yw,
                    float _zx, float _zy, float _zz, float _zw,

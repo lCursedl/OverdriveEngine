@@ -19,6 +19,8 @@ namespace ovEngineSDK {
    public:
     Matrix4() = default;
 
+    Matrix4(float value);
+
     Matrix4(float _xx, float _xy, float _xz, float _xw,
             float _yx, float _yy, float _yz, float _yw,
             float _zx, float _zy, float _zz, float _zw,

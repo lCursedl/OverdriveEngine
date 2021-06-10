@@ -13,7 +13,9 @@ namespace ovEngineSDK {
       TEXCOORD,
       NORMAL,
       BINORMAL,
-      TANGENT
+      TANGENT,
+      BLENDINDICES,
+      BLENDWEIGHT
     };
   }
   /** 
