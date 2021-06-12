@@ -12,6 +12,7 @@
 #include "ovMath.h"
 #include "ovVector3.h"
 #include "ovVector4.h"
+#include "ovQuaternion.h"
 
 namespace ovEngineSDK {
   class OV_UTILITY_EXPORT Matrix4
@@ -65,6 +66,15 @@ namespace ovEngineSDK {
 
     Matrix4
     transpose()const;
+
+    static Matrix4
+    scale(const Matrix4& Mat, const Vector3& Vec);
+
+    static Matrix4
+    fromQuat(const Quaternion& Quat);
+
+    Matrix4
+    inverse() const;
 
    public:
     Vector4 xVector;

@@ -18,7 +18,7 @@ class GameApp : public BaseApp
   onCreate() override;
 
   void
-  onUpdate() override;
+  onUpdate(float delta) override;
 
   void
   onRender() override;
@@ -32,6 +32,7 @@ class GameApp : public BaseApp
   ShaderProgram* m_shaderProgram = nullptr;
   InputLayout* m_layout = nullptr;
   Buffer* m_cBuffer = nullptr;
+  Buffer* m_bBuffer = nullptr;
   Buffer* m_vertexBuffer = nullptr;
   Buffer* m_indexBuffer = nullptr;
   COLOR m_color;
@@ -47,5 +48,9 @@ class GameApp : public BaseApp
   struct Vertex {
     Vector3 Position;
     Vector2 Texcoord;
+  };
+
+  struct Bones {
+    Matrix4 gBones[MAXBONES];
   };
 };

@@ -250,11 +250,19 @@ namespace ovEngineSDK {
     glBindVertexArray(ILayout->m_vao);
     for (uint32 i = 0; i < desc.v_Layout.size(); i++) {
       GLenum varType = desc.v_Layout[i].m_semantic == SEMANTIC::BLENDINDICES ?
-                                                                GL_UNSIGNED_INT : GL_FLOAT;
-      glVertexAttribFormat(i,
-        desc.v_Layout[i].m_numElements,
-        varType, GL_FALSE,
-        desc.v_Layout[i].m_offset);
+                                                                GL_INT : GL_FLOAT;
+      if (varType == GL_INT) {
+        glVertexAttribIFormat(
+          desc.v_Layout[i].m_numElements,
+          varType, GL_FALSE,
+          desc.v_Layout[i].m_offset);
+      }
+      else {
+        glVertexAttribFormat(i,
+          desc.v_Layout[i].m_numElements,
+          varType, GL_FALSE,
+          desc.v_Layout[i].m_offset);
+      }
       glVertexAttribBinding(i, 0);
       glEnableVertexAttribArray(i);
     }

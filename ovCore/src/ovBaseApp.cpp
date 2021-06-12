@@ -9,6 +9,7 @@ namespace ovEngineSDK {
     onCreate();
     MSG msg = {};
     while (WM_QUIT != msg.message) {
+      m_deltaTime = m_appClock.getElapsedTime().asSeconds();
       if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -28,7 +29,7 @@ namespace ovEngineSDK {
   }
 
   void
-  BaseApp::onUpdate() {
+  BaseApp::onUpdate(float delta) {
   }
 
   void
@@ -39,7 +40,7 @@ namespace ovEngineSDK {
   }
   
   void BaseApp::update() {
-    onUpdate();
+    onUpdate(m_deltaTime);
   }
 
   void BaseApp::render() {

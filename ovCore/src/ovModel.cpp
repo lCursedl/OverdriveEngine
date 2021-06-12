@@ -21,7 +21,12 @@ namespace ovEngineSDK {
         }
       }
     }
-    return file.substr(realPos, file.length() - realPos);
+    if (realPos == 0) {
+      return "/" + file;
+    }
+    else {
+      return file.substr(realPos, file.length() - realPos);
+    }    
   }
 
   Model::~Model() {
@@ -30,6 +35,7 @@ namespace ovEngineSDK {
     }
     m_meshes.clear();
     m_modelTextures.clear();
+    delete m_modelScene;
   }
 
   void
@@ -44,17 +50,16 @@ namespace ovEngineSDK {
     //Read file via assimp
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
-                                             aiProcessPreset_TargetRealtime_Fast |
+                                             aiProcessPreset_TargetRealtime_MaxQuality |
                                              aiProcess_ConvertToLeftHanded |
-                                             aiProcess_FindInstances |
-                                             aiProcess_ValidateDataStructure |
-                                             aiProcess_OptimizeMeshes |
-                                             aiProcess_Debone);
+                                             aiProcess_Triangulate);
     //Check for errors
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-    {
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
       return;
     }
+    m_modelScene = importer.GetOrphanedScene();
+    memcpy(&m_globalTransform, &m_modelScene->mRootNode->mTransformation, sizeof(Matrix4));
+    //m_globalTransform = m_globalTransform.inverse();
     //Retrieve the directory path of the file
     m_directory = path.substr(0, path.find_last_of('/'));
     //Process assimp's root node recursively
@@ -68,28 +73,31 @@ namespace ovEngineSDK {
   }
 
   void Model::transformBones(float delta, Vector<Matrix4>& Transforms) {
-    Matrix4 identity = Matrix4::IDENTITY;
     int32 totalBones = 0;
     for (uint32 i = 0; i < m_meshes.size(); i++) {
       totalBones += m_meshes[i]->m_numBones;
     }
-    float ticksPerSec = m_modelAnimation->mTicksPerSecond != 0 ?
-                        m_modelAnimation->mTicksPerSecond : 25.f;
-    float timeInTicks = delta * ticksPerSec;
-    float animTime = Math::fmod(timeInTicks, m_modelAnimation->mDuration);
+    float timeInTicks = delta * m_modelScene->mAnimations[0]->mTicksPerSecond;
+    float animTime = Math::fmod(timeInTicks, m_modelScene->mAnimations[0]->mDuration);
 
     for (uint32 i = 0; i < m_meshes.size(); i++) {
-      readNodeHierarchy(animTime, , Matrix4::IDENTITY, m_meshes[i]);
+      readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, m_meshes[i]);
     }
     Transforms.resize(totalBones);
-    for (uint32 i = 0; i < totalBones; i++) {
+
+    for (uint32 i = 0; i < m_meshes.size(); i++) {
+      for (uint32 j = 0; j < totalBones; j++) {
+          Transforms[j] = m_meshes[i]->m_boneInfo[j].FinalTransform;
+      }
+    }
+    /*for (uint32 i = 0; i < totalBones; i++) {
       for (uint32 j = 0; j < m_meshes.size(); j++) {
         for (uint32 k = 0; k < m_meshes[j]->m_boneInfo.size(); k++) {
           Transforms[i] = m_meshes[j]->m_boneInfo[k].FinalTransform;
           i++;
         }
       }
-    }
+    }*/
   }
 
   void
@@ -183,6 +191,16 @@ namespace ovEngineSDK {
     }
     return textures;
   }
+  const aiNodeAnim*
+  Model::findAnimationNode(const aiAnimation* anim, const String node) {
+    for (int32 i = 0; i < anim->mNumChannels; i++) {
+      const aiNodeAnim* T = anim->mChannels[i];
+      if (String(T->mNodeName.data) == node) {
+        return T;
+      }
+    }
+    return nullptr;
+  }
   void
   Model::readNodeHierarchy(float animTime,
                            const aiNode* node,
@@ -190,40 +208,43 @@ namespace ovEngineSDK {
                            Mesh* modelMesh) {
     String nodeName(node->mName.data);
     
-    //Transpose
     Matrix4 Transform;
-    Transform.xVector.x = node->mTransformation.a1;
-    Transform.xVector.y = node->mTransformation.a2;
-    Transform.xVector.z = node->mTransformation.a3;
-    Transform.xVector.w = node->mTransformation.a4;
-
-    Transform.yVector.x = node->mTransformation.b1;
-    Transform.yVector.y = node->mTransformation.b2;
-    Transform.yVector.z = node->mTransformation.b3;
-    Transform.yVector.w = node->mTransformation.b4;
-
-    Transform.zVector.x = node->mTransformation.c1;
-    Transform.zVector.y = node->mTransformation.c2;
-    Transform.zVector.z = node->mTransformation.c3;
-    Transform.zVector.w = node->mTransformation.c4;
-
-    Transform.wVector.x = node->mTransformation.d1;
-    Transform.wVector.y = node->mTransformation.d2;
-    Transform.wVector.z = node->mTransformation.d3;
-    Transform.wVector.w = node->mTransformation.d4;
-
-    Transform = Transform.transpose();
-
-    const aiNodeAnim* animNode = findAnimationNode(m_modelAnimation, nodeName);
+    memcpy(&Transform, &node->mTransformation, sizeof(Matrix4));
+    const aiNodeAnim* animNode = findAnimationNode(m_modelScene->mAnimations[0], nodeName);
     if (animNode) {
       //Interpolate scaling and generate scaling transformation matrix
+      aiVector3D aiscaling;
+      calcInterpolatedScale(aiscaling, animTime, animNode);
+      Matrix4 scaleMat = Matrix4::IDENTITY;
+      //Translate the values from aiVector3D to Vector3
+      Vector3 scaling(aiscaling.x, aiscaling.y, aiscaling.z);
+      scaleMat = Matrix4::scale(scaleMat, scaling);
 
+      //Interpolate rotation and generate rotation transform matrix
+      aiQuaternion aiquat;
+      calcInterpolatedRot(aiquat, animTime, animNode);
+      Quaternion rotation(static_cast<float>(aiquat.x), static_cast<float>(aiquat.y),
+                          static_cast<float>(aiquat.z), static_cast<float>(aiquat.w));
+      Matrix4 rotMat = Matrix4::fromQuat(rotation);
+
+      //Interpolate translation and generate translation transform matrix
+      aiVector3D aitranslate;
+      calcInterpolatedPos(aitranslate, animTime, animNode);
+      Matrix4 transMat = Matrix4::IDENTITY;
+      transMat.xVector.w = aitranslate.x;
+      transMat.yVector.w = aitranslate.y;
+      transMat.zVector.w = aitranslate.z;
+
+      //Combine above transformations
+      Transform = transMat * rotMat * scaleMat;
     }
     Matrix4 globalTransform = tParent * Transform;
     if (modelMesh->m_boneMapping.find(nodeName) != modelMesh->m_boneMapping.end()) {
       uint32 boneIndex = modelMesh->m_boneMapping[nodeName];
       modelMesh->m_boneInfo[boneIndex].FinalTransform =
-                                globalTransform * modelMesh->m_boneInfo[boneIndex].BoneOffset;
+                               m_globalTransform *
+                               globalTransform *
+                               modelMesh->m_boneInfo[boneIndex].BoneOffset;
     }
     for (uint32 i = 0; i < node->mNumChildren; i++) {
       readNodeHierarchy(animTime, node->mChildren[i], globalTransform, modelMesh);
@@ -274,8 +295,8 @@ namespace ovEngineSDK {
     assert(nextPosIndex < nodeAnimation->mNumPositionKeys);
     float delta = static_cast<float>(nodeAnimation->mPositionKeys[nextPosIndex].mTime - 
                                      nodeAnimation->mPositionKeys[posIndex].mTime);
-    float factor = animTime -
-                   static_cast<float>(nodeAnimation->mPositionKeys[posIndex].mTime / delta);
+    float factor = (animTime -
+                   static_cast<float>(nodeAnimation->mPositionKeys[posIndex].mTime)) / delta;
     assert(factor >= 0.f && factor <= 1.f);
     const aiVector3D& Start = nodeAnimation->mPositionKeys[posIndex].mValue;
     const aiVector3D& End = nodeAnimation->mPositionKeys[nextPosIndex].mValue;
@@ -286,12 +307,41 @@ namespace ovEngineSDK {
   Model::calcInterpolatedRot(aiQuaternion& Out,
                              float animTime,
                              const aiNodeAnim* nodeAnimation) {
-    
+
+    if (nodeAnimation->mNumRotationKeys == 1) {
+      Out = nodeAnimation->mRotationKeys[0].mValue;
+      return;
+    }
+    uint32 rotIndex = findRotation(animTime, nodeAnimation);
+    uint32 nextRotIndex = rotIndex + 1;
+    assert(nextRotIndex < nodeAnimation->mNumRotationKeys);
+    float delta = static_cast<float>(nodeAnimation->mRotationKeys[nextRotIndex].mTime -
+                                     nodeAnimation->mRotationKeys[rotIndex].mTime);
+    float factor = (animTime - static_cast<float>(nodeAnimation->mRotationKeys[rotIndex].mTime)) / delta;
+    assert(factor >= 0.f && factor <= 1.f);
+    const aiQuaternion& Start = nodeAnimation->mRotationKeys[rotIndex].mValue;
+    const aiQuaternion& End = nodeAnimation->mRotationKeys[nextRotIndex].mValue;
+    aiQuaternion::Interpolate(Out, Start, End, factor);
+    Out = Out.Normalize();
   }
   void
   Model::calcInterpolatedScale(aiVector3D& Out,
                                float animTime,
                                const aiNodeAnim* nodeAnimation) {
-    
+    if (nodeAnimation->mNumScalingKeys == 1) {
+      Out = nodeAnimation->mScalingKeys[0].mValue;
+      return;
+    }
+    uint32 scalIndex = findScaling(animTime, nodeAnimation);
+    uint32 nextScalIndex = scalIndex + 1;
+    assert(nextScalIndex < nodeAnimation->mNumScalingKeys);
+    float delta = static_cast<float>(nodeAnimation->mScalingKeys[nextScalIndex].mTime - 
+                                     nodeAnimation->mScalingKeys[scalIndex].mTime);
+    float factor = (animTime - static_cast<float>(nodeAnimation->mScalingKeys[scalIndex].mTime)) / delta;
+    assert(factor >= 0.f, && factor <= 1.f);
+    const aiVector3D& Start = nodeAnimation->mScalingKeys[scalIndex].mValue;
+    const aiVector3D& End = nodeAnimation->mScalingKeys[nextScalIndex].mValue;
+    aiVector3D dTime = End - Start;
+    Out = Start + factor * dTime;
   }
 }

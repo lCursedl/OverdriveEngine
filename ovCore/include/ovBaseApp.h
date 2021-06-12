@@ -7,6 +7,7 @@
 using sf::WindowHandle;
 using sf::Event;
 
+
 namespace ovEngineSDK {
   class OV_CORE_EXPORT BaseApp
   {
@@ -29,7 +30,7 @@ namespace ovEngineSDK {
     * @brief     
     */
     virtual void
-    onUpdate();
+    onUpdate(float delta);
 
     /*
     * @fn
@@ -66,6 +67,8 @@ namespace ovEngineSDK {
     Plugin m_directXPlugin;
     GraphicsAPI* m_graphicsAPI = nullptr;
     bool m_runApp = false;
+    sf::Clock m_appClock;
+    float m_deltaTime;
 
     static LRESULT CALLBACK WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam);
   };

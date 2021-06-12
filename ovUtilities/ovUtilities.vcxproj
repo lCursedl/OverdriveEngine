@@ -178,6 +178,7 @@
     <ClCompile Include="src\ovDegree.cpp" />
     <ClCompile Include="src\ovMath.cpp" />
     <ClCompile Include="src\ovMatrix4.cpp" />
+    <ClCompile Include="src\ovQuaternion.cpp" />
     <ClCompile Include="src\ovRadian.cpp" />
     <ClCompile Include="src\ovVector2.cpp" />
     <ClCompile Include="src\ovVector2I.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="include\ovPlatformDefines.h" />
     <ClInclude Include="include\ovPlatformTypes.h" />
     <ClInclude Include="include\ovPrerequisitesUtil.h" />
+    <ClInclude Include="include\ovQuaternion.h" />
     <ClInclude Include="include\ovRadian.h" />
     <ClInclude Include="include\ovStdHeaders.h" />
     <ClInclude Include="include\ovVector2.h" />

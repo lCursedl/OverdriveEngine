@@ -1,6 +1,6 @@
 #pragma once
 #define NUM_BONES_PERVERTEX 4
-#define MAXBONES 100
+#define MAXBONES 200
 
 #include <ovPrerequisitesCore.h>
 
@@ -25,7 +25,7 @@ namespace ovEngineSDK {
     Vector3 Normal;
     Vector3 Tangent;
     Vector3 Bitangent;
-    uint32 BoneID[4];
+    uint32 BoneID[4] = {0};
     float Weights[4] = {0.f};
   };
 

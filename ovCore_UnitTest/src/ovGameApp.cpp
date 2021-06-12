@@ -27,95 +27,32 @@ void GameApp::onCreate() {
   //Create input layout
   m_layout = m_graphicsAPI->createInputLayout(m_shaderProgram, lDesc);
 
-  //Define vertex buffer
-
-  /*Vector<Vertex>vertices;
-  vertices.push_back({ Vector3(-1.0f, 1.0f, -1.0f),	Vector2(0.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, 1.0f, -1.0f),  Vector2(1.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, 1.0f, 1.0f),	  Vector2(1.0f, 1.0f) });
-  vertices.push_back({ Vector3(-1.0f, 1.0f, 1.0f),	Vector2(0.0f, 1.0f) });
-
-  vertices.push_back({ Vector3(-1.0f, -1.0f, -1.0f),Vector2(0.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, -1.0f, -1.0f),	Vector2(1.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, -1.0f, 1.0f),	Vector2(1.0f, 1.0f) });
-  vertices.push_back({ Vector3(-1.0f, -1.0f, 1.0f), Vector2(0.0f, 1.0f) });
-
-  vertices.push_back({ Vector3(-1.0f, -1.0f, 1.0f), Vector2(0.0f, 0.0f) });
-  vertices.push_back({ Vector3(-1.0f, -1.0f, -1.0f),Vector2(1.0f, 0.0f) });
-  vertices.push_back({ Vector3(-1.0f, 1.0f, -1.0f), Vector2(1.0f, 1.0f) });
-  vertices.push_back({ Vector3(-1.0f, 1.0f, 1.0f),	Vector2(0.0f, 1.0f) });
-
-  vertices.push_back({ Vector3(1.0f, -1.0f, 1.0f),	Vector2(0.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, -1.0f, -1.0f), Vector2(1.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, 1.0f, -1.0f),	Vector2(1.0f, 1.0f) });
-  vertices.push_back({ Vector3(1.0f, 1.0f, 1.0f),	  Vector2(0.0f, 1.0f) });
-
-  vertices.push_back({ Vector3(-1.0f, -1.0f, -1.0f),Vector2(0.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, -1.0f, -1.0f), Vector2(1.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, 1.0f, -1.0f),	Vector2(1.0f, 1.0f) });
-  vertices.push_back({ Vector3(-1.0f, 1.0f, -1.0f), Vector2(0.0f, 1.0f) });
-
-  vertices.push_back({ Vector3(-1.0f, -1.0f, 1.0f), Vector2(0.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, -1.0f, 1.0f),	Vector2(1.0f, 0.0f) });
-  vertices.push_back({ Vector3(1.0f, 1.0f, 1.0f),	  Vector2(1.0f, 1.0f) });
-  vertices.push_back({ Vector3(-1.0f, 1.0f, 1.0f),	Vector2(0.0f, 1.0f) });*/
-
-  //Define index buffer
-
-  /*Vector<uint32>indices;
-  indices.push_back(3); indices.push_back(1); indices.push_back(0);
-  indices.push_back(2); indices.push_back(1); indices.push_back(3);
-
-  indices.push_back(6); indices.push_back(4); indices.push_back(5);
-  indices.push_back(7); indices.push_back(4); indices.push_back(6);
-
-  indices.push_back(11); indices.push_back(9); indices.push_back(8);
-  indices.push_back(10); indices.push_back(9); indices.push_back(11);
-
-  indices.push_back(14); indices.push_back(12); indices.push_back(13);
-  indices.push_back(15); indices.push_back(12); indices.push_back(14);
-
-  indices.push_back(19); indices.push_back(17); indices.push_back(16);
-  indices.push_back(18); indices.push_back(17); indices.push_back(19);
-
-  indices.push_back(22); indices.push_back(20); indices.push_back(21);
-  indices.push_back(23); indices.push_back(20); indices.push_back(22);*/
-
-  //Create vertex buffer
-
-  /*m_vertexBuffer = m_graphicsAPI->createBuffer(vertices.data(),
-    static_cast<int32>(sizeof(Vertex) * vertices.size()),
-    BUFFER_TYPE::VERTEX_BUFFER);*/
-
-  //Create index buffer
-
-  /*m_indexBuffer = m_graphicsAPI->createBuffer(indices.data(),
-    static_cast<int32>(sizeof(uint32) * indices.size()),
-    BUFFER_TYPE::INDEX_BUFFER);*/
-
   //Create constant buffer
   m_cBuffer = m_graphicsAPI->createBuffer(nullptr,
                                           static_cast<int32>(sizeof(Matrices)),
+                                          BUFFER_TYPE::CONST_BUFFER);
+  m_bBuffer = m_graphicsAPI->createBuffer(nullptr,
+                                          static_cast<int32>(sizeof(Bones)),
                                           BUFFER_TYPE::CONST_BUFFER);
   //Create structure to update constant buffer
   Matrices mat{};
   mat.World = Matrix4::IDENTITY;
   mat.Color = Vector4(1.f, 0.f, 0.f, 1.f);
-  mat.View = m_graphicsAPI->matrix4Policy(LookAtMatrix(Vector3(0.f, 3.f, -6.f),
+  mat.View = m_graphicsAPI->matrix4Policy(LookAtMatrix(Vector3(0.f, 0.f, -5.f),
                                                        Vector3(0.f, 1.f, 0.f),
                                                        Vector3(0.f, 1.f, 0.f)));
   mat.Projection = m_graphicsAPI->matrix4Policy(PerspectiveMatrix(70.f,
                                                                   800.f,
                                                                   600.f,
                                                                   0.01f,
-                                                                  100.f));  
+                                                                  100.f));
   m_graphicsAPI->updateBuffer(m_cBuffer, &mat);
 
   m_graphicsAPI->setInputLayout(m_layout);
-  //m_graphicsAPI->setVertexBuffer(m_vertexBuffer, static_cast<int32>(sizeof(Vertex)), 0);
-  //m_graphicsAPI->setIndexBuffer(m_indexBuffer);
   m_graphicsAPI->setConstantBuffer(0, m_cBuffer, SHADER_TYPE::VERTEX_SHADER);
   m_graphicsAPI->setConstantBuffer(0, m_cBuffer, SHADER_TYPE::PIXEL_SHADER);
+  m_graphicsAPI->setConstantBuffer(1, m_bBuffer, SHADER_TYPE::VERTEX_SHADER);
+  m_graphicsAPI->setConstantBuffer(1, m_bBuffer, SHADER_TYPE::PIXEL_SHADER);
   m_graphicsAPI->setShaders(m_shaderProgram);
 
   m_color.red = 0.0f;
@@ -130,7 +67,16 @@ void GameApp::onCreate() {
   myModel->load("D:/UAD/ovEngine/bin/resources/models/silly_dancing.fbx");
 }
 
-void GameApp::onUpdate() {
+void GameApp::onUpdate(float delta) {
+  Vector<Matrix4> transforms;
+  myModel->transformBones(delta, transforms);
+  Bones cbBone;
+  for (uint32 i = 0; i < transforms.size(); i++) {
+    if (i < MAXBONES) {
+      cbBone.gBones[i] = transforms[i];
+    }
+  }
+  m_graphicsAPI->updateBuffer(m_bBuffer, &cbBone);
 }
 
 void GameApp::onRender() {
@@ -142,6 +88,7 @@ void GameApp::onClear() {
   delete m_vertexBuffer;
   delete m_indexBuffer;
   delete m_cBuffer;
+  delete m_bBuffer;
   delete m_layout;
   delete m_shaderProgram;
   delete m_vs;

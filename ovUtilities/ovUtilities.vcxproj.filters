@@ -40,6 +40,9 @@
     <ClCompile Include="src\ovMatrix4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ovQuaternion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovPlatformDefines.h">
@@ -85,6 +88,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ovModule.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovQuaternion.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

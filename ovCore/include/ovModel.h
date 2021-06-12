@@ -24,6 +24,8 @@ namespace ovEngineSDK {
     String m_directory;
     SamplerState* m_textureSampler = nullptr;
     aiAnimation* m_modelAnimation = nullptr;
+    aiScene* m_modelScene = nullptr;
+    Matrix4 m_globalTransform;
 
     void processNode(aiNode* node, const aiScene* scene);
     Mesh* processMesh(aiMesh* mesh, const aiScene* scene);

@@ -23,34 +23,16 @@ namespace ovEngineSDK {
         boneIndex = m_boneMapping[boneName];
       }
       m_boneMapping[boneName] = boneIndex;
-      Matrix4 tempMatrix;
-      tempMatrix.xVector.x = mesh->mBones[i]->mOffsetMatrix.a1;
-      tempMatrix.xVector.y = mesh->mBones[i]->mOffsetMatrix.a2;
-      tempMatrix.xVector.z = mesh->mBones[i]->mOffsetMatrix.a3;
-      tempMatrix.xVector.w = mesh->mBones[i]->mOffsetMatrix.a4;
-
-      tempMatrix.yVector.x = mesh->mBones[i]->mOffsetMatrix.b1;
-      tempMatrix.yVector.y = mesh->mBones[i]->mOffsetMatrix.b2;
-      tempMatrix.yVector.z = mesh->mBones[i]->mOffsetMatrix.b3;
-      tempMatrix.yVector.w = mesh->mBones[i]->mOffsetMatrix.b4;
-
-      tempMatrix.zVector.x = mesh->mBones[i]->mOffsetMatrix.c1;
-      tempMatrix.zVector.y = mesh->mBones[i]->mOffsetMatrix.c2;
-      tempMatrix.zVector.z = mesh->mBones[i]->mOffsetMatrix.c3;
-      tempMatrix.zVector.w = mesh->mBones[i]->mOffsetMatrix.c4;
-
-      tempMatrix.wVector.x = mesh->mBones[i]->mOffsetMatrix.d1;
-      tempMatrix.wVector.y = mesh->mBones[i]->mOffsetMatrix.d2;
-      tempMatrix.wVector.z = mesh->mBones[i]->mOffsetMatrix.d3;
-      tempMatrix.wVector.w = mesh->mBones[i]->mOffsetMatrix.d4;
-
-      m_boneInfo[boneIndex].BoneOffset = tempMatrix.transpose();
-
+      memcpy(&m_boneInfo[boneIndex].BoneOffset, &mesh->mBones[i]->mOffsetMatrix, sizeof(Matrix4));
       for (int32 j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
+        uint32 vertexID = mesh->mBones[i]->mWeights[j].mVertexId;
+        float weigth = mesh->mBones[i]->mWeights[j].mWeight;
         for (int32 k = 0; k < NUM_BONES_PERVERTEX; k++) {
-          m_vertices->at(mesh->mBones[i]->mWeights[j].mVertexId).BoneID[k] = boneIndex;
-          m_vertices->at(mesh->mBones[i]->mWeights[j].mVertexId).Weights[k] = 
-                                                         mesh->mBones[i]->mWeights[j].mWeight;
+          if (m_vertices->at(vertexID).Weights[k] == 0.f) {
+            m_vertices->at(vertexID).BoneID[k] = boneIndex;
+            m_vertices->at(vertexID).Weights[k] = weigth;
+            break;
+          }
         }
       }
     }
