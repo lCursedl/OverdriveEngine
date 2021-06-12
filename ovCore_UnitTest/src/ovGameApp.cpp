@@ -64,7 +64,7 @@ void GameApp::onCreate() {
 
   //initialize model and load it
   myModel = new Model();
-  myModel->load("D:/UAD/ovEngine/bin/resources/models/silly_dancing.fbx");
+  myModel->load("resources/models/silly_dancing.fbx");
 }
 
 void GameApp::onUpdate(float delta) {
