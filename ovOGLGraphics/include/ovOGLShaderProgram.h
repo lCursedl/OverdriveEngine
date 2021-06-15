@@ -28,9 +28,9 @@ namespace ovEngineSDK {
     */
     ~OGLShaderProgram();
 
-    void setVertexShader(VertexShader* vertexShader)                 override;
+    void setVertexShader(SPtr<VertexShader> vertexShader)             override;
 
-    void setPixelShader(PixelShader* pixelShader)                    override;
+    void setPixelShader(SPtr<PixelShader> pixelShader)                override;
 
     void linkProgram()                                               override;
 

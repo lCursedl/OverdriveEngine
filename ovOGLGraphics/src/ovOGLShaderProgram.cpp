@@ -9,17 +9,11 @@ namespace ovEngineSDK {
     }
   }
 
-  void OGLShaderProgram::setVertexShader(VertexShader* vertexShader) {
-    if (m_program == 0) {
+  void OGLShaderProgram::setVertexShader(SPtr<VertexShader> vertexShader) {
+    if (m_program == 0 || vertexShader == nullptr) {
       return;
     }
-
-    OGLVertexShader* vs = dynamic_cast<OGLVertexShader*>(vertexShader);
-
-    if (!vs) {
-      return;
-    }
-
+    auto vs = static_pointer_cast<OGLVertexShader>(vertexShader);
     if (vs->m_vertexShader == 0) {
       return;
     }
@@ -27,17 +21,11 @@ namespace ovEngineSDK {
     m_pVertexShader = vertexShader;
   }
 
-  void OGLShaderProgram::setPixelShader(PixelShader* pixelShader) {
-    if (m_program == 0) {
+  void OGLShaderProgram::setPixelShader(SPtr<PixelShader> pixelShader) {
+    if (m_program == 0 || pixelShader == nullptr) {
       return;
     }
-
-    OGLPixelShader* ps = dynamic_cast<OGLPixelShader*>(pixelShader);
-
-    if (!ps) {
-      return;
-    }
-
+    auto ps = static_pointer_cast<OGLPixelShader>(pixelShader);
     if (ps->m_ps == 0) {
       return;
     }
@@ -56,8 +44,8 @@ namespace ovEngineSDK {
       glGetProgramInfoLog(m_program, 512, 0, log);
     }
     glDetachShader(m_program,
-      dynamic_cast<OGLVertexShader*>(m_pVertexShader)->m_vertexShader);
+      static_pointer_cast<OGLVertexShader>(m_pVertexShader)->m_vertexShader);
     glDetachShader(m_program,
-      dynamic_cast<OGLPixelShader*>(m_pPixelShader)->m_ps);
+      static_pointer_cast<OGLPixelShader>(m_pPixelShader)->m_ps);
   }
 }

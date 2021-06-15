@@ -20,36 +20,36 @@ namespace ovEngineSDK {
 
     //DEVICE
 
-    Texture*
+    SPtr<Texture>
     createTexture(int32 width,
-                           int32 height,
-                           TEXTURE_BINDINGS::E binding,
-                           FORMATS::E format)                         override;
+                  int32 height,
+                  TEXTURE_BINDINGS::E binding,
+                  FORMATS::E format)                                  override;
 
-    Texture*
+    SPtr<Texture>
     createTextureFromFile(String path)                                override;
 
-    ShaderProgram*
+    SPtr<ShaderProgram>
     createShaderProgram()                                             override;
 
-    Buffer*
+    SPtr<Buffer>
     createBuffer(const void* data,
-                         uint32 size,
-                         BUFFER_TYPE::E type)                         override;
+                 uint32 size,
+                 BUFFER_TYPE::E type)                                 override;
 
-    InputLayout*
-    createInputLayout(ShaderProgram* program,
-                                   LAYOUT_DESC desc)                  override;
-    SamplerState*
+    SPtr<InputLayout>
+    createInputLayout(SPtr<ShaderProgram> program,
+                      LAYOUT_DESC& desc)                               override;
+    SPtr<SamplerState>
     createSamplerState(FILTER_LEVEL::E mag,
-                                     FILTER_LEVEL::E min,
-                                     FILTER_LEVEL::E mip,
-                                     uint32 anisotropic,
-                                     WRAPPING::E wrapMode)            override;
-    VertexShader*
-    createVertexShader(std::wstring file)                             override;
-    PixelShader*
-    createPixelShader(std::wstring file)                              override;
+                       FILTER_LEVEL::E min,
+                       FILTER_LEVEL::E mip,
+                       uint32 anisotropic,
+                       WRAPPING::E wrapMode)                          override;
+    SPtr<VertexShader>
+    createVertexShader(WString file)                                  override;
+    SPtr<PixelShader>
+    createPixelShader(WString file)                                   override;
 
     //DEVICE CONTEXT
 
@@ -61,7 +61,7 @@ namespace ovEngineSDK {
                 int32 width,
                 int32 height)                                         override;
     void
-    setShaders(ShaderProgram* program)                                override;
+    setShaders(SPtr<ShaderProgram> program)                           override;
     void
     drawIndexed(uint32 indices)                                       override;
     void
@@ -69,31 +69,31 @@ namespace ovEngineSDK {
     void
     clearBackBuffer(COLOR color)                                      override;
     void
-    setInputLayout(InputLayout* layout)                               override;
+    setInputLayout(SPtr<InputLayout> layout)                          override;
     void
-    setRenderTarget(Texture* texture, Texture* depth)                 override;
+    setRenderTarget(SPtr<Texture> texture, SPtr<Texture> depth)       override;
     void
-    updateBuffer(Buffer* buffer, const void* data)                    override;
+    updateBuffer(SPtr<Buffer> buffer, const void* data)               override;
     void
-    setVertexBuffer(Buffer* buffer,
+    setVertexBuffer(SPtr<Buffer> buffer,
                     uint32 stride,
                     uint32 offset)                                    override;
     void
-    setIndexBuffer(Buffer* buffer)                                    override;
+    setIndexBuffer(SPtr<Buffer> buffer)                               override;
     void
     setSamplerState(uint32 slot,
-                    Texture* texture,
-                    SamplerState* sampler)                            override;
+                    SPtr<Texture> texture,
+                    SPtr<SamplerState> sampler)                       override;
     void
     setConstantBuffer(uint32 slot,
-                      Buffer* buffer,
+                      SPtr<Buffer> buffer,
                       SHADER_TYPE::E shaderType)                      override;
     void
-    clearRenderTarget(Texture* rt, COLOR color)                       override;
+    clearRenderTarget(SPtr<Texture> rt, COLOR color)                  override;
     void
-    clearDepthStencil(Texture* ds)                                    override;
+    clearDepthStencil(SPtr<Texture> ds)                               override;
     void
-    setTexture(uint32 slot, Texture* texture)                         override;
+    setTexture(uint32 slot, SPtr<Texture> texture)                    override;
     void
     setTopology(TOPOLOGY::E topology)                                 override;
 

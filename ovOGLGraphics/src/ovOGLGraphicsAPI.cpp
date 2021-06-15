@@ -12,8 +12,7 @@
 
 namespace ovEngineSDK {
   void
-  OGLGraphicsAPI::readShaderFile(std::wstring file, std::string& source)
-  {
+  OGLGraphicsAPI::readShaderFile(std::wstring file, std::string& source) {
     std::ifstream shaderFile;
 
     shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -32,8 +31,7 @@ namespace ovEngineSDK {
 
   bool
   OGLGraphicsAPI::init(void* window) {
-    PIXELFORMATDESCRIPTOR pfd =
-    {
+    PIXELFORMATDESCRIPTOR pfd = {
       sizeof(PIXELFORMATDESCRIPTOR),
       1,
       PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
@@ -65,9 +63,7 @@ namespace ovEngineSDK {
     }
     glEnable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     fillFormats();
-
     return true;
   }
 
@@ -81,12 +77,12 @@ namespace ovEngineSDK {
       return mat;
   }
 
-  Texture*
+  SPtr<Texture>
   OGLGraphicsAPI::createTexture(int32 width,
-                                        int32 height,
-                                        TEXTURE_BINDINGS::E binding,
-                                        FORMATS::E format) {
-    OGLTexture* Tex = new OGLTexture();
+                                int32 height,
+                                TEXTURE_BINDINGS::E binding,
+                                FORMATS::E format) {
+    SPtr<OGLTexture> Tex(new OGLTexture);
     if (binding & TEXTURE_BINDINGS::E::DEPTH_STENCIL) {
       //Create RenderBufferObject for depth and stencil
       glGenRenderbuffers(1, &Tex->m_texture);
@@ -125,7 +121,8 @@ namespace ovEngineSDK {
     return Tex;
   }
 
-  Texture* OGLGraphicsAPI::createTextureFromFile(String path) {
+  SPtr<Texture>
+  OGLGraphicsAPI::createTextureFromFile(String path) {
     int32 width, height, components;
     uint8* data = stbi_load(path.c_str(), &width, &height, &components, 0);
     if (data) {
@@ -143,7 +140,7 @@ namespace ovEngineSDK {
         format = GL_RGBA;
       }
 
-      OGLTexture* texture = new OGLTexture();
+      SPtr<OGLTexture> texture(new OGLTexture);
       glGenTextures(1, &texture->m_texture);
       glBindTexture(GL_TEXTURE_2D, texture->m_texture);
       glTexImage2D(GL_TEXTURE_2D,
@@ -172,9 +169,8 @@ namespace ovEngineSDK {
     return nullptr;
   }
 
-  std::wstring
-  getFileNameOGL(std::wstring vsfile)
-  {
+  WString
+  getFileNameOGL(WString vsfile) {
     size_t realPos = 0;
     size_t posInvSlash = vsfile.rfind('\\');
     size_t posSlash = vsfile.rfind('/');
@@ -198,19 +194,19 @@ namespace ovEngineSDK {
     return vsfile.substr(realPos, vsfile.length() - realPos);
   }
 
-  ShaderProgram*
+  SPtr<ShaderProgram>
   OGLGraphicsAPI::createShaderProgram() {
-    OGLShaderProgram* shaderProgram = new OGLShaderProgram();
+    SPtr<OGLShaderProgram> shaderProgram(new OGLShaderProgram);
     shaderProgram->m_program = glCreateProgram();
     return shaderProgram;
   }
 
-  Buffer*
+  SPtr<Buffer>
   OGLGraphicsAPI::createBuffer(const void* data,
                                uint32 size,
                                BUFFER_TYPE::E type) {
     if (size != 0) {
-      OGLBuffer* buffer = new OGLBuffer();
+      SPtr<OGLBuffer> buffer(new OGLBuffer);
 
       glGenBuffers(1, &buffer->m_buffer);
       buffer->m_size = size;
@@ -237,15 +233,15 @@ namespace ovEngineSDK {
       return buffer;
     }
     else {
-      OutputDebugStringA("Invalid size for buffer");
+      OutputDebugStringA("Invalid size for buffer\n");
       return nullptr;
     }
   }
 
-  InputLayout*
-  OGLGraphicsAPI::createInputLayout(ShaderProgram* program,
-    LAYOUT_DESC desc) {
-    OGLInputLayout* ILayout = new OGLInputLayout();
+  SPtr<InputLayout>
+  OGLGraphicsAPI::createInputLayout(SPtr<ShaderProgram> program,
+                                    LAYOUT_DESC& desc) {
+    SPtr<OGLInputLayout> ILayout(new OGLInputLayout);
     glGenVertexArrays(1, &ILayout->m_vao);
     glBindVertexArray(ILayout->m_vao);
     for (uint32 i = 0; i < desc.v_Layout.size(); i++) {
@@ -270,13 +266,13 @@ namespace ovEngineSDK {
     return ILayout;
   }
 
-  SamplerState*
+  SPtr<SamplerState>
   OGLGraphicsAPI::createSamplerState(FILTER_LEVEL::E mag,
-                                                  FILTER_LEVEL::E min,
-                                                  FILTER_LEVEL::E mip,
-                                                  uint32 anisotropic,
-                                                  WRAPPING::E wrapMode) {
-    OGLSamplerState* sampler = new OGLSamplerState();
+                                     FILTER_LEVEL::E min,
+                                     FILTER_LEVEL::E mip,
+                                     uint32 anisotropic,
+                                     WRAPPING::E wrapMode) {
+    SPtr<OGLSamplerState> sampler(new OGLSamplerState);
 
     glGenSamplers(1, &sampler->m_sampler);
 
@@ -350,16 +346,16 @@ namespace ovEngineSDK {
     return sampler;
   }
 
-  VertexShader*
-  OGLGraphicsAPI::createVertexShader(std::wstring file) {
-    std::wstring realFileName = getFileNameOGL(file) + L"_OGL.glsl";
-    std::string source;
+  SPtr<VertexShader>
+  OGLGraphicsAPI::createVertexShader(WString file) {
+    WString realFileName = getFileNameOGL(file) + L"_OGL.glsl";
+    String source;
     int32 result;
     char log[512];
     readShaderFile(realFileName, source);
     const char* vs_Source = source.c_str();
 
-    OGLVertexShader* vs = new OGLVertexShader();
+    SPtr<OGLVertexShader> vs(new OGLVertexShader);
     vs->m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs->m_vertexShader, 1, &vs_Source, 0);
     glCompileShader(vs->m_vertexShader);
@@ -368,22 +364,21 @@ namespace ovEngineSDK {
     if (!result) {
       glGetShaderInfoLog(vs->m_vertexShader, 512, 0, log);
       OutputDebugStringA(log);
-      delete vs;
       return nullptr;
     }
     return vs;
   }
 
-  PixelShader*
-  OGLGraphicsAPI::createPixelShader(std::wstring file) {
-    std::wstring realFileName = getFileNameOGL(file) + L"_OGL.glsl";
-    std::string source;
+  SPtr<PixelShader>
+  OGLGraphicsAPI::createPixelShader(WString file) {
+    WString realFileName = getFileNameOGL(file) + L"_OGL.glsl";
+    String source;
     int32 result;
     char log[512];
     readShaderFile(realFileName, source);
     const char* ps_Source = source.c_str();
 
-    OGLPixelShader* ps = new OGLPixelShader();
+    SPtr<OGLPixelShader> ps(new OGLPixelShader);
     ps->m_ps = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(ps->m_ps, 1, &ps_Source, 0);
     glCompileShader(ps->m_ps);
@@ -392,7 +387,6 @@ namespace ovEngineSDK {
     if (!result) {
       glGetShaderInfoLog(ps->m_ps, 512, 0, log);
       OutputDebugStringA(log);
-      delete ps;
       return nullptr;
     }
     return ps;
@@ -409,8 +403,8 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::setShaders(ShaderProgram* program) {
-    OGLShaderProgram* ShaderProgram = dynamic_cast<OGLShaderProgram*>(program);
+  OGLGraphicsAPI::setShaders(SPtr<ShaderProgram> program) {
+    auto ShaderProgram = static_pointer_cast<OGLShaderProgram>(program);
     glUseProgram(ShaderProgram->m_program);
   }
 
@@ -431,18 +425,18 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::setInputLayout(InputLayout* layout) {
-    glBindVertexArray(dynamic_cast<OGLInputLayout*>(layout)->m_vao);
+  OGLGraphicsAPI::setInputLayout(SPtr<InputLayout> layout) {
+    glBindVertexArray(static_pointer_cast<OGLInputLayout>(layout)->m_vao);
   }
 
   void
-  OGLGraphicsAPI::setRenderTarget(Texture* texture, Texture* depth) {
+  OGLGraphicsAPI::setRenderTarget(SPtr<Texture> texture, SPtr<Texture> depth) {
     if (texture) {
-      OGLTexture* tex = dynamic_cast<OGLTexture*>(texture);
+      auto tex = static_pointer_cast<OGLTexture>(texture);
       if (tex->m_framebuffer != 0) {
         glBindFramebuffer(GL_FRAMEBUFFER, tex->m_framebuffer);
         if (depth) {
-          OGLTexture* d = dynamic_cast<OGLTexture*>(depth);
+          auto d = static_pointer_cast<OGLTexture>(depth);
           if (d->m_texture != 0) {
             d->m_framebuffer = tex->m_framebuffer;
             glFramebufferRenderbuffer(GL_FRAMEBUFFER,
@@ -471,7 +465,7 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::updateBuffer(Buffer* buffer, const void* data) {
+  OGLGraphicsAPI::updateBuffer(SPtr<Buffer> buffer, const void* data) {
     if (!buffer) {
       OutputDebugStringA("Invalid buffer received.\n");
       return;
@@ -481,7 +475,7 @@ namespace ovEngineSDK {
       return;
     }
 
-    OGLBuffer* buff = dynamic_cast<OGLBuffer*>(buffer);
+    auto buff = static_pointer_cast<OGLBuffer>(buffer);
     if (buff->m_buffer == 0) {
       OutputDebugStringA("Buffer not initalized, can't update data.\n");
       return;
@@ -492,9 +486,9 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::setVertexBuffer(Buffer* buffer, uint32 stride, uint32 offset) {
+  OGLGraphicsAPI::setVertexBuffer(SPtr<Buffer> buffer, uint32 stride, uint32 offset) {
     if (buffer != nullptr) {
-      OGLBuffer* buff = dynamic_cast<OGLBuffer*>(buffer);
+      auto buff = static_pointer_cast<OGLBuffer>(buffer);
       if (buff->m_buffer != 0) {
         glBindVertexBuffer(0, buff->m_buffer, offset, stride);
       }
@@ -508,9 +502,9 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::setIndexBuffer(Buffer* buffer) {
+  OGLGraphicsAPI::setIndexBuffer(SPtr<Buffer> buffer) {
     if (buffer != nullptr) {
-      OGLBuffer* buff = dynamic_cast<OGLBuffer*>(buffer);
+      auto buff = static_pointer_cast<OGLBuffer>(buffer);
       if (buff->m_buffer != 0) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buff->m_buffer);
       }
@@ -525,8 +519,8 @@ namespace ovEngineSDK {
 
   void
   OGLGraphicsAPI::setSamplerState(uint32 slot,
-                                      Texture* texture,
-                                      SamplerState* sampler) {
+                                  SPtr<Texture> texture,
+                                  SPtr<SamplerState> sampler) {
     if (!texture) {
       OutputDebugStringA("Invalid texture received.");
       return;
@@ -536,14 +530,14 @@ namespace ovEngineSDK {
       return;
     }
 
-    OGLTexture* tex = dynamic_cast<OGLTexture*>(texture);
+    auto tex = static_pointer_cast<OGLTexture>(texture);
 
     if (tex->m_texture == 0) {
       OutputDebugStringA("Texture missing initialization.");
       return;
     }
 
-    OGLSamplerState* samp = dynamic_cast<OGLSamplerState*>(sampler);
+    auto samp = static_pointer_cast<OGLSamplerState>(sampler);
 
     if (samp->m_sampler == 0) {
       OutputDebugStringA("Sampler missing initialization.");
@@ -555,10 +549,10 @@ namespace ovEngineSDK {
 
   void
   OGLGraphicsAPI::setConstantBuffer(uint32 slot,
-                                        Buffer* buffer,
-                                        SHADER_TYPE::E shaderType) {
+                                    SPtr<Buffer> buffer,
+                                    SHADER_TYPE::E shaderType) {
     if (buffer) {
-      OGLBuffer* buff = dynamic_cast<OGLBuffer*>(buffer);
+      auto buff = static_pointer_cast<OGLBuffer>(buffer);
       if (buff->m_buffer != 0) {
         glBindBufferBase(GL_UNIFORM_BUFFER, slot, buff->m_buffer);
       }
@@ -572,12 +566,12 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::clearRenderTarget(Texture* rt, COLOR color) {
+  OGLGraphicsAPI::clearRenderTarget(SPtr<Texture> rt, COLOR color) {
     if (!rt) {
       OutputDebugStringA("Invalid Render Target received.");
       return;
     }
-    OGLTexture* tex = dynamic_cast<OGLTexture*>(rt);
+    auto tex = static_pointer_cast<OGLTexture>(rt);
     if (tex->m_framebuffer == 0) {
       OutputDebugStringA("Render target not initialized received.");
       return;
@@ -588,12 +582,12 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::clearDepthStencil(Texture* ds) {
+  OGLGraphicsAPI::clearDepthStencil(SPtr<Texture> ds) {
     if (!ds) {
       OutputDebugStringA("Invalid Depth Stencil received.");
       return;
     }
-    OGLTexture* depth = dynamic_cast<OGLTexture*>(ds);
+    auto depth = static_pointer_cast<OGLTexture>(ds);
     if (depth->m_texture == 0 || depth->m_framebuffer == 0) {
       OutputDebugStringA("Depth Stencil not initialized received.");
       return;
@@ -603,12 +597,12 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::setTexture(uint32 slot, Texture* texture) {
-    OGLTexture* tex = dynamic_cast<OGLTexture*>(texture);
-    if (!tex) {
+  OGLGraphicsAPI::setTexture(uint32 slot, SPtr<Texture> texture) {
+    if (!texture) {
       OutputDebugStringA("Texture received was nullptr.");
       return;
     }
+    auto tex = static_pointer_cast<OGLTexture>(texture);
     if (tex->m_texture == 0) {
       OutputDebugStringA("Uninitialized texture received.");
       return;
