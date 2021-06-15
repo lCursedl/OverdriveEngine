@@ -51,7 +51,7 @@ namespace ovEngineSDK {
    public:
     String Type;
     String Path;
-    Texture* TextureMesh = nullptr;
+    SPtr<Texture> TextureMesh;
   };
 
   class OV_CORE_EXPORT Mesh
@@ -63,7 +63,7 @@ namespace ovEngineSDK {
          aiMesh* mesh);
     ~Mesh();
     void setUpMesh();
-    void draw(SamplerState* sstate);
+    void draw(SPtr<SamplerState> sstate);
    private:
     Vector<MeshVertex>*  m_vertices;
     Vector<uint32>*      m_indices;
@@ -73,8 +73,8 @@ namespace ovEngineSDK {
     Map<String, uint32> m_boneMapping;
     uint32 m_numBones;
 
-    Buffer* m_vertexBuffer;
-    Buffer* m_indexBuffer;
+    SPtr<Buffer> m_vertexBuffer;
+    SPtr<Buffer> m_indexBuffer;
 
     friend class Model;
   };

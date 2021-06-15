@@ -141,4 +141,18 @@ namespace ovEngineSDK {
   using String = std::string;
 
   using WString = std::wstring;
+
+  template<typename T>
+  using UPtr = std::unique_ptr<T>;
+
+  template<typename T>
+  using SPtr = std::shared_ptr<T>;
+
+  template<typename T>
+  using WPtr = std::weak_ptr<T>;
+
+  using std::make_shared;
+  using std::make_unique;
+  using std::dynamic_pointer_cast;
+  using std::static_pointer_cast;
 }

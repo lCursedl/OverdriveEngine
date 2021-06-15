@@ -63,7 +63,7 @@ void GameApp::onCreate() {
   m_graphicsAPI->setBackBuffer();
 
   //initialize model and load it
-  myModel = new Model();
+  myModel = make_shared<Model>();
   myModel->load("resources/models/silly_dancing.fbx");
 }
 
@@ -85,13 +85,4 @@ void GameApp::onRender() {
 }
 
 void GameApp::onClear() {
-  delete m_vertexBuffer;
-  delete m_indexBuffer;
-  delete m_cBuffer;
-  delete m_bBuffer;
-  delete m_layout;
-  delete m_shaderProgram;
-  delete m_vs;
-  delete m_ps;
-  delete myModel;
 }

@@ -27,16 +27,16 @@ class GameApp : public BaseApp
   onClear() override;
 
  private:
-  VertexShader* m_vs = nullptr;
-  PixelShader* m_ps = nullptr;
-  ShaderProgram* m_shaderProgram = nullptr;
-  InputLayout* m_layout = nullptr;
-  Buffer* m_cBuffer = nullptr;
-  Buffer* m_bBuffer = nullptr;
-  Buffer* m_vertexBuffer = nullptr;
-  Buffer* m_indexBuffer = nullptr;
+  SPtr<VertexShader> m_vs;
+  SPtr<PixelShader> m_ps;
+  SPtr<ShaderProgram> m_shaderProgram;
+  SPtr<InputLayout> m_layout;
+  SPtr<Buffer> m_cBuffer;
+  SPtr<Buffer> m_bBuffer;
+  SPtr<Buffer> m_vertexBuffer;
+  SPtr<Buffer> m_indexBuffer;
   COLOR m_color;
-  Model* myModel = nullptr;
+  SPtr<Model> myModel;
 
   struct Matrices {
     Matrix4 World;

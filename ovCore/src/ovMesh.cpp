@@ -52,12 +52,6 @@ namespace ovEngineSDK {
         delete m_indices;
       }
     }
-    if (m_vertexBuffer) {
-      delete m_vertexBuffer;
-    }
-    if (m_indexBuffer) {
-      delete m_indexBuffer;
-    }
     if (m_textures.size() > 0) {
       m_textures.clear();
     }
@@ -71,7 +65,7 @@ namespace ovEngineSDK {
                                              static_cast<int32>(sizeof(uint32) * m_indices->size()),
                                              BUFFER_TYPE::INDEX_BUFFER);
   }
-  void Mesh::draw(SamplerState* sstate) {
+  void Mesh::draw(SPtr<SamplerState> sstate) {
     auto graphicAPI = &g_graphicsAPI();
     for (uint32 i = 0; i < m_textures.size(); i++) {
       graphicAPI->setSamplerState(0, m_textures[i].TextureMesh, sstate);

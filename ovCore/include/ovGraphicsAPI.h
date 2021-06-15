@@ -95,7 +95,7 @@ namespace ovEngineSDK {
      * @param[in]format	Specifies the texture format.
      * @return   Texture pointer of the corresponding API.
      */
-     virtual Texture*
+     virtual SPtr<Texture>
      createTexture(int32,
                    int32,
                    TEXTURE_BINDINGS::E,
@@ -108,7 +108,8 @@ namespace ovEngineSDK {
      * @param[in]path The path to the file.
      * @return   Texture pointer for the corresponding API with data.
      */
-     virtual Texture* createTextureFromFile(String){
+     virtual SPtr<Texture>
+     createTextureFromFile(String){
       return nullptr;
      }
 
@@ -117,7 +118,7 @@ namespace ovEngineSDK {
      * @brief    Creates a shader program and returns it.
      * @return   ShaderProgram pointer of the corresponding API.
      */
-     virtual ShaderProgram*
+     virtual SPtr<ShaderProgram>
      createShaderProgram() {
       return nullptr;
      }
@@ -131,7 +132,7 @@ namespace ovEngineSDK {
      *            INDEX_BUFFER, CONST_BUFFER).
      * @return   Buffer pointer of the corresponding API.
      */
-     virtual Buffer*
+     virtual SPtr<Buffer>
      createBuffer(const void*,
                   uint32,
                   BUFFER_TYPE::E) {
@@ -145,9 +146,9 @@ namespace ovEngineSDK {
      * @param[in]desc The layout descriptor.
      * @return   InputLayout pointer of the corresponding API.
      */
-     virtual InputLayout*
-     createInputLayout(ShaderProgram*,
-                       LAYOUT_DESC) {
+     virtual SPtr<InputLayout>
+     createInputLayout(SPtr<ShaderProgram>,
+                       LAYOUT_DESC&) {
       return nullptr;
      }
 
@@ -164,7 +165,7 @@ namespace ovEngineSDK {
                  CLAMP, BORDER, MIRROR_ONCE ).
      * @return   SamplerState pointer of the corresponding API.
      */
-     virtual SamplerState*
+     virtual SPtr<SamplerState>
      createSamplerState(FILTER_LEVEL::E,
                         FILTER_LEVEL::E,
                         FILTER_LEVEL::E,
@@ -179,8 +180,8 @@ namespace ovEngineSDK {
      * @param[in]file Filename of the vertex shader.
      * @return   VertexShader pointer of the corresponding API.
      */
-     virtual VertexShader*
-     createVertexShader(std::wstring) {
+     virtual SPtr<VertexShader>
+     createVertexShader(WString) {
       return nullptr;
      }
 
@@ -190,8 +191,8 @@ namespace ovEngineSDK {
      * @param[in]file Filename of the pixel shader.
      * @return   PixelShader pointer of the corresponding API.
      */
-     virtual PixelShader*
-     createPixelShader(std::wstring) {
+     virtual SPtr<PixelShader>
+     createPixelShader(WString) {
       return nullptr;
      }
 
@@ -238,14 +239,14 @@ namespace ovEngineSDK {
      *	         as current.
      * @param[in]program CShaderProgram pointer from where to take shaders.
      */
-     virtual void setShaders(ShaderProgram*) {}
+     virtual void setShaders(SPtr<ShaderProgram>) {}
 
      /**
      * @fn       void setInputLayout(CInputLayout* layout)
      * @brief    Receives an input layout and sets it as current.
      * @param[in] layout CInputLayout pointer from where to take the layout.
      */
-     virtual void setInputLayout(InputLayout*) {}
+     virtual void setInputLayout(SPtr<InputLayout>) {}
 
      /**
      * @fn       void clearBackBuffer(COLOR color)
@@ -261,7 +262,7 @@ namespace ovEngineSDK {
      * @param[in]depth CTexture pointer which contains the depth stencil.
      *	         depth can be nullptr if only render target wants to be set.
      */
-     virtual void setRenderTarget(Texture*, Texture*) {}
+     virtual void setRenderTarget(SPtr<Texture>, SPtr<Texture>) {}
 
      /**
      * @fn       void updateBuffer(CBuffer* buffer, const void * data)
@@ -269,7 +270,7 @@ namespace ovEngineSDK {
      * @param[in]buffer Buffer to update.
      * @param[in]data Pointer of the data to assign to buffer.
      */
-     virtual void updateBuffer(Buffer*, const void*) {}
+     virtual void updateBuffer(SPtr<Buffer>, const void*) {}
 
      /**
      * @fn       void setVertexBuffer(CBuffer* buffer)
@@ -279,7 +280,7 @@ namespace ovEngineSDK {
      * @param[in]offset Buffer offset from where to take data.
      *           warning If buffer is nullptr, no operations are done.
      */
-     virtual void setVertexBuffer(Buffer*,
+     virtual void setVertexBuffer(SPtr<Buffer>,
                                   uint32,
                                   uint32) {}
 
@@ -289,7 +290,7 @@ namespace ovEngineSDK {
      * @param[in]buffer Buffer to set.
      * @warning  If buffer is nullptr, no operations are done.
      */
-     virtual void setIndexBuffer(Buffer*) {}
+     virtual void setIndexBuffer(SPtr<Buffer>) {}
 
      /** 
      * @fn       void setSamplerState(CTexture* texture, CSamplerState* sampler)
@@ -299,8 +300,8 @@ namespace ovEngineSDK {
      * @param[in]sampler Sampler State to bind.
      */
      virtual void setSamplerState(uint32,
-                                  Texture*,
-                                  SamplerState*) {}
+                                  SPtr<Texture>,
+                                  SPtr<SamplerState>) {}
 
      /**
      * @fn       void setConstantBuffer(uint32 slot, CBuffer* buffer,
@@ -312,7 +313,7 @@ namespace ovEngineSDK {
      *				   PIXEL_SHADER )
      */
      virtual void setConstantBuffer(uint32,
-                                    Buffer*,
+                                    SPtr<Buffer>,
                                     SHADER_TYPE::E) {}
 
      /**
@@ -321,13 +322,13 @@ namespace ovEngineSDK {
      * @param[in] rt Render target to clear.
      * @param[in] color COLOR to use for clearing.
      */
-     virtual void clearRenderTarget(Texture*, COLOR) {}
+     virtual void clearRenderTarget(SPtr<Texture>, COLOR) {}
 
      /**
      * @fn       void clearDepthStencil(CTexture* ds)
      * @brief    Clears the specified depth stencil.
      */
-     virtual void clearDepthStencil(Texture*) {}
+     virtual void clearDepthStencil(SPtr<Texture>) {}
 
      /**
      * @fn       void setTexture(uint32 slot, CTexture* texture)
@@ -335,7 +336,7 @@ namespace ovEngineSDK {
      * @param[in]slot Index of the texture in the shader.
      * @param[in]texture Texture to set.
      */
-     virtual void setTexture(uint32, Texture*) {}
+     virtual void setTexture(uint32, SPtr<Texture>) {}
 
      /**
      * @fn       void setTopology(TOPOLOGY topology)

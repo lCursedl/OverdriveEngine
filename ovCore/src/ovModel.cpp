@@ -338,7 +338,7 @@ namespace ovEngineSDK {
     float delta = static_cast<float>(nodeAnimation->mScalingKeys[nextScalIndex].mTime - 
                                      nodeAnimation->mScalingKeys[scalIndex].mTime);
     float factor = (animTime - static_cast<float>(nodeAnimation->mScalingKeys[scalIndex].mTime)) / delta;
-    assert(factor >= 0.f, && factor <= 1.f);
+    assert(factor >= 0.f && factor <= 1.f);
     const aiVector3D& Start = nodeAnimation->mScalingKeys[scalIndex].mValue;
     const aiVector3D& End = nodeAnimation->mScalingKeys[nextScalIndex].mValue;
     aiVector3D dTime = End - Start;

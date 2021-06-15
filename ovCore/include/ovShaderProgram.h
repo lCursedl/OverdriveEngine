@@ -21,7 +21,7 @@ namespace ovEngineSDK {
      * @brief    Obtains the pointer to the VertexShader member
      * @return	 Vertexshader pointer
      */
-     VertexShader* getVertexShader() {
+     SPtr<VertexShader> getVertexShader() {
        return m_pVertexShader;
      }
 
@@ -30,7 +30,7 @@ namespace ovEngineSDK {
      * @brief    Obtains the pointer to the PixelShader member
      * @return   PixelShader pointer
      */
-     PixelShader* getPixelShader() {
+     SPtr<PixelShader> getPixelShader() {
        return m_pPixelShader;
      }
 
@@ -39,7 +39,7 @@ namespace ovEngineSDK {
      * @brief    Sets the received VS pointer as the one to store.
      * @param[in]vertexShader VertexShader pointer to store
      */
-     virtual void setVertexShader(VertexShader* vertexShader) {
+     virtual void setVertexShader(SPtr<VertexShader> vertexShader) {
        m_pVertexShader = vertexShader;
      }
 
@@ -48,7 +48,7 @@ namespace ovEngineSDK {
      * @brief    Sets the received PS pointer as the one to store.
      * @param[in]pixelShader PixelShader pointer to store
      */
-     virtual void setPixelShader(PixelShader* pixelShader) {
+     virtual void setPixelShader(SPtr<PixelShader> pixelShader) {
        m_pPixelShader = pixelShader;
      }
 
@@ -59,7 +59,7 @@ namespace ovEngineSDK {
      virtual void linkProgram() {}
 
    protected:
-    VertexShader* m_pVertexShader = nullptr;	/**< VertexShader pointer */
-    PixelShader* m_pPixelShader = nullptr;		/**< PixelShader pointer */
+    SPtr<VertexShader> m_pVertexShader = nullptr;	/**< VertexShader pointer */
+    SPtr<PixelShader> m_pPixelShader = nullptr;		/**< PixelShader pointer */
   };
 }

@@ -13,8 +13,8 @@ namespace ovEngineSDK {
   }
 
   /**
-  * @class       CVertexShader
-  *	@brief       Class which serves as an interface for both CDXVertexShader & COGLVertexShader.
+  * @class       VertexShader
+  *	@brief       Class which serves as an interface for both DXVertexShader & OGLVertexShader.
   *
   *	             Contains only a constructor and virtual destructor.
   */
@@ -26,8 +26,8 @@ namespace ovEngineSDK {
   };
 
   /**
-  * @class       CPixelShader
-  *	@brief       Class which serves as an interface for both CDXPixelShader & COGLPixelShader.
+  * @class       PixelShader
+  *	@brief       Class which serves as an interface for both DXPixelShader & OGLPixelShader.
   *
   *	             Contains only a constructor and virtual destructor.
   */

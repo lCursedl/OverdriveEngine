@@ -22,7 +22,7 @@ namespace ovEngineSDK {
     Vector<Mesh*> m_meshes;
     Vector<MeshTexture> m_modelTextures;
     String m_directory;
-    SamplerState* m_textureSampler = nullptr;
+    SPtr<SamplerState> m_textureSampler;
     aiAnimation* m_modelAnimation = nullptr;
     aiScene* m_modelScene = nullptr;
     Matrix4 m_globalTransform;
