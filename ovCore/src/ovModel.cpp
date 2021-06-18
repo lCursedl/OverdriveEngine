@@ -90,14 +90,6 @@ namespace ovEngineSDK {
           Transforms[j] = m_meshes[i]->m_boneInfo[j].FinalTransform;
       }
     }
-    /*for (uint32 i = 0; i < totalBones; i++) {
-      for (uint32 j = 0; j < m_meshes.size(); j++) {
-        for (uint32 k = 0; k < m_meshes[j]->m_boneInfo.size(); k++) {
-          Transforms[i] = m_meshes[j]->m_boneInfo[k].FinalTransform;
-          i++;
-        }
-      }
-    }*/
   }
 
   void

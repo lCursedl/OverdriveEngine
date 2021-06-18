@@ -60,10 +60,10 @@ namespace ovEngineSDK {
     auto graphicAPI = &g_graphicsAPI();
     m_vertexBuffer = graphicAPI->createBuffer(m_vertices->data(),
                                               static_cast<int32>(sizeof(MeshVertex) * m_vertices->size()),
-                                              BUFFER_TYPE::VERTEX_BUFFER);
+                                              BUFFER_TYPE::kVERTEX_BUFFER);
     m_indexBuffer = graphicAPI->createBuffer(m_indices->data(),
                                              static_cast<int32>(sizeof(uint32) * m_indices->size()),
-                                             BUFFER_TYPE::INDEX_BUFFER);
+                                             BUFFER_TYPE::kINDEX_BUFFER);
   }
   void Mesh::draw(SPtr<SamplerState> sstate) {
     auto graphicAPI = &g_graphicsAPI();

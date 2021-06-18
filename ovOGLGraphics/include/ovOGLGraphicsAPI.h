@@ -34,7 +34,7 @@ namespace ovEngineSDK {
 
     SPtr<Buffer>
     createBuffer(const void* data,
-                 uint32 size,
+                 SIZE_T size,
                  BUFFER_TYPE::E type)                                 override;
 
     SPtr<InputLayout>
@@ -59,7 +59,9 @@ namespace ovEngineSDK {
     setViewport(int32 topLeftX,
                 int32 topLeftY,
                 int32 width,
-                int32 height)                                         override;
+                int32 height,
+                float minDepth,
+                float maxDepth)                                       override;
     void
     setShaders(SPtr<ShaderProgram> program)                           override;
     void
@@ -67,7 +69,7 @@ namespace ovEngineSDK {
     void
     draw(uint32 count, uint32 first)                                  override;
     void
-    clearBackBuffer(COLOR color)                                      override;
+    clearBackBuffer(Color clearColor)                                 override;
     void
     setInputLayout(SPtr<InputLayout> layout)                          override;
     void
@@ -89,7 +91,7 @@ namespace ovEngineSDK {
                       SPtr<Buffer> buffer,
                       SHADER_TYPE::E shaderType)                      override;
     void
-    clearRenderTarget(SPtr<Texture> rt, COLOR color)                  override;
+    clearRenderTarget(SPtr<Texture> rt, Color clearColor)             override;
     void
     clearDepthStencil(SPtr<Texture> ds)                               override;
     void

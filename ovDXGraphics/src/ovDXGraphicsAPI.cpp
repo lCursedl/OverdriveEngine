@@ -331,14 +331,14 @@ namespace ovEngineSDK {
   }
 
   SPtr<Buffer> DXGraphicsAPI::createBuffer(const void* data,
-                                           uint32 size,
+                                           SIZE_T size,
                                            BUFFER_TYPE::E type) {
     if (size != 0) {
       D3D11_BUFFER_DESC buffDesc;
       ZeroMemory(&buffDesc, sizeof(buffDesc));
 
       buffDesc.Usage = D3D11_USAGE_DEFAULT;
-      buffDesc.ByteWidth = size;
+      buffDesc.ByteWidth = static_cast<uint32>(size);
       buffDesc.CPUAccessFlags = 0;
       buffDesc.BindFlags = (D3D11_BIND_FLAG)type;
 
@@ -388,36 +388,36 @@ namespace ovEngineSDK {
     for (uint32 i = 0; i < desc.v_Layout.size(); i++) {
       //SEMANTIC NAME & INDEX
       switch (desc.v_Layout[i].m_semantic) {
-      case SEMANTIC::POSITION:
+      case SEMANTIC::kPOSITION:
         D.SemanticName = "POSITION";
         D.SemanticIndex = positionindex;
         positionindex++;
         break;
-      case SEMANTIC::TEXCOORD:
+      case SEMANTIC::kTEXCOORD:
         D.SemanticName = "TEXCOORD";
         D.SemanticIndex = texcoordindex;
         texcoordindex++;
         break;
-      case SEMANTIC::NORMAL:
+      case SEMANTIC::kNORMAL:
         D.SemanticName = "NORMAL";
         D.SemanticIndex = normalindex;
         normalindex++;
         break;
-      case SEMANTIC::BINORMAL:
+      case SEMANTIC::kBINORMAL:
         D.SemanticName = "BINORMAL";
         D.SemanticIndex = binormalindex;
         binormalindex++;
         break;
-      case SEMANTIC::TANGENT:
+      case SEMANTIC::kTANGENT:
         D.SemanticName = "TANGENT";
         D.SemanticIndex = tangentindex;
         tangentindex++;
         break;
-      case SEMANTIC::BLENDINDICES:
+      case SEMANTIC::kBLENDINDICES:
         D.SemanticName = "BLENDINDICES";
         D.SemanticIndex = blendindex;
         break;
-      case SEMANTIC::BLENDWEIGHT:
+      case SEMANTIC::kBLENDWEIGHT:
         D.SemanticName = "BLENDWEIGHT";
         D.SemanticIndex = weightindex;
         break;
@@ -560,12 +560,17 @@ namespace ovEngineSDK {
   }
 
   void
-  DXGraphicsAPI::setViewport(int32 topLeftX, int32 topLeftY, int32 width, int32 height) {
+  DXGraphicsAPI::setViewport(int32 topLeftX,
+                             int32 topLeftY,
+                             int32 width,
+                             int32 height,
+                             float minDepth,
+                             float maxDepth) {
     D3D11_VIEWPORT vp;
     vp.Width = static_cast<FLOAT>(width);
     vp.Height = static_cast<FLOAT>(height);
-    vp.MinDepth = 0.f;
-    vp.MaxDepth = 1.f;
+    vp.MinDepth = minDepth;
+    vp.MaxDepth = maxDepth;
     vp.TopLeftX = static_cast<FLOAT>(topLeftX);
     vp.TopLeftY = static_cast<FLOAT>(topLeftY);
     m_deviceContext->RSSetViewports(1, &vp);
@@ -588,14 +593,16 @@ namespace ovEngineSDK {
     m_deviceContext->Draw(count, first);
   }
 
-  void DXGraphicsAPI::clearBackBuffer(COLOR color) {
-    float Color[4] = { color.red, color.green, color.blue, color.alpha };
-    m_deviceContext->ClearRenderTargetView(static_pointer_cast<DXTexture>(m_backBuffer)->m_rtv,
-                                           Color);
-    m_deviceContext->ClearDepthStencilView(static_pointer_cast<DXTexture>(m_depthStencil)->m_dsv,
-                                           D3D11_CLEAR_DEPTH,
-                                           1.0f,
-                                           0);
+  void DXGraphicsAPI::clearBackBuffer(Color clearColor) {
+    float Color[4] = { clearColor.red, clearColor.green, clearColor.blue, clearColor.alpha };
+    m_deviceContext->ClearRenderTargetView(
+                     static_pointer_cast<DXTexture>(m_backBuffer)->m_rtv,
+                     Color);
+    m_deviceContext->ClearDepthStencilView(
+                     static_pointer_cast<DXTexture>(m_depthStencil)->m_dsv,
+                     D3D11_CLEAR_DEPTH,
+                     1.0f,
+                     0);
   }
 
   void
@@ -740,7 +747,7 @@ namespace ovEngineSDK {
   }
 
   void
-  DXGraphicsAPI::clearRenderTarget(SPtr<Texture> rt, COLOR color) {
+  DXGraphicsAPI::clearRenderTarget(SPtr<Texture> rt, Color clearColor) {
     if (!rt) {
       OutputDebugStringA("Invalid Render Target received");
       return;
@@ -750,7 +757,7 @@ namespace ovEngineSDK {
       OutputDebugStringA("Render Target not initialized received");
       return;
     }
-    float c[4] = { color.red, color.green, color.blue, color.alpha };
+    float c[4] = { clearColor.red, clearColor.green, clearColor.blue, clearColor.alpha };
     m_deviceContext->ClearRenderTargetView(tex->m_rtv, c);
   }
 
@@ -788,31 +795,31 @@ namespace ovEngineSDK {
   void DXGraphicsAPI::setTopology(TOPOLOGY::E topology) {
     D3D11_PRIMITIVE_TOPOLOGY T = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
     switch (topology) {
-    case TOPOLOGY::E::POINTS:
+    case TOPOLOGY::E::kPOINTS:
       T = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
       break;
-    case TOPOLOGY::E::LINES:
+    case TOPOLOGY::E::kLINES:
       T = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
       break;
-    case TOPOLOGY::E::TRIANGLES:
+    case TOPOLOGY::E::kTRIANGLES:
       T = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
       break;
-    case TOPOLOGY::E::LINE_STRIP:
+    case TOPOLOGY::E::kLINE_STRIP:
       T = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
       break;
-    case TOPOLOGY::E::TRIANGLE_STRIP:
+    case TOPOLOGY::E::kTRIANGLE_STRIP:
       T = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
       break;
-    case TOPOLOGY::E::LINE_ADJACENCY:
+    case TOPOLOGY::E::kLINE_ADJACENCY:
       T = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
       break;
-    case TOPOLOGY::E::TRIANGLE_ADJANCENCY:
+    case TOPOLOGY::E::kTRIANGLE_ADJANCENCY:
       T = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
       break;
-    case TOPOLOGY::E::LINE_STRIP_ADJACENCY:
+    case TOPOLOGY::E::kLINE_STRIP_ADJACENCY:
       T = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
       break;
-    case TOPOLOGY::E::TRIANGLE_STRIP_ADJACENCY:
+    case TOPOLOGY::E::kTRIANGLE_STRIP_ADJACENCY:
       T = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
       break;
     }
@@ -908,49 +915,49 @@ namespace ovEngineSDK {
   }
 
   void DXGraphicsAPI::fillFormats() {
-    m_formats.insert(std::make_pair(FORMATS::R8_SNORM, DXGI_FORMAT_R8_SNORM));
-    m_formats.insert(std::make_pair(FORMATS::R16_SNORM, DXGI_FORMAT_R16_SNORM));
-    m_formats.insert(std::make_pair(FORMATS::RG8_SNORM, DXGI_FORMAT_R8G8_SNORM));
-    m_formats.insert(std::make_pair(FORMATS::RG16_SNORM, DXGI_FORMAT_R16G16_SNORM));
-    m_formats.insert(std::make_pair(FORMATS::RGB10_A2UI, DXGI_FORMAT_R10G10B10A2_UINT));
-    m_formats.insert(std::make_pair(FORMATS::R16_FLOAT, DXGI_FORMAT_R16_FLOAT));
-    m_formats.insert(std::make_pair(FORMATS::RG16_FLOAT, DXGI_FORMAT_R16G16_FLOAT));
-    m_formats.insert(std::make_pair(FORMATS::RGBA16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT));
-    m_formats.insert(std::make_pair(FORMATS::R32_FLOAT, DXGI_FORMAT_R32_FLOAT));
-    m_formats.insert(std::make_pair(FORMATS::RG32_FLOAT, DXGI_FORMAT_R32G32_FLOAT));
-    m_formats.insert(std::make_pair(FORMATS::RGB32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT));
-    m_formats.insert(std::make_pair(FORMATS::RGBA32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT));
-    m_formats.insert(std::make_pair(FORMATS::RG11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT));
-    m_formats.insert(std::make_pair(FORMATS::RGB9_E5, DXGI_FORMAT_R9G9B9E5_SHAREDEXP));
-    m_formats.insert(std::make_pair(FORMATS::R8_INT, DXGI_FORMAT_R8_SINT));
-    m_formats.insert(std::make_pair(FORMATS::R8_UINT, DXGI_FORMAT_R8_UINT));
-    m_formats.insert(std::make_pair(FORMATS::R16_INT, DXGI_FORMAT_R16_SINT));
-    m_formats.insert(std::make_pair(FORMATS::R16_UINT, DXGI_FORMAT_R16_UINT));
-    m_formats.insert(std::make_pair(FORMATS::R32_INT, DXGI_FORMAT_R32_SINT));
-    m_formats.insert(std::make_pair(FORMATS::R32_UINT, DXGI_FORMAT_R32_UINT));
-    m_formats.insert(std::make_pair(FORMATS::RG8_INT, DXGI_FORMAT_R8G8_SINT));
-    m_formats.insert(std::make_pair(FORMATS::RG8_UINT, DXGI_FORMAT_R8G8_UINT));
-    m_formats.insert(std::make_pair(FORMATS::RG16_INT, DXGI_FORMAT_R16G16_SINT));
-    m_formats.insert(std::make_pair(FORMATS::RG16_UINT, DXGI_FORMAT_R16G16_UINT));
-    m_formats.insert(std::make_pair(FORMATS::RG32_INT, DXGI_FORMAT_R32G32_SINT));
-    m_formats.insert(std::make_pair(FORMATS::RG32_UINT, DXGI_FORMAT_R32G32_UINT));
-    m_formats.insert(std::make_pair(FORMATS::RGB32_INT, DXGI_FORMAT_R32G32B32_SINT));
-    m_formats.insert(std::make_pair(FORMATS::RGB32_UINT, DXGI_FORMAT_R32G32B32_UINT));
-    m_formats.insert(std::make_pair(FORMATS::RGBA8_INT, DXGI_FORMAT_R8G8B8A8_SINT));
-    m_formats.insert(std::make_pair(FORMATS::RGBA8_UINT, DXGI_FORMAT_R8G8B8A8_UINT));
-    m_formats.insert(std::make_pair(FORMATS::RGBA16_INT, DXGI_FORMAT_R16G16B16A16_SINT));
-    m_formats.insert(std::make_pair(FORMATS::RGBA16_UINT, DXGI_FORMAT_R16G16B16A16_UINT));
-    m_formats.insert(std::make_pair(FORMATS::RGBA32_INT, DXGI_FORMAT_R32G32B32A32_SINT));
-    m_formats.insert(std::make_pair(FORMATS::RGBA32_UINT, DXGI_FORMAT_R32G32B32A32_UINT));
-    m_formats.insert(std::make_pair(FORMATS::R8_UNORM, DXGI_FORMAT_R8_UNORM));
-    m_formats.insert(std::make_pair(FORMATS::R16_UNORM, DXGI_FORMAT_R16_UNORM));
-    m_formats.insert(std::make_pair(FORMATS::RG8_UNORM, DXGI_FORMAT_R8G8_UNORM));
-    m_formats.insert(std::make_pair(FORMATS::RG16_UNORM, DXGI_FORMAT_R16G16_UNORM));
-    m_formats.insert(std::make_pair(FORMATS::RGB5A1_UNORM, DXGI_FORMAT_B5G5R5A1_UNORM));
-    m_formats.insert(std::make_pair(FORMATS::RGBA8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM));
-    m_formats.insert(std::make_pair(FORMATS::RGB10A2_UNORM, DXGI_FORMAT_R10G10B10A2_UNORM));
-    m_formats.insert(std::make_pair(FORMATS::RGBA16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM));
-    m_formats.insert(std::make_pair(FORMATS::RGBA8_SRGB_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB));
-    m_formats.insert(std::make_pair(FORMATS::D24_S8, DXGI_FORMAT_D24_UNORM_S8_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kR8_SNORM, DXGI_FORMAT_R8_SNORM));
+    m_formats.insert(std::make_pair(FORMATS::kR16_SNORM, DXGI_FORMAT_R16_SNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRG8_SNORM, DXGI_FORMAT_R8G8_SNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRG16_SNORM, DXGI_FORMAT_R16G16_SNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRGB10_A2UI, DXGI_FORMAT_R10G10B10A2_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kR16_FLOAT, DXGI_FORMAT_R16_FLOAT));
+    m_formats.insert(std::make_pair(FORMATS::kRG16_FLOAT, DXGI_FORMAT_R16G16_FLOAT));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT));
+    m_formats.insert(std::make_pair(FORMATS::kR32_FLOAT, DXGI_FORMAT_R32_FLOAT));
+    m_formats.insert(std::make_pair(FORMATS::kRG32_FLOAT, DXGI_FORMAT_R32G32_FLOAT));
+    m_formats.insert(std::make_pair(FORMATS::kRGB32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT));
+    m_formats.insert(std::make_pair(FORMATS::kRG11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT));
+    m_formats.insert(std::make_pair(FORMATS::kRGB9_E5, DXGI_FORMAT_R9G9B9E5_SHAREDEXP));
+    m_formats.insert(std::make_pair(FORMATS::kR8_INT, DXGI_FORMAT_R8_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kR8_UINT, DXGI_FORMAT_R8_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kR16_INT, DXGI_FORMAT_R16_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kR16_UINT, DXGI_FORMAT_R16_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kR32_INT, DXGI_FORMAT_R32_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kR32_UINT, DXGI_FORMAT_R32_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kRG8_INT, DXGI_FORMAT_R8G8_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kRG8_UINT, DXGI_FORMAT_R8G8_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kRG16_INT, DXGI_FORMAT_R16G16_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kRG16_UINT, DXGI_FORMAT_R16G16_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kRG32_INT, DXGI_FORMAT_R32G32_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kRG32_UINT, DXGI_FORMAT_R32G32_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kRGB32_INT, DXGI_FORMAT_R32G32B32_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kRGB32_UINT, DXGI_FORMAT_R32G32B32_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA8_INT, DXGI_FORMAT_R8G8B8A8_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA8_UINT, DXGI_FORMAT_R8G8B8A8_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA16_INT, DXGI_FORMAT_R16G16B16A16_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA16_UINT, DXGI_FORMAT_R16G16B16A16_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA32_INT, DXGI_FORMAT_R32G32B32A32_SINT));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA32_UINT, DXGI_FORMAT_R32G32B32A32_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kR8_UNORM, DXGI_FORMAT_R8_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kR16_UNORM, DXGI_FORMAT_R16_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRG8_UNORM, DXGI_FORMAT_R8G8_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRG16_UNORM, DXGI_FORMAT_R16G16_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRGB5A1_UNORM, DXGI_FORMAT_B5G5R5A1_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRGB10A2_UNORM, DXGI_FORMAT_R10G10B10A2_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kRGBA8_SRGB_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB));
+    m_formats.insert(std::make_pair(FORMATS::kD24_S8, DXGI_FORMAT_D24_UNORM_S8_UINT));
   }
 }

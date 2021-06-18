@@ -5,7 +5,7 @@ namespace ovEngineSDK {
   BaseApp::run() {
     initSystems();
     createWindow();
-    m_graphicsAPI->init(m_windowHandle);
+    g_graphicsAPI().init(m_windowHandle);
     onCreate();
     MSG msg = {};
     while (WM_QUIT != msg.message) {
@@ -45,24 +45,23 @@ namespace ovEngineSDK {
 
   void BaseApp::render() {
     onRender();
-    m_graphicsAPI->swapBuffer();
+    g_graphicsAPI().swapBuffer();
   }
 
   void BaseApp::initSystems() {
-    if (m_directXPlugin.loadPlugin("ovDXGraphics_d.dll")) {
+    if (m_graphicPlugin.loadPlugin("ovDXGraphics_d.dll")) {
       auto createGraphicsAPI = reinterpret_cast<funCreateGraphicsAPI>(
-                               m_directXPlugin.getProcedureByName("createGraphicsAPI"));
+                               m_graphicPlugin.getProcedureByName("createGraphicsAPI"));
       GraphicsAPI::startUp();
       GraphicsAPI* graphicAPI = createGraphicsAPI();
-      g_graphicsAPI().setObject(graphicAPI);
-      m_graphicsAPI = &g_graphicsAPI();      
+      g_graphicsAPI().setObject(graphicAPI);   
     }
   }
 
   void
   BaseApp::destroySystems() {
-    m_graphicsAPI->shutdown();
-    m_graphicsAPI->shutDown();
+    g_graphicsAPI().shutdown();
+    g_graphicsAPI().shutDown();
   }
 
   void BaseApp::createWindow() {

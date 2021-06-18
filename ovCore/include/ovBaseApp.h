@@ -64,8 +64,7 @@ namespace ovEngineSDK {
 
    protected:
     WindowHandle m_windowHandle = 0;
-    Plugin m_directXPlugin;
-    GraphicsAPI* m_graphicsAPI = nullptr;
+    Plugin m_graphicPlugin;
     bool m_runApp = false;
     sf::Clock m_appClock;
     float m_deltaTime;

@@ -17,7 +17,7 @@ namespace ovEngineSDK {
   *	@brief       Structure which defines a color with Red, Green, Blue and
   *              Alpha components.
   */
-  struct COLOR {
+  struct Color {
     float red;
     float green;
     float blue;
@@ -29,16 +29,16 @@ namespace ovEngineSDK {
   *	@brief       Enum which defines the different types of topologies available from the api.
   */
   namespace TOPOLOGY {
-    enum class E {
-      POINTS = 0,
-      LINES,
-      TRIANGLES,
-      LINE_STRIP,
-      TRIANGLE_STRIP,
-      LINE_ADJACENCY,
-      TRIANGLE_ADJANCENCY,
-      LINE_STRIP_ADJACENCY,
-      TRIANGLE_STRIP_ADJACENCY
+    enum E {
+      kPOINTS = 0,
+      kLINES,
+      kTRIANGLES,
+      kLINE_STRIP,
+      kTRIANGLE_STRIP,
+      kLINE_ADJACENCY,
+      kTRIANGLE_ADJANCENCY,
+      kLINE_STRIP_ADJACENCY,
+      kTRIANGLE_STRIP_ADJACENCY
     };
   }
 
@@ -134,7 +134,7 @@ namespace ovEngineSDK {
      */
      virtual SPtr<Buffer>
      createBuffer(const void*,
-                  uint32,
+                  SIZE_T,
                   BUFFER_TYPE::E) {
       return nullptr;
      }
@@ -213,11 +213,15 @@ namespace ovEngineSDK {
      * @param[in]topLeftY Corner on the Y axis of the render area.
      * @param[in]width Width of render area.
      * @param[in]height Height of render area.
+     * @param[in]minDepth Minimum depth of viewport
+     * @param[in]maxDepth Maximum depth of viewport
      */
      virtual void setViewport(int32,
                               int32,
                               int32,
-                              int32) {}
+                              int32,
+                              float,
+                              float) {}
 
      /**
      * @fn void  drawIndexed(uint32 indices)
@@ -253,7 +257,7 @@ namespace ovEngineSDK {
      * @brief    Clears default render target with specified color and depth stencil.
      * @param[in]color Color in which to clear the render target.
      */
-     virtual void clearBackBuffer(COLOR) {}
+     virtual void clearBackBuffer(Color) {}
 
      /** 
      * @fn       void setRenderTarget(CTexture* texture, CTexture* depth)
@@ -322,7 +326,7 @@ namespace ovEngineSDK {
      * @param[in] rt Render target to clear.
      * @param[in] color COLOR to use for clearing.
      */
-     virtual void clearRenderTarget(SPtr<Texture>, COLOR) {}
+     virtual void clearRenderTarget(SPtr<Texture>, Color) {}
 
      /**
      * @fn       void clearDepthStencil(CTexture* ds)

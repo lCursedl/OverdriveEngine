@@ -203,7 +203,7 @@ namespace ovEngineSDK {
 
   SPtr<Buffer>
   OGLGraphicsAPI::createBuffer(const void* data,
-                               uint32 size,
+                               SIZE_T size,
                                BUFFER_TYPE::E type) {
     if (size != 0) {
       SPtr<OGLBuffer> buffer(new OGLBuffer);
@@ -212,13 +212,13 @@ namespace ovEngineSDK {
       buffer->m_size = size;
 
       switch (type) {
-      case BUFFER_TYPE::E::VERTEX_BUFFER:
+      case BUFFER_TYPE::E::kVERTEX_BUFFER:
         buffer->m_type = GL_ARRAY_BUFFER;
         break;
-      case BUFFER_TYPE::E::INDEX_BUFFER:
+      case BUFFER_TYPE::E::kINDEX_BUFFER:
         buffer->m_type = GL_ELEMENT_ARRAY_BUFFER;
         break;
-      case BUFFER_TYPE::E::CONST_BUFFER:
+      case BUFFER_TYPE::E::kCONST_BUFFER:
         buffer->m_type = GL_UNIFORM_BUFFER;
         break;
       }
@@ -245,7 +245,7 @@ namespace ovEngineSDK {
     glGenVertexArrays(1, &ILayout->m_vao);
     glBindVertexArray(ILayout->m_vao);
     for (uint32 i = 0; i < desc.v_Layout.size(); i++) {
-      GLenum varType = desc.v_Layout[i].m_semantic == SEMANTIC::BLENDINDICES ?
+      GLenum varType = desc.v_Layout[i].m_semantic == SEMANTIC::kBLENDINDICES ?
                                                                 GL_INT : GL_FLOAT;
       if (varType == GL_INT) {
         glVertexAttribIFormat(
@@ -398,8 +398,14 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::setViewport(int32 topLeftX, int32 topLeftY, int32 width, int32 height) {
+  OGLGraphicsAPI::setViewport(int32 topLeftX,
+                              int32 topLeftY,
+                              int32 width,
+                              int32 height,
+                              float minDepth,
+                              float maxDepth) {
     glViewport(topLeftX, topLeftY, width, height);
+    glDepthRange(minDepth, maxDepth);
   }
 
   void
@@ -419,8 +425,8 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::clearBackBuffer(COLOR color) {
-    glClearColor(color.red, color.green, color.blue, color.alpha);
+  OGLGraphicsAPI::clearBackBuffer(Color clearColor) {
+    glClearColor(clearColor.red, clearColor.green, clearColor.blue, clearColor.alpha);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
@@ -566,7 +572,7 @@ namespace ovEngineSDK {
   }
 
   void
-  OGLGraphicsAPI::clearRenderTarget(SPtr<Texture> rt, COLOR color) {
+  OGLGraphicsAPI::clearRenderTarget(SPtr<Texture> rt, Color clearColor) {
     if (!rt) {
       OutputDebugStringA("Invalid Render Target received.");
       return;
@@ -577,7 +583,7 @@ namespace ovEngineSDK {
       return;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, tex->m_framebuffer);
-    glClearColor(color.red, color.green, color.blue, color.alpha);
+    glClearColor(clearColor.red, clearColor.green, clearColor.blue, clearColor.alpha);
     glClear(GL_COLOR_BUFFER_BIT);
   }
 
@@ -614,31 +620,31 @@ namespace ovEngineSDK {
   void
   OGLGraphicsAPI::setTopology(TOPOLOGY::E topology) {
     switch (topology) {
-    case TOPOLOGY::E::POINTS:
+    case TOPOLOGY::E::kPOINTS:
       m_topology = GL_POINTS;
       break;
-    case TOPOLOGY::E::LINES:
+    case TOPOLOGY::E::kLINES:
       m_topology = GL_LINES;
       break;
-    case TOPOLOGY::E::TRIANGLES:
+    case TOPOLOGY::E::kTRIANGLES:
       m_topology = GL_TRIANGLES;
       break;
-    case TOPOLOGY::E::LINE_STRIP:
+    case TOPOLOGY::E::kLINE_STRIP:
       m_topology = GL_LINE_STRIP;
       break;
-    case TOPOLOGY::E::TRIANGLE_STRIP:
+    case TOPOLOGY::E::kTRIANGLE_STRIP:
       m_topology = GL_TRIANGLE_STRIP;
       break;
-    case TOPOLOGY::E::LINE_ADJACENCY:
+    case TOPOLOGY::E::kLINE_ADJACENCY:
       m_topology = GL_LINES_ADJACENCY;
       break;
-    case TOPOLOGY::E::TRIANGLE_ADJANCENCY:
+    case TOPOLOGY::E::kTRIANGLE_ADJANCENCY:
       m_topology = GL_TRIANGLES_ADJACENCY;
       break;
-    case TOPOLOGY::E::LINE_STRIP_ADJACENCY:
+    case TOPOLOGY::E::kLINE_STRIP_ADJACENCY:
       m_topology = GL_LINE_STRIP_ADJACENCY;
       break;
-    case TOPOLOGY::E::TRIANGLE_STRIP_ADJACENCY:
+    case TOPOLOGY::E::kTRIANGLE_STRIP_ADJACENCY:
       m_topology = GL_TRIANGLE_STRIP_ADJACENCY;
       break;
     }
@@ -654,93 +660,93 @@ namespace ovEngineSDK {
 
   void
   OGLGraphicsAPI::fillFormats() {
-    m_formats.insert(std::make_pair(FORMATS::E::R8_SNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kR8_SNORM,
       std::make_pair(GL_R8_SNORM, GL_RED)));
-    m_formats.insert(std::make_pair(FORMATS::E::R16_SNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kR16_SNORM,
       std::make_pair(GL_R16_SNORM, GL_RED)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG8_SNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG8_SNORM,
       std::make_pair(GL_RG8_SNORM, GL_RG)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG16_SNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG16_SNORM,
       std::make_pair(GL_RG16_SNORM, GL_RG)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGB10_A2UI,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGB10_A2UI,
       std::make_pair(GL_RGB10_A2UI, GL_RGBA)));
-    m_formats.insert(std::make_pair(FORMATS::E::R16_FLOAT,
+    m_formats.insert(std::make_pair(FORMATS::E::kR16_FLOAT,
       std::make_pair(GL_R16F, GL_RED)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG16_FLOAT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG16_FLOAT,
       std::make_pair(GL_RG16F, GL_RG)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA16_FLOAT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA16_FLOAT,
       std::make_pair(GL_RGBA16F, GL_RGBA)));
-    m_formats.insert(std::make_pair(FORMATS::E::R32_FLOAT,
+    m_formats.insert(std::make_pair(FORMATS::E::kR32_FLOAT,
       std::make_pair(GL_R32F, GL_RED)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG32_FLOAT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG32_FLOAT,
       std::make_pair(GL_RG32F, GL_RG)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGB32_FLOAT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGB32_FLOAT,
       std::make_pair(GL_RGB32F, GL_RGB)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA32_FLOAT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA32_FLOAT,
       std::make_pair(GL_RGBA32F, GL_RGBA)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG11B10_FLOAT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG11B10_FLOAT,
       std::make_pair(GL_R11F_G11F_B10F, GL_RGB)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGB9_E5,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGB9_E5,
       std::make_pair(GL_RGB9_E5, GL_RGB)));
-    m_formats.insert(std::make_pair(FORMATS::E::R8_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kR8_INT,
       std::make_pair(GL_R8I, GL_RED_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::R8_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kR8_UINT,
       std::make_pair(GL_R8UI, GL_RED_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::R16_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kR16_INT,
       std::make_pair(GL_R16I, GL_RED_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::R16_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kR16_UINT,
       std::make_pair(GL_R16UI, GL_RED_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::R32_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kR32_INT,
       std::make_pair(GL_R32I, GL_RED_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::R32_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kR32_UINT,
       std::make_pair(GL_R32UI, GL_RED_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG8_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG8_INT,
       std::make_pair(GL_RG8I, GL_RG_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG8_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG8_UINT,
       std::make_pair(GL_RG8UI, GL_RG_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG16_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG16_INT,
       std::make_pair(GL_RG16I, GL_RG_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG16_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG16_UINT,
       std::make_pair(GL_RG16UI, GL_RG_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG32_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG32_INT,
       std::make_pair(GL_RG32I, GL_RG_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG32_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG32_UINT,
       std::make_pair(GL_RG32UI, GL_RG_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGB32_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGB32_INT,
       std::make_pair(GL_RGB32I, GL_RGB_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGB32_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGB32_UINT,
       std::make_pair(GL_RGB32UI, GL_RGB_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA8_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA8_INT,
       std::make_pair(GL_RGBA8I, GL_RGBA_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA8_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA8_UINT,
       std::make_pair(GL_RGBA8UI, GL_RGBA_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA16_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA16_INT,
       std::make_pair(GL_RGBA16I, GL_RGBA_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA16_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA16_UINT,
       std::make_pair(GL_RGBA16UI, GL_RGBA_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA32_INT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA32_INT,
       std::make_pair(GL_RGBA32I, GL_RGBA_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA32_UINT,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA32_UINT,
       std::make_pair(GL_RGBA32UI, GL_RGBA_INTEGER)));
-    m_formats.insert(std::make_pair(FORMATS::E::R8_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kR8_UNORM,
       std::make_pair(GL_R8, GL_RED)));
-    m_formats.insert(std::make_pair(FORMATS::E::R16_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kR16_UNORM,
       std::make_pair(GL_R16, GL_RED)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG8_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG8_UNORM,
       std::make_pair(GL_RG8, GL_RG)));
-    m_formats.insert(std::make_pair(FORMATS::E::RG16_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRG16_UNORM,
       std::make_pair(GL_RG16, GL_RG)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGB5A1_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGB5A1_UNORM,
       std::make_pair(GL_RGB5_A1, GL_RGB)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA8_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA8_UNORM,
       std::make_pair(GL_RGBA8, GL_RGBA)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGB10A2_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGB10A2_UNORM,
       std::make_pair(GL_RGB10_A2, GL_RGBA)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA16_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA16_UNORM,
       std::make_pair(GL_RGBA16, GL_RGBA)));
-    m_formats.insert(std::make_pair(FORMATS::E::RGBA8_SRGB_UNORM,
+    m_formats.insert(std::make_pair(FORMATS::E::kRGBA8_SRGB_UNORM,
       std::make_pair(GL_SRGB8_ALPHA8, GL_RGBA)));
-    m_formats.insert(std::make_pair(FORMATS::E::D24_S8,
+    m_formats.insert(std::make_pair(FORMATS::E::kD24_S8,
       std::make_pair(GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL)));
   }
 }

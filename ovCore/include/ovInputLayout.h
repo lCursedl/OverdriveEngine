@@ -9,13 +9,13 @@ namespace ovEngineSDK {
   */
   namespace SEMANTIC {
     enum E {
-      POSITION = 0,
-      TEXCOORD,
-      NORMAL,
-      BINORMAL,
-      TANGENT,
-      BLENDINDICES,
-      BLENDWEIGHT
+      kPOSITION = 0,
+      kTEXCOORD,
+      kNORMAL,
+      kBINORMAL,
+      kTANGENT,
+      kBLENDINDICES,
+      kBLENDWEIGHT
     };
   }
   /** 

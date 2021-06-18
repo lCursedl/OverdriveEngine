@@ -28,7 +28,7 @@ namespace ovEngineSDK {
    private:
 
     uint32 m_type = 0;            /**< unsigned int for buffer type storing. */
-    int32 m_size = 0;             /**< int for buffer size storing. */
+    SIZE_T m_size = 0;             /**< int for buffer size storing. */
     uint32 m_buffer = 0;          /**< unsigned int for OpenGL buffer index */
 
     friend class OGLGraphicsAPI;

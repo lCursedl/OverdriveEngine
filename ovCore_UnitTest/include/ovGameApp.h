@@ -33,24 +33,17 @@ class GameApp : public BaseApp
   SPtr<InputLayout> m_layout;
   SPtr<Buffer> m_cBuffer;
   SPtr<Buffer> m_bBuffer;
-  SPtr<Buffer> m_vertexBuffer;
-  SPtr<Buffer> m_indexBuffer;
-  COLOR m_color;
+  Color m_color;
   SPtr<Model> myModel;
 
   struct Matrices {
-    Matrix4 World;
-    Matrix4 View;
-    Matrix4 Projection;
-    Vector4 Color;
-  };
-
-  struct Vertex {
-    Vector3 Position;
-    Vector2 Texcoord;
+    Matrix4 world;
+    Matrix4 view;
+    Matrix4 projection;
+    Vector4 color;
   };
 
   struct Bones {
-    Matrix4 gBones[MAXBONES];
+    Matrix4 bones[MAXBONES];
   };
 };

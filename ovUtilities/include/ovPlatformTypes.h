@@ -38,4 +38,5 @@ namespace ovEngineSDK {
   using int16 = int16_t;
   using int32 = int32_t;
   using int64 = int64_t;
+  using SIZE_T = size_t;
 }
