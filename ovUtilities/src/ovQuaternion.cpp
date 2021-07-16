@@ -17,4 +17,8 @@ namespace ovEngineSDK {
     z = s * Vec.z;
     w = c;
   }
+
+  Quaternion Quaternion::inverse() const {
+      return Quaternion(-x, -y, -z, w);
+  }
 }

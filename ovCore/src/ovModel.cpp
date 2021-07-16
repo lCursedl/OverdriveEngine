@@ -25,7 +25,7 @@ namespace ovEngineSDK {
       return "/" + file;
     }
     else {
-      return file.substr(realPos, file.length() - realPos);
+      return "/" + file.substr(realPos + 1, file.length() - realPos);
     }    
   }
 
@@ -39,7 +39,7 @@ namespace ovEngineSDK {
   }
 
   void
-  Model::draw() {
+  Model::render() {
     for (auto& mesh : m_meshes) {
       mesh->draw(m_textureSampler);
     }
@@ -59,7 +59,7 @@ namespace ovEngineSDK {
     }
     m_modelScene = importer.GetOrphanedScene();
     memcpy(&m_globalTransform, &m_modelScene->mRootNode->mTransformation, sizeof(Matrix4));
-    //m_globalTransform = m_globalTransform.inverse();
+    m_globalTransform = m_globalTransform.inverse();
     //Retrieve the directory path of the file
     m_directory = path.substr(0, path.find_last_of('/'));
     //Process assimp's root node recursively
@@ -74,19 +74,19 @@ namespace ovEngineSDK {
 
   void Model::transformBones(float delta, Vector<Matrix4>& Transforms) {
     int32 totalBones = 0;
-    for (uint32 i = 0; i < m_meshes.size(); i++) {
+    for (uint32 i = 0; i < m_meshes.size(); ++i) {
       totalBones += m_meshes[i]->m_numBones;
     }
     float timeInTicks = delta * m_modelScene->mAnimations[0]->mTicksPerSecond;
     float animTime = Math::fmod(timeInTicks, m_modelScene->mAnimations[0]->mDuration);
 
-    for (uint32 i = 0; i < m_meshes.size(); i++) {
+    for (uint32 i = 0; i < m_meshes.size(); ++i) {
       readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, m_meshes[i]);
     }
     Transforms.resize(totalBones);
 
-    for (uint32 i = 0; i < m_meshes.size(); i++) {
-      for (uint32 j = 0; j < totalBones; j++) {
+    for (uint32 i = 0; i < m_meshes.size(); ++i) {
+      for (uint32 j = 0; j < totalBones; ++j) {
           Transforms[j] = m_meshes[i]->m_boneInfo[j].FinalTransform;
       }
     }
@@ -202,6 +202,7 @@ namespace ovEngineSDK {
     
     Matrix4 Transform;
     memcpy(&Transform, &node->mTransformation, sizeof(Matrix4));
+    Transform = Transform.transpose();
     const aiNodeAnim* animNode = findAnimationNode(m_modelScene->mAnimations[0], nodeName);
     if (animNode) {
       //Interpolate scaling and generate scaling transformation matrix
@@ -215,6 +216,7 @@ namespace ovEngineSDK {
       //Interpolate rotation and generate rotation transform matrix
       aiQuaternion aiquat;
       calcInterpolatedRot(aiquat, animTime, animNode);
+      aiquat.Conjugate();
       Quaternion rotation(static_cast<float>(aiquat.x), static_cast<float>(aiquat.y),
                           static_cast<float>(aiquat.z), static_cast<float>(aiquat.w));
       Matrix4 rotMat = Matrix4::fromQuat(rotation);
@@ -314,7 +316,7 @@ namespace ovEngineSDK {
     const aiQuaternion& Start = nodeAnimation->mRotationKeys[rotIndex].mValue;
     const aiQuaternion& End = nodeAnimation->mRotationKeys[nextRotIndex].mValue;
     aiQuaternion::Interpolate(Out, Start, End, factor);
-    Out = Out.Normalize();
+    Out.Normalize();
   }
   void
   Model::calcInterpolatedScale(aiVector3D& Out,

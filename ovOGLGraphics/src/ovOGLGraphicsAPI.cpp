@@ -244,13 +244,14 @@ namespace ovEngineSDK {
     SPtr<OGLInputLayout> ILayout(new OGLInputLayout);
     glGenVertexArrays(1, &ILayout->m_vao);
     glBindVertexArray(ILayout->m_vao);
-    for (uint32 i = 0; i < desc.v_Layout.size(); i++) {
+    SIZE_T layoutElements = desc.v_Layout.size();
+    for (uint32 i = 0; i < layoutElements; ++i) {
       GLenum varType = desc.v_Layout[i].m_semantic == SEMANTIC::kBLENDINDICES ?
                                                                 GL_INT : GL_FLOAT;
       if (varType == GL_INT) {
-        glVertexAttribIFormat(
+        glVertexAttribIFormat(i,
           desc.v_Layout[i].m_numElements,
-          varType, GL_FALSE,
+          varType,
           desc.v_Layout[i].m_offset);
       }
       else {

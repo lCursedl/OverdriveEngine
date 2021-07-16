@@ -169,11 +169,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\ovComponent.cpp" />
+    <ClCompile Include="src\ovActor.cpp" />
     <ClCompile Include="src\ovBaseApp.cpp" />
     <ClCompile Include="src\ovGraphicsAPI.cpp" />
     <ClCompile Include="src\ovMesh.cpp" />
     <ClCompile Include="src\ovModel.cpp" />
     <ClCompile Include="src\ovPlugin.cpp" />
+    <ClCompile Include="src\ovSceneGraph.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovActor.h" />

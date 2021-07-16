@@ -42,6 +42,7 @@ namespace ovEngineSDK {
     if (!result)
     {
       glGetProgramInfoLog(m_program, 512, 0, log);
+      OutputDebugStringA(log);
     }
     glDetachShader(m_program,
       static_pointer_cast<OGLVertexShader>(m_pVertexShader)->m_vertexShader);

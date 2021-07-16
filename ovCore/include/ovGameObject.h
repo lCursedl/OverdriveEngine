@@ -3,7 +3,7 @@
 #include <ovPrerequisitesCore.h>
 
 namespace ovEngineSDK {
-  class GameObject
+  class OV_CORE_EXPORT GameObject
   {
    public:
    GameObject() = default;

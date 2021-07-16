@@ -24,6 +24,7 @@ namespace ovEngineSDK {
       }
       m_boneMapping[boneName] = boneIndex;
       memcpy(&m_boneInfo[boneIndex].BoneOffset, &mesh->mBones[i]->mOffsetMatrix, sizeof(Matrix4));
+      //m_boneInfo[boneIndex].BoneOffset = m_boneInfo[boneIndex].BoneOffset.transpose();
       for (int32 j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
         uint32 vertexID = mesh->mBones[i]->mWeights[j].mVertexId;
         float weigth = mesh->mBones[i]->mWeights[j].mWeight;

@@ -11,6 +11,8 @@ namespace ovEngineSDK {
     Quaternion() = default;
     Quaternion(float InX, float InY, float InZ, float InW);
     Quaternion(Vector3& Vec, float AngleRad);
+    Quaternion
+    inverse() const;
    public:
     float x;
     float y;

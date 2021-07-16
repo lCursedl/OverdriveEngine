@@ -54,7 +54,8 @@ namespace ovEngineSDK {
                                m_graphicPlugin.getProcedureByName("createGraphicsAPI"));
       GraphicsAPI::startUp();
       GraphicsAPI* graphicAPI = createGraphicsAPI();
-      g_graphicsAPI().setObject(graphicAPI);   
+      g_graphicsAPI().setObject(graphicAPI);
+      SceneGraph::startUp();
     }
   }
 
@@ -62,6 +63,7 @@ namespace ovEngineSDK {
   BaseApp::destroySystems() {
     g_graphicsAPI().shutdown();
     g_graphicsAPI().shutDown();
+    SceneGraph::shutDown();
   }
 
   void BaseApp::createWindow() {

@@ -242,7 +242,7 @@ namespace ovEngineSDK {
       return texture;
     }
     else {
-      OutputDebugStringA("Missing API initialization.");
+      OutputDebugStringA("Missing API initialization.\n");
       return nullptr;
     }
   }
@@ -366,7 +366,7 @@ namespace ovEngineSDK {
       return buffer;
     }
     else {
-      OutputDebugStringA("Invalid size for buffer");
+      OutputDebugStringA("Invalid size for buffer.\n");
       return nullptr;
     }
   }
@@ -613,12 +613,12 @@ namespace ovEngineSDK {
         m_deviceContext->IASetInputLayout(dxlayout->m_inputLayout);
       }
       else {
-        OutputDebugStringA("Input layout invalid.");
+        OutputDebugStringA("Input layout invalid.\n");
       }
 
     }
     else {
-      OutputDebugStringA("Received nullptr pointer.");
+      OutputDebugStringA("Received nullptr pointer.\n");
     }
   }
 
@@ -633,7 +633,7 @@ namespace ovEngineSDK {
             m_deviceContext->OMSetRenderTargets(1, &rtv, dsv);
           }
           else {
-            OutputDebugStringA("Invalid DepthStencilView.");
+            OutputDebugStringA("Invalid DepthStencilView.\n");
           }
         }
         else {
@@ -642,28 +642,28 @@ namespace ovEngineSDK {
 
       }
       else {
-        OutputDebugStringA("Invalid RenderTargetView.");
+        OutputDebugStringA("Invalid RenderTargetView.\n");
       }
     }
     else {
-      OutputDebugStringA("Received nullptr pointer for texture.");
+      OutputDebugStringA("Received nullptr pointer for texture.\n");
     }
   }
 
   void
   DXGraphicsAPI::updateBuffer(SPtr<Buffer> buffer, const void* data) {
     if (!buffer) {
-      OutputDebugStringA("Invalid buffer received.");
+      OutputDebugStringA("Invalid buffer received.\n");
       return;
     }
     if (!data) {
-      OutputDebugStringA("Invalid data received.");
+      OutputDebugStringA("Invalid data received.\n");
       return;
     }
 
     auto buff = static_pointer_cast<DXBuffer>(buffer);
     if (!buff->m_buffer) {
-      OutputDebugStringA("Buffer not initialized, can't update data.");
+      OutputDebugStringA("Buffer not initialized, can't update data.\n");
       return;
     }
     m_deviceContext->UpdateSubresource(buff->m_buffer, 0, nullptr, data, 0, 0);
@@ -683,11 +683,11 @@ namespace ovEngineSDK {
                                             &offset);
       }
       else {
-        OutputDebugStringA("Buffer missing initialization.");
+        OutputDebugStringA("Buffer missing initialization.\n");
       }
     }
     else {
-      OutputDebugStringA("Empty buffer received.");
+      OutputDebugStringA("Empty buffer received.\n");
     }
   }
 
@@ -699,11 +699,11 @@ namespace ovEngineSDK {
         m_deviceContext->IASetIndexBuffer(buff->m_buffer, DXGI_FORMAT_R32_UINT, 0);
       }
       else {
-        OutputDebugStringA("Buffer missing initialization.");
+        OutputDebugStringA("Buffer missing initialization.\n");
       }
     }
     else {
-      OutputDebugStringA("Empty buffer received.");
+      OutputDebugStringA("Empty buffer received.\n");
     }
   }
 
@@ -712,12 +712,12 @@ namespace ovEngineSDK {
                                  SPtr<Texture> texture,
                                  SPtr<SamplerState> sampler) {
     if (!sampler) {
-      OutputDebugStringA("Invalid sampler received.");
+      OutputDebugStringA("Invalid sampler received.\n");
       return;
     }
     auto samp = static_pointer_cast<DXSamplerState>(sampler);
     if (!samp->m_sampler) {
-      OutputDebugStringA("Sampler missing initialization.");
+      OutputDebugStringA("Sampler missing initialization.\n");
       return;
     }
     m_deviceContext->PSSetSamplers(slot, 1, &samp->m_sampler);
@@ -738,23 +738,23 @@ namespace ovEngineSDK {
         }
       }
       else {
-        OutputDebugStringA("Buffer not initialized received");
+        OutputDebugStringA("Buffer not initialized received.\n");
       }
     }
     else {
-      OutputDebugStringA("Invalid buffer received.");
+      OutputDebugStringA("Invalid buffer received.\n");
     }
   }
 
   void
   DXGraphicsAPI::clearRenderTarget(SPtr<Texture> rt, Color clearColor) {
     if (!rt) {
-      OutputDebugStringA("Invalid Render Target received");
+      OutputDebugStringA("Invalid Render Target received.\n");
       return;
     }
     auto tex = static_pointer_cast<DXTexture>(rt);
     if (!tex->m_rtv) {
-      OutputDebugStringA("Render Target not initialized received");
+      OutputDebugStringA("Render Target not initialized received.\n");
       return;
     }
     float c[4] = { clearColor.red, clearColor.green, clearColor.blue, clearColor.alpha };
@@ -764,12 +764,12 @@ namespace ovEngineSDK {
   void
   DXGraphicsAPI::clearDepthStencil(SPtr<Texture> ds) {
     if (!ds) {
-      OutputDebugStringA("Depth Stencil received was nullptr.");
+      OutputDebugStringA("Depth Stencil received was nullptr.\n");
       return;
     }
     auto depth = static_pointer_cast<DXTexture>(ds);
     if (!depth->m_dsv) {
-      OutputDebugStringA("Depth Stencil not initialized received.");
+      OutputDebugStringA("Depth Stencil not initialized received.\n");
       return;
     }
     m_deviceContext->ClearDepthStencilView(depth->m_dsv,
@@ -782,11 +782,11 @@ namespace ovEngineSDK {
   DXGraphicsAPI::setTexture(uint32 slot, SPtr<Texture> texture) {
     auto tex = static_pointer_cast<DXTexture>(texture);
     if (!tex) {
-      OutputDebugStringA("Texture received was nullptr.");
+      OutputDebugStringA("Texture received was nullptr.\n");
       return;
     }
     if (!tex->m_texture || !tex->m_srv) {
-      OutputDebugStringA("Uninitialized texture received.");
+      OutputDebugStringA("Uninitialized texture received.\n");
       return;
     }
     m_deviceContext->PSSetShaderResources(slot, 1, &tex->m_srv);

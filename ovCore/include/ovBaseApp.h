@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <ovPrerequisitesCore.h>
 #include <ovGraphicsAPI.h>
+#include <ovSceneGraph.h>
 #include <ovPlugin.h>
 
 using sf::WindowHandle;

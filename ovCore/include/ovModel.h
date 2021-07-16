@@ -1,6 +1,7 @@
 #pragma once
 #include <ovPrerequisitesCore.h>
 #include <ovMesh.h>
+#include <ovComponent.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -9,13 +10,13 @@
 
 
 namespace ovEngineSDK {
-  class OV_CORE_EXPORT Model
+  class OV_CORE_EXPORT Model : public Component
   {
    public:
     Model() = default;
     ~Model();
 
-    void draw();
+    void render() override;
     void load(String const& path);
     void transformBones(float delta, Vector<Matrix4>& Transforms);
    private:

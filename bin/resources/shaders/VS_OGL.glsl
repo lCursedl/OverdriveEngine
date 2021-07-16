@@ -9,30 +9,25 @@ layout (location = 6) in vec4 aWeights;
 
 const int MAX_BONES = 200;
 
-layout(std140, binding = 0) uniform Matrices
-{
-	mat4 World;
-	mat4 View;
-	mat4 Projection;
-	vec4 Color;
+layout(std140, binding = 0) uniform Matrices {
+  mat4 World;
+  mat4 View;
+  mat4 Projection;
+  vec4 Color;
 };
 
-layout(std140, binding = 1) uniform Bones
-{
-	mat4 gBones[MAX_BONES];
+layout(std140, binding = 1) uniform Bones {
+  mat4 gBones[MAX_BONES];
 };
 
 out vec2 Texcoord;
-out vec4 psPos;
 
-void main()
-{
-	mat4 BoneTransform = gBones[aBoneID[0]] * aWeights[0];
-	BoneTransform += gBones[aBoneID[1]] * aWeights[1];
-	BoneTransform += gBones[aBoneID[2]] * aWeights[2];
-	BoneTransform += gBones[aBoneID[3]] * aWeights[3];
-	
-	psPos = BoneTransform * vec4(aPosition, 1.0);
-	gl_Position = Projection * View * World * psPos;
-	Texcoord = aTexcoord;
+void main() {
+  mat4 BoneTransform = gBones[aBoneID[0]] * aWeights[0];
+  BoneTransform += gBones[aBoneID[1]] * aWeights[1];
+  BoneTransform += gBones[aBoneID[2]] * aWeights[2];
+  BoneTransform += gBones[aBoneID[3]] * aWeights[3];
+  
+  gl_Position = Projection * View * World * BoneTransform * vec4(aPosition, 1.0);
+  Texcoord = aTexcoord;
 }

@@ -48,8 +48,8 @@ PS_INPUT main( VS_INPUT input )
 	BoneTransform		+= mul(gBones[input.BoneID.z], input.Weights.z);
 	BoneTransform		+= mul(gBones[input.BoneID.w], input.Weights.w);
 
-	output.Pos = mul(float4(input.Pos, 1.0), BoneTransform);
-    //output.Pos = mul(float4(input.Pos, 1.0f), World );
+	//output.Pos = mul(float4(input.Pos, 1.0), BoneTransform);
+    output.Pos = mul(float4(input.Pos, 1.0f), World );
 	output.Pos = mul( output.Pos, World );
     output.Pos = mul( output.Pos, View );
     output.Pos = mul( output.Pos, Projection );
