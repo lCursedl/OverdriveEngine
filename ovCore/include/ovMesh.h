@@ -17,7 +17,7 @@ namespace ovEngineSDK {
   class Buffer;
   class Texture;
   class SamplerState;
-  struct MeshVertex
+  struct OV_CORE_EXPORT MeshVertex
   {
    public:
     Vector3 Position;
@@ -29,14 +29,14 @@ namespace ovEngineSDK {
     float Weights[4] = {0.f};
   };
 
-  struct VertexBoneData
+  struct OV_CORE_EXPORT VertexBoneData
   {
-    float BoneID[NUM_BONES_PERVERTEX] = {0};
-    float Weights[NUM_BONES_PERVERTEX] = {0};
+    int32 BoneID[NUM_BONES_PERVERTEX] = {0};
+    float Weights[NUM_BONES_PERVERTEX] = {0.f};
     void addBoneData(uint32 boneID, float weight);
   };
 
-  struct BoneInfo
+  struct OV_CORE_EXPORT BoneInfo
   {
     Matrix4 BoneOffset;
     Matrix4 FinalTransform;
@@ -46,7 +46,7 @@ namespace ovEngineSDK {
     }
   };
 
-  struct MeshTexture
+  struct OV_CORE_EXPORT MeshTexture
   {
    public:
     String Type;

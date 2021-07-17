@@ -38,6 +38,10 @@ namespace ovEngineSDK {
     delete m_modelScene;
   }
 
+  void Model::update(float delta) {
+    delta;
+  }
+
   void
   Model::render() {
     for (auto& mesh : m_meshes) {
@@ -77,16 +81,19 @@ namespace ovEngineSDK {
     for (uint32 i = 0; i < m_meshes.size(); ++i) {
       totalBones += m_meshes[i]->m_numBones;
     }
-    float timeInTicks = delta * m_modelScene->mAnimations[0]->mTicksPerSecond;
-    float animTime = Math::fmod(timeInTicks, m_modelScene->mAnimations[0]->mDuration);
+    float timeInTicks = delta * 
+                        static_cast<float>(m_modelScene->mAnimations[0]->mTicksPerSecond);
+    float animTime = Math::fmod(
+    timeInTicks, static_cast<float>(m_modelScene->mAnimations[0]->mDuration));
 
     for (uint32 i = 0; i < m_meshes.size(); ++i) {
       readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, m_meshes[i]);
     }
     Transforms.resize(totalBones);
 
-    for (uint32 i = 0; i < m_meshes.size(); ++i) {
-      for (uint32 j = 0; j < totalBones; ++j) {
+    SIZE_T meshCount = m_meshes.size();
+    for (SIZE_T i = 0; i < meshCount; ++i) {
+      for (int32 j = 0; j < totalBones; ++j) {
           Transforms[j] = m_meshes[i]->m_boneInfo[j].FinalTransform;
       }
     }
@@ -185,7 +192,7 @@ namespace ovEngineSDK {
   }
   const aiNodeAnim*
   Model::findAnimationNode(const aiAnimation* anim, const String node) {
-    for (int32 i = 0; i < anim->mNumChannels; i++) {
+    for (uint32 i = 0; i < anim->mNumChannels; i++) {
       const aiNodeAnim* T = anim->mChannels[i];
       if (String(T->mNodeName.data) == node) {
         return T;

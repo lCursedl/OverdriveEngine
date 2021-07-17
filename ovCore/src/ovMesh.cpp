@@ -10,7 +10,7 @@ namespace ovEngineSDK {
     m_indices = index;
     m_textures = texture;
     m_numBones = 0;
-    for (uint32 i = 0; i < mesh->mNumBones; i++) {
+    for (uint32 i = 0; i < mesh->mNumBones; ++i) {
       uint32 boneIndex = 0;
       String boneName(mesh->mBones[i]->mName.data);
       if (m_boneMapping.find(boneName) == m_boneMapping.end()) {
@@ -25,7 +25,7 @@ namespace ovEngineSDK {
       m_boneMapping[boneName] = boneIndex;
       memcpy(&m_boneInfo[boneIndex].BoneOffset, &mesh->mBones[i]->mOffsetMatrix, sizeof(Matrix4));
       //m_boneInfo[boneIndex].BoneOffset = m_boneInfo[boneIndex].BoneOffset.transpose();
-      for (int32 j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
+      for (uint32 j = 0; j < mesh->mBones[i]->mNumWeights; ++j) {
         uint32 vertexID = mesh->mBones[i]->mWeights[j].mVertexId;
         float weigth = mesh->mBones[i]->mWeights[j].mWeight;
         for (int32 k = 0; k < NUM_BONES_PERVERTEX; k++) {

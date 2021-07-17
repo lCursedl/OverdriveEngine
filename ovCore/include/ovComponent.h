@@ -16,8 +16,8 @@ namespace ovEngineSDK {
     Component() = default;
     virtual ~Component() = default;
 
-    virtual void update(float delta);
-    virtual void render();
+    virtual void update(float delta) = 0;
+    virtual void render() = 0;
 
     COMPONENT_TYPE::E m_componentID;
   };

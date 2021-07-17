@@ -16,6 +16,7 @@ namespace ovEngineSDK {
     Model() = default;
     ~Model();
 
+    void update(float delta) override;
     void render() override;
     void load(String const& path);
     void transformBones(float delta, Vector<Matrix4>& Transforms);
