@@ -1,4 +1,7 @@
 #include "ovGameApp.h"
+#if OV_PLATFORM == OV_PLATFORM_WIN32
+#include <Windows.h>
+#endif // OV_PLATFORM == OV_PLATFORM_WIN32
 
 void GameApp::onCreate() {
   auto& graphicAPI = g_graphicsAPI();
@@ -38,7 +41,7 @@ void GameApp::onCreate() {
   //Create structure to update constant buffer
   Matrices mat;
   mat.world = Matrix4::IDENTITY;
-  //mat.world = graphicAPI.matrix4Policy(Matrix4::scale(mat.world, Vector3(0.20f, 0.20f, 0.20f)));
+  mat.world = graphicAPI.matrix4Policy(Matrix4::scale(mat.world, Vector3(0.2f, 0.2f, 0.2f)));
   mat.color = Vector4(1.f, 0.f, 0.f, 1.f);
   mat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(0.f, 0.f, -10.f),
                                                     Vector3(0.f, 1.f, 0.f),
@@ -65,7 +68,7 @@ void GameApp::onCreate() {
   graphicAPI.setBackBuffer();
 
   SPtr<Model>model = make_shared<Model>();
-  model->load("resources/models/silly_dancing.fbx");
+  model->load("resources/models/Vela/Vela2.fbx");
 
   SPtr<Actor>myActor = make_shared<Actor>();
   myActor->addComponent(model);

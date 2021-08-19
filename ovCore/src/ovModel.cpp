@@ -15,7 +15,7 @@ namespace ovEngineSDK {
     }
     else {
       realPos = posInvSlash;
-      if (!posSlash == String::npos) {
+      if (posSlash == String::npos) {
         if (posSlash > realPos) {
           posSlash = realPos;
         }
@@ -24,9 +24,8 @@ namespace ovEngineSDK {
     if (realPos == 0) {
       return "/" + file;
     }
-    else {
-      return "/" + file.substr(realPos + 1, file.length() - realPos);
-    }    
+
+    return "/" + file.substr(realPos + 1, file.length() - realPos);  
   }
 
   Model::~Model() {
@@ -78,16 +77,16 @@ namespace ovEngineSDK {
 
   void Model::transformBones(float delta, Vector<Matrix4>& Transforms) {
     int32 totalBones = 0;
-    for (uint32 i = 0; i < m_meshes.size(); ++i) {
-      totalBones += m_meshes[i]->m_numBones;
+    for (auto& tempMesh : m_meshes) {
+      totalBones += tempMesh->m_numBones;
     }
     float timeInTicks = delta * 
                         static_cast<float>(m_modelScene->mAnimations[0]->mTicksPerSecond);
     float animTime = Math::fmod(
     timeInTicks, static_cast<float>(m_modelScene->mAnimations[0]->mDuration));
 
-    for (uint32 i = 0; i < m_meshes.size(); ++i) {
-      readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, m_meshes[i]);
+    for (auto& tempMesh : m_meshes) {
+      readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, tempMesh);
     }
     Transforms.resize(totalBones);
 
@@ -102,11 +101,11 @@ namespace ovEngineSDK {
   void
   Model::processNode(aiNode* node, const aiScene* scene) {
     //Process each mesh located at the current node
-    for (uint32 i = 0; i < node->mNumMeshes; i++) {
+    for (uint32 i = 0; i < node->mNumMeshes; ++i) {
       aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
       m_meshes.push_back(processMesh(mesh, scene));
     }
-    for (uint32 i = 0; i < node->mNumChildren; i++) {
+    for (uint32 i = 0; i < node->mNumChildren; ++i) {
       processNode(node->mChildren[i], scene);
     }
   }
@@ -119,7 +118,7 @@ namespace ovEngineSDK {
     Vector<MeshTexture> textures;
 
     //Walk through each of the mesh's vertices
-    for (uint32 i = 0; i < mesh->mNumVertices; i++) {
+    for (uint32 i = 0; i < mesh->mNumVertices; ++i) {
       MeshVertex v;
       //Positions
       v.Position.x = mesh->mVertices[i].x;
@@ -149,17 +148,23 @@ namespace ovEngineSDK {
       vertices->push_back(v);
     }
     //Go through each of the mesh's faces and retrieve the corresponding indices
-    for (uint32 i = 0; i < mesh->mNumFaces; i++) {
+    for (uint32 i = 0; i < mesh->mNumFaces; ++i) {
       aiFace face= mesh->mFaces[i];
       //Retrieve all indices of the face and store them in the indices vector
-      for (uint32 j = 0; j < face.mNumIndices; j++) {
+      for (uint32 j = 0; j < face.mNumIndices; ++j) {
         indices->push_back(face.mIndices[j]);
       }
     }
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     Vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
+    Vector<MeshTexture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS);
+    Vector<MeshTexture> metallicMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
+    Vector<MeshTexture> roughMaps = loadMaterialTextures(material, aiTextureType_SHININESS);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+    textures.insert(textures.end(), metallicMaps.begin(), metallicMaps.end());
+    textures.insert(textures.end(), roughMaps.begin(), roughMaps.end());
     return new Mesh(vertices, indices, textures, mesh);
   }
 
@@ -167,15 +172,15 @@ namespace ovEngineSDK {
   Model::loadMaterialTextures(aiMaterial* material, aiTextureType type) {
     Vector<MeshTexture> textures;
 
-    for (uint32 i = 0; i < material->GetTextureCount(type); i++) {
+    for (uint32 i = 0; i < material->GetTextureCount(type); ++i) {
       aiString aiStr;
       material->GetTexture(type, i, &aiStr);
       String str = String(aiStr.C_Str());
       str = m_directory + getTexturePath(str);
       bool skip = false;
-      for (uint32 j = 0; j < m_modelTextures.size(); j++) {
-        if (strcmp(m_modelTextures[j].Path.data(), str.data()) == 0) {
-          textures.push_back(m_modelTextures[j]);
+      for (auto& textureModel : m_modelTextures) {
+        if (strcmp(textureModel.Path.data(), str.data()) == 0) {
+          textures.push_back(textureModel);
           skip = true;
           break;
         }
@@ -192,7 +197,7 @@ namespace ovEngineSDK {
   }
   const aiNodeAnim*
   Model::findAnimationNode(const aiAnimation* anim, const String node) {
-    for (uint32 i = 0; i < anim->mNumChannels; i++) {
+    for (uint32 i = 0; i < anim->mNumChannels; ++i) {
       const aiNodeAnim* T = anim->mChannels[i];
       if (String(T->mNodeName.data) == node) {
         return T;
@@ -247,13 +252,13 @@ namespace ovEngineSDK {
                                globalTransform *
                                modelMesh->m_boneInfo[boneIndex].BoneOffset;
     }
-    for (uint32 i = 0; i < node->mNumChildren; i++) {
+    for (uint32 i = 0; i < node->mNumChildren; ++i) {
       readNodeHierarchy(animTime, node->mChildren[i], globalTransform, modelMesh);
     }
   }
   uint32
   Model::findPosition(float animTime, const aiNodeAnim* nodeAnimation) {
-    for (uint32 i = 0; i < nodeAnimation->mNumPositionKeys - 1; i++) {
+    for (uint32 i = 0; i < nodeAnimation->mNumPositionKeys - 1; ++i) {
       if (animTime < static_cast<float>(nodeAnimation->mPositionKeys[i + 1].mTime)) {
         return i;
       }
@@ -264,7 +269,7 @@ namespace ovEngineSDK {
   uint32
   Model::findRotation(float animTime, const aiNodeAnim* nodeAnimation) {
     assert(nodeAnimation->mNumRotationKeys > 0);
-    for (uint32 i = 0; i < nodeAnimation->mNumRotationKeys - 1; i++) {
+    for (uint32 i = 0; i < nodeAnimation->mNumRotationKeys - 1; ++i) {
       if (animTime < static_cast<float>(nodeAnimation->mRotationKeys[i + 1].mTime)) {
         return i;
       }
@@ -275,7 +280,7 @@ namespace ovEngineSDK {
   uint32
   Model::findScaling(float animTime, const aiNodeAnim* nodeAnimation) {
     assert(nodeAnimation->mNumScalingKeys > 0);
-    for (uint32 i = 0; i < nodeAnimation->mNumScalingKeys - 1; i++) {
+    for (uint32 i = 0; i < nodeAnimation->mNumScalingKeys - 1; ++i) {
       if (animTime < static_cast<float>(nodeAnimation->mScalingKeys[i + 1].mTime)) {
         return i;
       }

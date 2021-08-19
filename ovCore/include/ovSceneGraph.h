@@ -4,6 +4,8 @@
 #include <ovActor.h>
 
 namespace ovEngineSDK {
+  
+  class Model;
 
   class OV_CORE_EXPORT SceneNode
   {
@@ -24,6 +26,9 @@ namespace ovEngineSDK {
     update(float delta);
     void
     render();
+
+    void
+    insertModels(Vector<SPtr<Model>>& modelsVector);
   };
 
   class OV_CORE_EXPORT SceneGraph : public Module<SceneGraph>
@@ -38,6 +43,9 @@ namespace ovEngineSDK {
     update(float delta);
     void
     render();
+
+    Vector<SPtr<Model>>
+    transferModels();
 
     private:
     SPtr<SceneNode> m_pRoot;

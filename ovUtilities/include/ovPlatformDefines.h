@@ -220,3 +220,7 @@
 # define OV_DEBUG_ONLY(x)
 # define OV_ASSERT
 #endif
+
+#if OV_COMPILER == OV_COMPILER_MSVC
+#pragma warning(disable : 4251)
+#endif // OV_COMPILER == OV_COMPILER_MSVC

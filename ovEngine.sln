@@ -33,6 +33,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ovCore_UnitTest", "ovCore_U
 		{6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C} = {6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ovRenderer", "ovRenderer\ovRenderer.vcxproj", "{5EC7C796-CBA1-47C6-84C4-52C004C2178A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C} = {6BB1CFF8-8BC6-4731-A4DF-D74B0F84EA4C}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_DLL|x64 = Debug_DLL|x64
@@ -141,6 +146,22 @@ Global
 		{8976DE60-EA90-477D-AEA9-552634C3E51D}.Release|x64.Build.0 = Release_DLL|x64
 		{8976DE60-EA90-477D-AEA9-552634C3E51D}.Release|x86.ActiveCfg = Release_DLL|Win32
 		{8976DE60-EA90-477D-AEA9-552634C3E51D}.Release|x86.Build.0 = Release_DLL|Win32
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Debug_DLL|x64.ActiveCfg = Debug_DLL|x64
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Debug_DLL|x64.Build.0 = Debug_DLL|x64
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Debug_DLL|x86.ActiveCfg = Debug_DLL|Win32
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Debug_DLL|x86.Build.0 = Debug_DLL|Win32
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Debug|x64.ActiveCfg = Debug_DLL|x64
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Debug|x64.Build.0 = Debug_DLL|x64
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Debug|x86.ActiveCfg = Debug_DLL|Win32
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Debug|x86.Build.0 = Debug_DLL|Win32
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Release_DLL|x64.ActiveCfg = Release_DLL|x64
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Release_DLL|x64.Build.0 = Release_DLL|x64
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Release_DLL|x86.ActiveCfg = Release_DLL|Win32
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Release_DLL|x86.Build.0 = Release_DLL|Win32
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Release|x64.ActiveCfg = Release_DLL|x64
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Release|x64.Build.0 = Release_DLL|x64
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Release|x86.ActiveCfg = Release_DLL|Win32
+		{5EC7C796-CBA1-47C6-84C4-52C004C2178A}.Release|x86.Build.0 = Release_DLL|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

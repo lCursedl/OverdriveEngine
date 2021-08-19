@@ -2,6 +2,10 @@
 #include <ovOGLVertexShader.h>
 #include <ovOGLPixelShader.h>
 
+#if OV_PLATFORM == OV_PLATFORM_WIN32
+#include <Windows.h>
+#endif // OV_PLATFORM == OV_PLATFORM_WIN32
+
 namespace ovEngineSDK {
   OGLShaderProgram::~OGLShaderProgram() {
     if (0 != m_program) {

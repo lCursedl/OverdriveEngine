@@ -12,25 +12,25 @@
 #   if defined( OV_STATIC_LIB )
 #     define OV_CORE_EXPORT
 #   else
-#     if defined ( OV_CORE_EXPORTS )
-#       define OV_CORE_EXPORT __declspec( dllexport )
+#     if defined ( OV_RENDERER_EXPORTS )
+#       define OV_RENDERER_EXPORT __declspec( dllexport )
 #     else
-#       define OV_CORE_EXPORT __declspec( dllimport )
+#       define OV_RENDERER_EXPORT __declspec( dllimport )
 #     endif
 #   endif
 # else
 #   if defined( OV_STATIC_LIB )
-#     define OV_CORE_EXPORT
+#     define OV_RENDERER_EXPORT
 #   else
-#     if defined ( OV_CORE_EXPORTS )
-#       define OV_CORE_EXPORT __attribute__ ((dllexport))
+#     if defined ( OV_RENDERER_EXPORTS )
+#       define OV_RENDERER_EXPORT __attribute__ ((dllexport))
 #     else
-#       define OV_CORE_EXPORT __attribute__ ((dllimport))
+#       define OV_RENDERER_EXPORT __attribute__ ((dllimport))
 #     endif
 #   endif
 # endif
-# define OV_CORE_HIDDEN
+# define OV_RENDERER_HIDDEN
 #else
-# define OV_CORE_EXPORT __attribute__ ((visibility ("default")))
-# define OV_CORE_HIDDEN __attribute__ ((visibility ("hidden")))
+# define OV_RENDERER_EXPORT __attribute__ ((visibility ("default")))
+# define OV_RENDERER_HIDDEN __attribute__ ((visibility ("hidden")))
 #endif

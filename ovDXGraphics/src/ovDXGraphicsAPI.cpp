@@ -7,6 +7,8 @@
 #include <ovDXShaderProgram.h>
 #include <ovDXInputLayout.h>
 #include <ovDXSamplerState.h>
+#include <ovDXRasterizerState.h>
+#include <ovDXDepthStencilState.h>
 
 #include <wincodec.h>
 
@@ -552,6 +554,73 @@ namespace ovEngineSDK {
     return ps;
   }
 
+  SPtr<RasterizerState>
+  DXGraphicsAPI::createRasterizerState(FILL_MODE::E fillMode,
+                                      CULL_MODE::E cullMode,
+                                      bool counterClockWise) {
+    D3D11_RASTERIZER_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.FrontCounterClockwise = counterClockWise;
+    switch (fillMode) {
+    case FILL_MODE::kWIREFRAME:
+      desc.FillMode = D3D11_FILL_WIREFRAME;
+      break;
+    case FILL_MODE::kSOLID:
+      desc.FillMode = D3D11_FILL_SOLID;
+      break;
+    }
+
+    switch (cullMode) {
+    case CULL_MODE::kNONE:
+      desc.CullMode = D3D11_CULL_NONE;
+      break;
+    case CULL_MODE::kFRONT:
+      desc.CullMode = D3D11_CULL_FRONT;
+      break;
+    case CULL_MODE::kBACK:
+      desc.CullMode = D3D11_CULL_BACK;
+      break;
+    }
+
+    SPtr<DXRasterizerState> rasterState(new DXRasterizerState);
+    if (FAILED(m_device->CreateRasterizerState(&desc, &rasterState->m_rState))) {
+      return nullptr;
+    }
+
+    return rasterState;
+  }
+
+  SPtr<DepthStencilState>
+  DXGraphicsAPI::createDepthStencilState(bool stencilEnable, bool depthEnable) {
+    D3D11_DEPTH_STENCIL_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+
+    desc.StencilEnable = stencilEnable;
+    desc.DepthEnable = depthEnable;
+
+    desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+    desc.StencilReadMask = 0xFF;
+    desc.StencilWriteMask = 0xFF;
+
+    desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+    desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+    desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+    desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+    SPtr<DXDepthStencilState> depthState(new DXDepthStencilState);
+    if (FAILED(m_device->CreateDepthStencilState(&desc, &depthState->m_depthState))) {
+      return nullptr;
+    }
+    return depthState;
+  }
+
   void
   DXGraphicsAPI::setBackBuffer() {
     m_deviceContext->OMSetRenderTargets(1,
@@ -623,21 +692,23 @@ namespace ovEngineSDK {
   }
 
   void
-  DXGraphicsAPI::setRenderTarget(SPtr<Texture> texture, SPtr<Texture> depth) {
+  DXGraphicsAPI::setRenderTarget(int32 amount,
+                                 SPtr<Texture> texture,
+                                 SPtr<Texture> depth) {
     if (texture) {
       auto rtv = static_pointer_cast<DXTexture>(texture)->m_rtv;
       if (rtv) {
         if (depth) {
           auto dsv = static_pointer_cast<DXTexture>(depth)->m_dsv;
           if (dsv) {
-            m_deviceContext->OMSetRenderTargets(1, &rtv, dsv);
+            m_deviceContext->OMSetRenderTargets(amount, &rtv, dsv);
           }
           else {
             OutputDebugStringA("Invalid DepthStencilView.\n");
           }
         }
         else {
-          m_deviceContext->OMSetRenderTargets(1, &rtv, nullptr);
+          m_deviceContext->OMSetRenderTargets(amount, &rtv, nullptr);
         }
 
       }
@@ -824,6 +895,18 @@ namespace ovEngineSDK {
       break;
     }
     m_deviceContext->IASetPrimitiveTopology(T);
+  }
+
+  void
+  DXGraphicsAPI::setRasterizerState(SPtr<RasterizerState> rasterState) {
+    auto raster = static_pointer_cast<DXRasterizerState>(rasterState);
+    m_deviceContext->RSSetState(raster->m_rState);
+  }
+
+  void
+  DXGraphicsAPI::setDepthStencilState(SPtr<DepthStencilState> depthState) {
+    auto depth = static_pointer_cast<DXDepthStencilState>(depthState);
+    m_deviceContext->OMSetDepthStencilState(depth->m_depthState, 0);
   }
 
   void DXGraphicsAPI::swapBuffer() {

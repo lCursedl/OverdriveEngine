@@ -170,18 +170,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ovDXBuffer.cpp" />
+    <ClCompile Include="src\ovDXDepthStencilState.cpp" />
     <ClCompile Include="src\ovDXGraphicsAPI.cpp" />
     <ClCompile Include="src\ovDXInputLayout.cpp" />
     <ClCompile Include="src\ovDXPixelShader.cpp" />
+    <ClCompile Include="src\ovDXRasterizerState.cpp" />
     <ClCompile Include="src\ovDXSamplerState.cpp" />
     <ClCompile Include="src\ovDXTexture.cpp" />
     <ClCompile Include="src\ovDXVertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovDXBuffer.h" />
+    <ClInclude Include="include\ovDXDepthStencilState.h" />
     <ClInclude Include="include\ovDXGraphicsAPI.h" />
     <ClInclude Include="include\ovDXInputLayout.h" />
     <ClInclude Include="include\ovDXPixelShader.h" />
+    <ClInclude Include="include\ovDXRasterizerState.h" />
     <ClInclude Include="include\ovDXSamplerState.h" />
     <ClInclude Include="include\ovDXShaderProgram.h" />
     <ClInclude Include="include\ovDXTexture.h" />

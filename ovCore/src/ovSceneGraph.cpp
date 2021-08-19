@@ -1,4 +1,5 @@
 #include "ovSceneGraph.h"
+#include <ovModel.h>
 
 namespace ovEngineSDK {
   void
@@ -29,6 +30,19 @@ namespace ovEngineSDK {
     }
   }
 
+  void SceneNode::insertModels(Vector<SPtr<Model>>& modelsVector) {
+    if (m_pActor) {
+      for (auto& components : m_pActor->m_components) {
+        if (COMPONENT_TYPE::kSTATIC_MESH == components->m_componentID) {
+          modelsVector.push_back(static_pointer_cast<Model>(components));
+        }
+      }
+      for (auto& childs : m_pChilds) {
+        childs->insertModels(modelsVector);
+      }
+    }
+  }
+
   SceneGraph::SceneGraph() {
     m_pRoot = make_shared<SceneNode>();
   }
@@ -55,5 +69,17 @@ namespace ovEngineSDK {
         m_pRoot->m_pChilds[i]->render();
       }
     }
+  }
+
+  Vector<SPtr<Model>>
+  SceneGraph::transferModels() {
+    Vector<SPtr<Model>> modelVector;
+    if (m_pRoot) {
+      for (auto& node : m_pRoot->m_pChilds) {
+        node->insertModels(modelVector);
+      }
+    }
+
+    return modelVector;
   }
 }

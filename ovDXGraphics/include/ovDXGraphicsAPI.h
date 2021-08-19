@@ -51,6 +51,14 @@ namespace ovEngineSDK {
     SPtr<PixelShader>
     createPixelShader(WString file)                                   override;
 
+    SPtr<RasterizerState>
+    createRasterizerState(FILL_MODE::E fillMode,
+                          CULL_MODE::E cullMode,
+                          bool counterClockWise)                      override;
+
+    SPtr<DepthStencilState>
+    createDepthStencilState(bool stencilEnable, bool depthEnable)     override;
+
     //DEVICE CONTEXT
 
     void
@@ -73,7 +81,9 @@ namespace ovEngineSDK {
     void
     setInputLayout(SPtr<InputLayout> layout)                          override;
     void
-    setRenderTarget(SPtr<Texture> texture, SPtr<Texture> depth)       override;
+    setRenderTarget(int32 amount,
+                    SPtr<Texture> texture,
+                    SPtr<Texture> depth)       override;
     void
     updateBuffer(SPtr<Buffer> buffer, const void* data)               override;
     void
@@ -98,7 +108,10 @@ namespace ovEngineSDK {
     setTexture(uint32 slot, SPtr<Texture> texture)                    override;
     void
     setTopology(TOPOLOGY::E topology)                                 override;
-
+    void
+    setRasterizerState(SPtr<RasterizerState> rasterState)             override;
+    void
+    setDepthStencilState(SPtr<DepthStencilState> depthState)          override;
     //SWAPCHAIN
 
     void

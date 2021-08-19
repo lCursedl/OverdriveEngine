@@ -8,7 +8,6 @@
 using sf::WindowHandle;
 using sf::Event;
 
-
 namespace ovEngineSDK {
   class OV_CORE_EXPORT BaseApp
   {
@@ -66,10 +65,9 @@ namespace ovEngineSDK {
    protected:
     WindowHandle m_windowHandle = 0;
     Plugin m_graphicPlugin;
+    Plugin m_rendererPlugin;
     bool m_runApp = false;
     sf::Clock m_appClock;
     float m_deltaTime;
-
-    static LRESULT CALLBACK WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam);
   };
 }

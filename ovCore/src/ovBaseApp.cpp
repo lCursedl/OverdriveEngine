@@ -1,16 +1,26 @@
 #include "ovBaseApp.h"
+#include <ovRenderer.h>
+#include <Windows.h>
 
 namespace ovEngineSDK {
+  
+  LRESULT CALLBACK WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam);
+
   int32
   BaseApp::run() {
     initSystems();
     createWindow();
     g_graphicsAPI().init(m_windowHandle);
+    Renderer::instance().init();
     onCreate();
+
+    Renderer::instance().setModels(SceneGraph::instance().transferModels());
+
     MSG msg = {};
+
     while (WM_QUIT != msg.message) {
       m_deltaTime = m_appClock.getElapsedTime().asSeconds();
-      if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+      if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
       }
@@ -29,7 +39,7 @@ namespace ovEngineSDK {
   }
 
   void
-  BaseApp::onUpdate(float delta) {
+  BaseApp::onUpdate(float) {
   }
 
   void
@@ -55,7 +65,11 @@ namespace ovEngineSDK {
       GraphicsAPI::startUp();
       GraphicsAPI* graphicAPI = createGraphicsAPI();
       g_graphicsAPI().setObject(graphicAPI);
-      SceneGraph::startUp();
+      
+    }
+    SceneGraph::startUp();
+    if (m_rendererPlugin.loadPlugin("ovRenderer_d.dll")) {
+      Renderer::startUp();
     }
   }
 
@@ -64,6 +78,7 @@ namespace ovEngineSDK {
     g_graphicsAPI().shutdown();
     g_graphicsAPI().shutDown();
     SceneGraph::shutDown();
+    Renderer::shutDown();
   }
 
   void BaseApp::createWindow() {
@@ -93,7 +108,8 @@ namespace ovEngineSDK {
     ShowWindow(hwnd, 10);
     m_windowHandle = hwnd;
   }
-  LRESULT BaseApp::WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam) {
+
+  LRESULT CALLBACK WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam) {
     PAINTSTRUCT ps;
     HDC hdc;
 

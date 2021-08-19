@@ -10,6 +10,8 @@
 #include <ovSamplerState.h>
 #include <ovModule.h>
 #include <ovMatrix4.h>
+#include <ovRasterizerState.h>
+#include <ovDepthStencilState.h>
 
 namespace ovEngineSDK {
   /**
@@ -175,7 +177,7 @@ namespace ovEngineSDK {
      }
 
      /**
-     * @fn       CVertexShader* createVertexShader(std::wstring file)
+     * @fn       VertexShader* createVertexShader(WString file)
      * @brief    Creates a vertex shader from the specified file, if available.
      * @param[in]file Filename of the vertex shader.
      * @return   VertexShader pointer of the corresponding API.
@@ -186,14 +188,47 @@ namespace ovEngineSDK {
      }
 
      /**
-     * @fn       PixelShader* createPixelShader(std::wstring file)
-     * @brief    Creates a pixe shader from the specified file, if available.
+     * @fn       PixelShader* createPixelShader(WString file)
+     * @brief    Creates a pixel shader from the specified file, if available.
      * @param[in]file Filename of the pixel shader.
      * @return   PixelShader pointer of the corresponding API.
      */
      virtual SPtr<PixelShader>
      createPixelShader(WString) {
       return nullptr;
+     }
+
+     /**
+     * @fn       SPtr<RasterizerState> createRasterizerState(FILL_MODE::E fillmode,
+                                                             CULL_MODE::E cullmode,
+                                                             bool counterClockWise)
+     * @brief    Creates a rasterizer state from the defined parameters and returns it.
+     * @param[in]fillMode Determines the fill mode to use when rendering triangles
+     *                    ( WIREFRAME, SOLID ).
+     * @param[in]cullMode Indicates triangles facing a particular direction are not drawn
+     *                    ( NONE, FRONT, BACK ).
+     * @param[in]counterClockWise Determines if a triangle is front- or back-facing.
+     * @return   Rasterizer state smart pointer of the corresponding API.
+     */
+     virtual SPtr<RasterizerState>
+     createRasterizerState(FILL_MODE::E,
+                           CULL_MODE::E,
+                           bool) {
+       return nullptr;
+     }
+
+     /**
+     * @fn       SPtr<DepthStencilState>createDepthStencilState(bool stencilEnable,
+                                                                bool depthEnable)
+     * @brief    Creates a depth stencil state from the defined parameters and returns it.
+     * @param[in]stencilEnable Enable depth testing.
+     * @param[in]depthEnable Enable stencil testing.
+     * @return   Depth stencil state smart pointer of the corresponding API.
+     */
+     virtual SPtr<DepthStencilState>
+       createDepthStencilState(bool,
+                               bool) {
+       return nullptr;
      }
 
      /***********************************************************************************/
@@ -261,12 +296,13 @@ namespace ovEngineSDK {
 
      /** 
      * @fn       void setRenderTarget(CTexture* texture, CTexture* depth)
-     * @brief    Sets the specified render target and depth stencil as current.
-     * @param[in]texture CTexture pointer which contains the render target.
-     * @param[in]depth CTexture pointer which contains the depth stencil.
+     * @brief    Sets the specified render targets and depth stencil as current.
+     * @param[in]amount Number of render targets to set
+     * @param[in]texture Texture pointer which contains the render target.
+     * @param[in]depth Texture pointer which contains the depth stencil.
      *	         depth can be nullptr if only render target wants to be set.
      */
-     virtual void setRenderTarget(SPtr<Texture>, SPtr<Texture>) {}
+     virtual void setRenderTarget(int32 ,SPtr<Texture>, SPtr<Texture>) {}
 
      /**
      * @fn       void updateBuffer(CBuffer* buffer, const void * data)
@@ -364,6 +400,10 @@ namespace ovEngineSDK {
      * @param[in]height New Y dimension for back buffer.
      */
      virtual void resizeBackBuffer(uint32, uint32) {}
+
+     virtual void setRasterizerState(SPtr<RasterizerState>) {}
+
+     virtual void setDepthStencilState(SPtr<DepthStencilState>) {}
   };
 
   OV_CORE_EXPORT GraphicsAPI&
