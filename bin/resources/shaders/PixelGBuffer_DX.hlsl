@@ -26,7 +26,7 @@ PS_OUTPUT main(PS_INPUT Input) : SV_TARGET {
 	PS_OUTPUT Output = (PS_OUTPUT)0;
 	
 	//Position
-	Output.pos = float4(Input.psPos.xyz, 1.0f);
+	Output.pos = float4(Input.posView.xyz, 1.0f);
 	
 	//Normal
 	float3 normal = normalMap.Sample(linearSampler, Input.texCoord).xyz;

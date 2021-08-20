@@ -36,13 +36,6 @@ class GameApp : public BaseApp
   Color m_color;
   SPtr<Model> myModel;
 
-  struct Matrices {
-    Matrix4 world;
-    Matrix4 view;
-    Matrix4 projection;
-    Vector4 color;
-  };
-
   struct Bones {
     Matrix4 bones[MAXBONES];
   };

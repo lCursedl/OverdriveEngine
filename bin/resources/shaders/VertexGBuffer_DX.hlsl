@@ -1,9 +1,9 @@
 //Constant buffer
 
 cbuffer WVP : register (b0) {
-	matrix World;
 	matrix View;
 	matrix Projection;
+	float4 ObjectPos;
 };
 //Input layout
 
@@ -25,7 +25,14 @@ struct VS_OUTPUT {
 
 VS_OUTPUT main(VS_INPUT Input) {
 	VS_OUTPUT Output;
-	matrix matWV = mul(World, View);
+	
+	matrix Worldvs;
+	Worldvs[0] = float4(1, 0, 0, 0);
+    Worldvs[1] = float4(0, 1, 0, 0);
+    Worldvs[2] = float4(0, 0, 1, 0);
+    Worldvs[3] = ObjectPos;
+	
+	matrix matWV = mul(Worldvs, View);
 	
 	//View space pos
 	Output.posView = mul(float4(Input.msPos.xyz, 1.0f), matWV).xyz;

@@ -1,5 +1,5 @@
 #include "ovBaseApp.h"
-#include <ovRenderer.h>
+#include "ovBaseRenderer.h"
 #include <Windows.h>
 
 namespace ovEngineSDK {
@@ -12,7 +12,7 @@ namespace ovEngineSDK {
     createWindow();
     g_graphicsAPI().init(m_windowHandle);    
     onCreate();
-    Renderer::instance().init();
+    BaseRenderer::instance().init();
 
     MSG msg = {};
 
@@ -53,7 +53,7 @@ namespace ovEngineSDK {
 
   void BaseApp::render() {
     onRender();
-    Renderer::instance().render();
+    BaseRenderer::instance().render();
     g_graphicsAPI().swapBuffer();
   }
 
@@ -68,7 +68,11 @@ namespace ovEngineSDK {
     }
     SceneGraph::startUp();
     if (m_rendererPlugin.loadPlugin("ovRenderer_d.dll")) {
-      Renderer::startUp();
+      auto createRenderer = reinterpret_cast<funcCreateBaseRenderer>(
+                            m_rendererPlugin.getProcedureByName("createRenderer"));
+      BaseRenderer::startUp();
+      BaseRenderer* renderBase = createRenderer();
+      g_baseRenderer().setObject(renderBase);
     }
   }
 
@@ -77,7 +81,7 @@ namespace ovEngineSDK {
     g_graphicsAPI().shutdown();
     g_graphicsAPI().shutDown();
     SceneGraph::shutDown();
-    Renderer::shutDown();
+    BaseRenderer::shutDown();
   }
 
   void BaseApp::createWindow() {
