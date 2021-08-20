@@ -302,7 +302,7 @@ namespace ovEngineSDK {
      * @param[in]depth Texture pointer which contains the depth stencil.
      *	         depth can be nullptr if only render target wants to be set.
      */
-     virtual void setRenderTarget(int32 ,SPtr<Texture>, SPtr<Texture>) {}
+     virtual void setRenderTarget(int32 , Vector<SPtr<Texture>>, SPtr<Texture>) {}
 
      /**
      * @fn       void updateBuffer(CBuffer* buffer, const void * data)

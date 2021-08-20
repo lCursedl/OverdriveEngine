@@ -10,11 +10,9 @@ namespace ovEngineSDK {
   BaseApp::run() {
     initSystems();
     createWindow();
-    g_graphicsAPI().init(m_windowHandle);
-    Renderer::instance().init();
+    g_graphicsAPI().init(m_windowHandle);    
     onCreate();
-
-    Renderer::instance().setModels(SceneGraph::instance().transferModels());
+    Renderer::instance().init();
 
     MSG msg = {};
 
@@ -55,6 +53,7 @@ namespace ovEngineSDK {
 
   void BaseApp::render() {
     onRender();
+    Renderer::instance().render();
     g_graphicsAPI().swapBuffer();
   }
 

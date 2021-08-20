@@ -7,6 +7,10 @@ namespace ovEngineSDK {
   class Model;
   class RasterizerState;
   class DepthStencilState;
+  class ShaderProgram;
+  class VertexShader;
+  class PixelShader;
+  class Texture;
 
   class OV_RENDERER_EXPORT Renderer : public Module<Renderer>
   {
@@ -26,6 +30,12 @@ namespace ovEngineSDK {
 
     SPtr<DepthStencilState> m_gBufferDS;
     SPtr<DepthStencilState> m_screenQuadDS;
+
+    SPtr<ShaderProgram> m_gBufferProgram;
+
+    Vector<SPtr<Texture>> m_gBufferTextures;
+
+    SPtr<Texture> m_depthStencilTexture;
   };
 
   OV_RENDERER_EXPORT Renderer& g_renderer();

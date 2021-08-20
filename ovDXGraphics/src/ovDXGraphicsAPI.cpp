@@ -693,27 +693,30 @@ namespace ovEngineSDK {
 
   void
   DXGraphicsAPI::setRenderTarget(int32 amount,
-                                 SPtr<Texture> texture,
+                                 Vector<SPtr<Texture>> textures,
                                  SPtr<Texture> depth) {
-    if (texture) {
-      auto rtv = static_pointer_cast<DXTexture>(texture)->m_rtv;
-      if (rtv) {
-        if (depth) {
-          auto dsv = static_pointer_cast<DXTexture>(depth)->m_dsv;
-          if (dsv) {
-            m_deviceContext->OMSetRenderTargets(amount, &rtv, dsv);
-          }
-          else {
-            OutputDebugStringA("Invalid DepthStencilView.\n");
-          }
+    if (!textures.empty()) {
+      ID3D11RenderTargetView* arrRTV[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+
+      for (int32 i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i) {
+        arrRTV[i] = nullptr;
+      }
+
+      for (int32 i = 0; i < amount; i++) {
+        arrRTV[i] = static_pointer_cast<DXTexture>(textures[i])->m_rtv;
+      }
+
+      if (depth) {
+        auto dsv = static_pointer_cast<DXTexture>(depth)->m_dsv;
+        if (dsv) {
+          m_deviceContext->OMSetRenderTargets(amount, arrRTV, dsv);
         }
         else {
-          m_deviceContext->OMSetRenderTargets(amount, &rtv, nullptr);
+          OutputDebugStringA("Invalid DepthStencilView.\n");
         }
-
       }
       else {
-        OutputDebugStringA("Invalid RenderTargetView.\n");
+        m_deviceContext->OMSetRenderTargets(amount, arrRTV, nullptr);
       }
     }
     else {

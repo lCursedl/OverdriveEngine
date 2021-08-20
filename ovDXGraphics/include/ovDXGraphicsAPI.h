@@ -82,8 +82,8 @@ namespace ovEngineSDK {
     setInputLayout(SPtr<InputLayout> layout)                          override;
     void
     setRenderTarget(int32 amount,
-                    SPtr<Texture> texture,
-                    SPtr<Texture> depth)       override;
+                    Vector<SPtr<Texture>> textures,
+                    SPtr<Texture> depth)                              override;
     void
     updateBuffer(SPtr<Buffer> buffer, const void* data)               override;
     void

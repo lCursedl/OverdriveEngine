@@ -12,7 +12,7 @@ namespace ovEngineSDK {
     m_textures = texture;
     m_numBones = 0;
     
-    uint32 boneIndex;
+    /*uint32 boneIndex;
     String boneName;
 
     for (uint32 i = 0; i < mesh->mNumBones; ++i) {
@@ -47,7 +47,7 @@ namespace ovEngineSDK {
           }
         }
       }
-    }
+    }*/
     setUpMesh();
   }
 

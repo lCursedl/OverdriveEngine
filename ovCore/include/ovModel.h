@@ -8,8 +8,19 @@
 #include <assimp/postprocess.h>
 #include <assimp/cimport.h>
 
+//class aiAnimation;
+//class aiScene;
+//class aiNodeAnim;
+//class aiTextureType;
+//class aiMaterial;
+//class aiNode;
+//class aiMesh;
+//class aiVector3D;
+//class aiQuaternion;
 
 namespace ovEngineSDK {
+  
+
   class OV_CORE_EXPORT Model : public Component
   {
    public:

@@ -25,8 +25,8 @@ namespace ovEngineSDK {
     Vector3 Normal;
     Vector3 Tangent;
     Vector3 Bitangent;
-    uint32 BoneID[4] = {0};
-    float Weights[4] = {0.f};
+    /*uint32 BoneID[4] = {0};
+    float Weights[4] = {0.f};*/
   };
 
   struct OV_CORE_EXPORT VertexBoneData
