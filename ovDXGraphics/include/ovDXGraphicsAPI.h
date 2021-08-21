@@ -59,6 +59,9 @@ namespace ovEngineSDK {
     SPtr<DepthStencilState>
     createDepthStencilState(bool stencilEnable, bool depthEnable)     override;
 
+    Vector2
+    getViewportDimensions()                                           override;
+
     //DEVICE CONTEXT
 
     void

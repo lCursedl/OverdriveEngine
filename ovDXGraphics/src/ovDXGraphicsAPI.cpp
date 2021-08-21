@@ -621,6 +621,14 @@ namespace ovEngineSDK {
     return depthState;
   }
 
+  Vector2
+  DXGraphicsAPI::getViewportDimensions() {
+    D3D11_VIEWPORT views;
+    uint32 numViews= 1;
+    m_deviceContext->RSGetViewports(&numViews, &views);
+    return Vector2(views.Width - views.TopLeftX, views.Height - views.TopLeftY);
+  }
+
   void
   DXGraphicsAPI::setBackBuffer() {
     m_deviceContext->OMSetRenderTargets(1,
@@ -856,7 +864,8 @@ namespace ovEngineSDK {
   DXGraphicsAPI::setTexture(uint32 slot, SPtr<Texture> texture) {
     auto tex = static_pointer_cast<DXTexture>(texture);
     if (!tex) {
-      OutputDebugStringA("Texture received was nullptr.\n");
+      ID3D11ShaderResourceView* temp = nullptr;
+      m_deviceContext->PSSetShaderResources(slot, 1, &temp);
       return;
     }
     if (!tex->m_texture || !tex->m_srv) {

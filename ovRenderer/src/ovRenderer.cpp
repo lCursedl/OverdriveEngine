@@ -23,6 +23,17 @@ namespace ovEngineSDK {
     float sample;
   };
 
+  struct Dimension {
+    Vector4 viewportDim;
+  };
+
+  struct Lighting {
+    Vector3 lightPos;
+    float lightIntensity;
+    Vector4 viewPos;
+    Matrix4 matWV;
+  };
+
   void
   Renderer::init() {
     auto& graphicAPI =  g_graphicsAPI();
@@ -32,13 +43,11 @@ namespace ovEngineSDK {
                                                     true);
     
     m_gBufferDS = graphicAPI.createDepthStencilState(true, true);
-    SPtr<VertexShader> gBufferVertex = graphicAPI.createVertexShader(
-                                       L"resources/shaders/VertexGBuffer");
-    SPtr<PixelShader> gBufferPixel = graphicAPI.createPixelShader(
-                                       L"resources/shaders/PixelGBuffer");
+
     m_gBufferProgram = graphicAPI.createShaderProgram();
-    m_gBufferProgram->setVertexShader(gBufferVertex);
-    m_gBufferProgram->setPixelShader(gBufferPixel);
+    m_gBufferProgram->setVertexShader(graphicAPI.createVertexShader(L"resources/shaders/VertexGBuffer"));
+    m_gBufferProgram->setPixelShader(graphicAPI.createPixelShader(
+                                     L"resources/shaders/PixelGBuffer"));
     m_gBufferProgram->linkProgram();
 
     LAYOUT_DESC lDesc;
@@ -62,11 +71,11 @@ namespace ovEngineSDK {
                                                       600,
                                                       TEXTURE_BINDINGS::E::DEPTH_STENCIL,
                                                       FORMATS::kD24_S8);
-
+  //Vector3(-0.05f, -4.54f, -.8f),
     Matrices mat;
-    mat.objectPos = Vector4(0.f, 0.f, 300.f, 1.f);
-    mat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(0.f, 0.f, -10.f),
-                                                     Vector3(0.f, 1.f, 0.f),
+    mat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
+    mat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(0.f, -150.f, 0.f),
+                                                     Vector3(0.f, 0.f, -100.f),
                                                      Vector3(0.f, 1.f, 0.f)));
     mat.projection = graphicAPI.matrix4Policy(PerspectiveMatrix(70.f,
                                                                 800.f,
@@ -101,10 +110,57 @@ namespace ovEngineSDK {
                                                    sizeof(SSAO),
                                                    BUFFER_TYPE::kCONST_BUFFER);
 
+    //BlurH
+    m_blurBufferConstant = graphicAPI.createBuffer(nullptr,
+                                                   sizeof(Dimension),
+                                                   BUFFER_TYPE::kCONST_BUFFER);
+    m_blurHProgram = graphicAPI.createShaderProgram();
+    m_blurHProgram->setVertexShader(graphicAPI.createVertexShader(
+                                    L"resources/shaders/VS_SSAO"));
+    m_blurHProgram->setPixelShader(graphicAPI.createPixelShader(
+                                   L"resources/shaders/PS_BlurH"));
+    m_blurHProgram->linkProgram();
+    m_tempBlurTextures.push_back(graphicAPI.createTexture(800,
+                                                          600,
+                                                          TEXTURE_BINDINGS::E::RENDER_TARGET |
+                                                           TEXTURE_BINDINGS::E::SHADER_RESOURCE,
+                                                          FORMATS::kRGBA16_FLOAT));
+
+    //BlurV
+    m_blurVProgram = graphicAPI.createShaderProgram();
+    m_blurVProgram->setVertexShader(graphicAPI.createVertexShader(
+                                    L"resources/shaders/VS_SSAO"));
+    m_blurVProgram->setPixelShader(graphicAPI.createPixelShader(
+                                   L"resources/shaders/PS_BlurV"));
+    m_blurVProgram->linkProgram();
+
+    //Light
+    m_lightProgram = graphicAPI.createShaderProgram();
+    m_lightProgram->setVertexShader(graphicAPI.createVertexShader(
+                                    L"resources/shaders/VS_SSAO"));
+    m_lightProgram->setPixelShader(graphicAPI.createPixelShader(
+                                   L"resources/shaders/PS_Light"));
+    m_lightProgram->linkProgram();
+
+    Lighting light;
+    light.lightPos = Vector3(650.f, 300.f, -200.f);
+    light.lightIntensity = 2.0f;
+    light.viewPos = Vector4(mat.view.zVector.x,
+                            mat.view.zVector.y,
+                            mat.view.zVector.z,
+                            1.0f);
+    light.matWV = Matrix4::IDENTITY;
+    light.matWV.zVector = mat.objectPos;
+    light.matWV = graphicAPI.matrix4Policy(light.matWV * mat.view);
+
+    m_lightBufferConstant = graphicAPI.createBuffer(&light,
+                                                    sizeof(Lighting),
+                                                    BUFFER_TYPE::kCONST_BUFFER);
+
     //Screen Aligned Quad
     m_screenQuadRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
                                                       CULL_MODE::kNONE,
-                                                      false);
+                                                      true);
 
     
     m_screenQuadDS = graphicAPI.createDepthStencilState(false, false);
@@ -113,8 +169,6 @@ namespace ovEngineSDK {
     m_screenQuad->load("resources/models/ScreenAlignedQuad.3ds");
 
     m_screenQuadLayout = graphicAPI.createInputLayout(m_ssaoProgram, lDesc);
-    
-
   }
 
   void
@@ -129,6 +183,17 @@ namespace ovEngineSDK {
     auto& graphicAPI = g_graphicsAPI();
     
     //GBuffer
+
+    graphicAPI.setRenderTarget(m_gBufferTextures.size(),
+                               m_gBufferTextures,
+                               m_depthStencilTexture);
+
+    for (auto& target : m_gBufferTextures) {
+      graphicAPI.clearRenderTarget(target, clearColor);
+    }
+
+    graphicAPI.clearDepthStencil(m_depthStencilTexture);
+
     graphicAPI.setInputLayout(m_gBufferLayout);
     graphicAPI.setShaders(m_gBufferProgram);
     graphicAPI.setRasterizerState(m_gBufferRS);
@@ -137,18 +202,21 @@ namespace ovEngineSDK {
     graphicAPI.setConstantBuffer(0, m_gBufferConstant, SHADER_TYPE::VERTEX_SHADER);
     graphicAPI.setConstantBuffer(0, m_gBufferConstant, SHADER_TYPE::PIXEL_SHADER);
 
-    for (auto& target : m_gBufferTextures) {
+    
+    SceneGraph::instance().render();
+
+    for (int32 i = 0; i < 4; ++i) {
+      graphicAPI.setTexture(i, nullptr);
+    }
+
+    //SSAO
+
+    graphicAPI.setRenderTarget(1, m_ssaoTextures, nullptr);
+
+    for (auto& target : m_ssaoTextures) {
       graphicAPI.clearRenderTarget(target, clearColor);
     }
 
-    graphicAPI.clearDepthStencil(m_depthStencilTexture);
-
-    graphicAPI.setRenderTarget(m_gBufferTextures.size(),
-                               m_gBufferTextures,
-                               m_depthStencilTexture);
-    SceneGraph::instance().render();
-
-    //SSAO
     graphicAPI.setInputLayout(m_screenQuadLayout);
     graphicAPI.setShaders(m_ssaoProgram);
     graphicAPI.setRasterizerState(m_screenQuadRS);
@@ -157,15 +225,73 @@ namespace ovEngineSDK {
     graphicAPI.setConstantBuffer(0, m_ssaoBufferConstant, SHADER_TYPE::VERTEX_SHADER);
     graphicAPI.setConstantBuffer(0, m_ssaoBufferConstant, SHADER_TYPE::PIXEL_SHADER);
 
-    for (auto& target : m_ssaoTextures) {
-      graphicAPI.clearRenderTarget(target, clearColor);
-    }
-
-    graphicAPI.setRenderTarget(1, m_ssaoTextures, m_depthStencilTexture);
-
     graphicAPI.setTexture(0, m_gBufferTextures[0]);
     graphicAPI.setTexture(1, m_gBufferTextures[1]);
 
     m_screenQuad->render();
+
+    for (int32 i = 0; i < 2; ++i) {
+      graphicAPI.setTexture(i, nullptr);
+    }
+
+    //BlurH - SSAO
+    graphicAPI.setRenderTarget(1, m_tempBlurTextures, nullptr);
+
+    for (auto& target : m_tempBlurTextures) {
+      graphicAPI.clearRenderTarget(target, clearColor);
+    }
+
+    graphicAPI.setShaders(m_blurHProgram);    
+
+    Dimension dim;
+    Vector2 tempVec = graphicAPI.getViewportDimensions();
+    dim.viewportDim.x = tempVec.x;
+    dim.viewportDim.y = tempVec.y;
+
+    graphicAPI.updateBuffer(m_blurBufferConstant, &dim);
+
+    graphicAPI.setConstantBuffer(0, m_blurBufferConstant, SHADER_TYPE::VERTEX_SHADER);
+    graphicAPI.setConstantBuffer(0, m_blurBufferConstant, SHADER_TYPE::PIXEL_SHADER);
+
+    graphicAPI.setTexture(0, m_ssaoTextures[0]);
+
+    m_screenQuad->render();
+
+    graphicAPI.setTexture(0, nullptr);
+
+    //BLURV - SSAO
+    graphicAPI.setRenderTarget(1, m_ssaoTextures, nullptr);
+
+    for (auto& target : m_ssaoTextures) {
+      graphicAPI.clearRenderTarget(target, clearColor);
+    }
+
+    graphicAPI.setShaders(m_blurVProgram);
+
+    graphicAPI.setTexture(0, m_tempBlurTextures[0]);
+
+    m_screenQuad->render();
+    
+    graphicAPI.setTexture(0, nullptr);
+
+    //LIGHTING
+
+    graphicAPI.setBackBuffer();
+    graphicAPI.clearBackBuffer(clearColor);
+
+    graphicAPI.setShaders(m_lightProgram);
+    graphicAPI.setTexture(0, m_gBufferTextures[0]);
+    graphicAPI.setTexture(1, m_gBufferTextures[1]);
+    graphicAPI.setTexture(2, m_gBufferTextures[2]);
+    graphicAPI.setTexture(3, m_ssaoTextures[0]);
+
+    graphicAPI.setConstantBuffer(0, m_lightBufferConstant, SHADER_TYPE::VERTEX_SHADER);
+    graphicAPI.setConstantBuffer(0, m_lightBufferConstant, SHADER_TYPE::PIXEL_SHADER);
+
+    m_screenQuad->render();
+
+    for (int32 i = 0; i < 4; ++i) {
+      graphicAPI.setTexture(i, nullptr);
+    }
   }
 }

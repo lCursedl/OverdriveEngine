@@ -34,14 +34,21 @@ namespace ovEngineSDK {
 
     SPtr<ShaderProgram> m_gBufferProgram;
     SPtr<ShaderProgram> m_ssaoProgram;
+    SPtr<ShaderProgram> m_blurHProgram;
+    SPtr<ShaderProgram> m_blurVProgram;
+    SPtr<ShaderProgram> m_lightProgram;
 
     Vector<SPtr<Texture>> m_gBufferTextures;
     Vector<SPtr<Texture>> m_ssaoTextures;
+    Vector<SPtr<Texture>> m_tempBlurTextures;
+    Vector<SPtr<Texture>> m_lightTextures;
 
     SPtr<Texture> m_depthStencilTexture;
 
     SPtr<Buffer> m_gBufferConstant;  
     SPtr<Buffer> m_ssaoBufferConstant;
+    SPtr<Buffer> m_blurBufferConstant;
+    SPtr<Buffer> m_lightBufferConstant;
     
     SPtr<InputLayout> m_gBufferLayout;
 

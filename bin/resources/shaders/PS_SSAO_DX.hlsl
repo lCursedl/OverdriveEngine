@@ -18,10 +18,6 @@ struct PS_INPUT {
 	float2 texCoord : TEXCOORD0;
 };
 
-struct PS_OUTPUT {
-	float4 color 	: SV_TARGET0;
-};
-
 float3 GetPosition(float2 uv) {
 	return positionTex.Sample(lSampler, uv).xyz;	 
 }
@@ -46,9 +42,7 @@ float DoAmbientOcclusion(float2 texCoord, float2 uv, float3 pos, float3 normal)
   return max(0.0f, dot(normal, v) - kBias) * (1.0 / (1.0 + d)) * kIntensity;
 }
 
-PS_OUTPUT main(PS_INPUT Input) {
-	PS_OUTPUT Output;
-	
+float4 main(PS_INPUT Input) : SV_Target {
 	// sampler position
 	const float2 vec[4] =
 	{
@@ -85,6 +79,5 @@ PS_OUTPUT main(PS_INPUT Input) {
 	}
 	ao /= (iterations * 4);
 	
-	Output.color = float4(pow(1.0f - ao.xxx, 2.2f), 1.0f);
-	return Output;
+	return float4(1.0f - ao.xxx, 1.0f);
 }
