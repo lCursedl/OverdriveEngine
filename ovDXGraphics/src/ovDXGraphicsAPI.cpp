@@ -163,9 +163,9 @@ namespace ovEngineSDK {
 
   SPtr<Texture>
   DXGraphicsAPI::createTexture(int32 width,
-                                             int32 height,
-                                             TEXTURE_BINDINGS::E binding,
-                                             FORMATS::E format) {
+                               int32 height,
+                               TEXTURE_BINDINGS::E binding,
+                               FORMATS::E format) {
     if (nullptr != m_device) {
       SPtr<DXTexture>texture(new DXTexture);
 
@@ -453,14 +453,40 @@ namespace ovEngineSDK {
                                     FILTER_LEVEL::E min,
                                     FILTER_LEVEL::E mip,
                                     uint32 anisotropic,
-                                    WRAPPING::E wrapMode) {
+                                    WRAPPING::E wrapMode,
+                                    COMPARISON::E compMode) {
     D3D11_SAMPLER_DESC desc;
     ZeroMemory(&desc, sizeof(desc));
 
     desc.AddressU = (D3D11_TEXTURE_ADDRESS_MODE)wrapMode;
     desc.AddressV = (D3D11_TEXTURE_ADDRESS_MODE)wrapMode;
     desc.AddressW = (D3D11_TEXTURE_ADDRESS_MODE)wrapMode;
-    desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    switch (compMode) {
+    case COMPARISON::NEVER:
+      desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+      break;
+    case COMPARISON::LESS:
+      desc.ComparisonFunc = D3D11_COMPARISON_LESS;
+      break;
+    case COMPARISON::EQUAL:
+      desc.ComparisonFunc = D3D11_COMPARISON_EQUAL;
+      break;
+    case COMPARISON::LESS_EQUAL:
+      desc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+      break;
+    case COMPARISON::GREATER:
+      desc.ComparisonFunc = D3D11_COMPARISON_GREATER;
+      break;
+    case COMPARISON::NOT_EQUAL:
+      desc.ComparisonFunc = D3D11_COMPARISON_NOT_EQUAL;
+      break;
+    case COMPARISON::GREATER_EQUAL:
+      desc.ComparisonFunc = D3D11_COMPARISON_GREATER_EQUAL;
+      break;
+    case COMPARISON::ALWAYS:
+      desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+      break;
+    }
     desc.MinLOD = 0;
     desc.MaxLOD = D3D11_FLOAT32_MAX;
 
@@ -469,36 +495,52 @@ namespace ovEngineSDK {
     if (mag == FILTER_LEVEL::FILTER_POINT) {
       if (min == FILTER_LEVEL::FILTER_POINT) {
         if (mip == FILTER_LEVEL::FILTER_POINT) {
-          desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+          desc.Filter = compMode == COMPARISON::NEVER ?
+                        D3D11_FILTER_MIN_MAG_MIP_POINT : 
+                        D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
         }
         else {
-          desc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+          desc.Filter = compMode == COMPARISON::NEVER ?
+                        D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR :
+                        D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
         }
       }
       else {
         if (mip == FILTER_LEVEL::FILTER_POINT) {
-          desc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+          desc.Filter = compMode == COMPARISON::NEVER ?
+                        D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT :
+                        D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
         }
         else {
-          desc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+          desc.Filter = compMode == COMPARISON::NEVER ?
+                        D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR :
+                        D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
         }
       }
     }
     else {
       if (min == FILTER_LEVEL::FILTER_POINT) {
         if (mip == FILTER_LEVEL::FILTER_POINT) {
-          desc.Filter = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+          desc.Filter = compMode == COMPARISON::NEVER ?
+                        D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :
+                        D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT;
         }
         else {
-          desc.Filter = D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+          desc.Filter = compMode == COMPARISON::NEVER ?
+                        D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR :
+                        D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
         }
       }
       else {
         if (mip == FILTER_LEVEL::FILTER_POINT) {
-          desc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+          desc.Filter = compMode == COMPARISON::NEVER ?
+                        D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :
+                        D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
         }
         else {
-          desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+          desc.Filter = compMode == COMPARISON::NEVER ?
+                        D3D11_FILTER_MIN_MAG_MIP_LINEAR :
+                        D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
         }
       }
     }
@@ -627,6 +669,16 @@ namespace ovEngineSDK {
     uint32 numViews= 1;
     m_deviceContext->RSGetViewports(&numViews, &views);
     return Vector2(views.Width - views.TopLeftX, views.Height - views.TopLeftY);
+  }
+
+  Matrix4
+  DXGraphicsAPI::createCompatibleOrtho(float Left,
+                                       float Right,
+                                       float Top,
+                                       float Bottom,
+                                       float Near,
+                                       float Far) {
+    return OrthoMatrix(Left, Right, Top, Bottom, Near, Far, true);
   }
 
   void

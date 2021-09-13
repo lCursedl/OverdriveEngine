@@ -300,4 +300,18 @@ namespace ovEngineSDK {
     zVector = Vector4(0.f, 0.f, MaxZ / (MaxZ - MinZ), 1.f);
     wVector = Vector4(0.f, 0.f, -MinZ * MaxZ / (MaxZ - MinZ), 0.f);
   }
+
+  OrthoMatrix::OrthoMatrix(float Left,
+                           float Right,
+                           float Top,
+                           float Bottom,
+                           float Near,
+                           float Far,
+                           bool Variation) {
+    xVector = Vector4(2 / (Right - Left), 0, 0, -((Right + Left) / (Right - Left)));
+    yVector = Vector4(0, 2 / (Top - Bottom), 0, -((Top + Bottom) / (Top - Bottom)));
+    zVector = Variation ? Vector4(0, 0, 1 / (Far - Near), -(Near / (Far - Near))) : 
+                          Vector4(0, 0, 2 / (Far - Near), -((Far + Near) / (Far - Near)));   
+    wVector = Vector4(0, 0, 0, 1);
+  }
 }

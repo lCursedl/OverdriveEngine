@@ -72,7 +72,8 @@ namespace ovEngineSDK {
                                                           FILTER_LEVEL::FILTER_LINEAR,
                                                           FILTER_LEVEL::FILTER_LINEAR,
                                                           0,
-                                                          WRAPPING::WRAP);
+                                                          WRAPPING::WRAP,
+                                                          COMPARISON::NEVER);
   }
 
   void Model::transformBones(float delta, Vector<Matrix4>& Transforms) {

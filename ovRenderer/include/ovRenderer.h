@@ -13,6 +13,7 @@ namespace ovEngineSDK {
   class Texture;
   class Buffer;
   class InputLayout;
+  class SamplerState;
 
   class Renderer final : public BaseRenderer
   {
@@ -28,6 +29,7 @@ namespace ovEngineSDK {
 
     SPtr<RasterizerState> m_gBufferRS;
     SPtr<RasterizerState> m_screenQuadRS;
+    SPtr<RasterizerState> m_shadowRS;
 
     SPtr<DepthStencilState> m_gBufferDS;
     SPtr<DepthStencilState> m_screenQuadDS;
@@ -42,17 +44,23 @@ namespace ovEngineSDK {
     Vector<SPtr<Texture>> m_ssaoTextures;
     Vector<SPtr<Texture>> m_tempBlurTextures;
     Vector<SPtr<Texture>> m_lightTextures;
+    Vector<SPtr<Texture>> m_shadowTextures;
 
     SPtr<Texture> m_depthStencilTexture;
+    SPtr<Texture> m_depthMapTexture;
 
     SPtr<Buffer> m_gBufferConstant;  
     SPtr<Buffer> m_ssaoBufferConstant;
     SPtr<Buffer> m_blurBufferConstant;
     SPtr<Buffer> m_lightBufferConstant;
+    SPtr<Buffer> m_shadowBufferConstant;
     
     SPtr<InputLayout> m_gBufferLayout;
 
     SPtr<InputLayout> m_screenQuadLayout;
+
+    SPtr<SamplerState> m_comparisonSampler;
+    SPtr<SamplerState> m_linearSampler;
   };
 
   extern "C" OV_PLUGIN_EXPORT BaseRenderer*

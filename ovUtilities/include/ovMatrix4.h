@@ -103,4 +103,16 @@ namespace ovEngineSDK {
                       float MinZ,
                       float MaxZ);
   };
+
+  class OV_UTILITY_EXPORT OrthoMatrix : public Matrix4
+  {
+   public:
+    OrthoMatrix(float Left,
+                float Right,
+                float Top,
+                float Bottom,
+                float Near,
+                float Far,
+                bool Variation);
+  };
 }

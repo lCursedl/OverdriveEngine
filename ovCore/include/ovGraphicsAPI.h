@@ -83,6 +83,14 @@ namespace ovEngineSDK {
       GraphicsAPI::_instance() = _api;
      }
 
+     virtual Matrix4
+     createCompatibleOrtho(float Left,
+                           float Right,
+                           float Top,
+                           float Bottom,
+                           float Near,
+                           float Far) {return Matrix4();}
+
      /***********************************************************************************/
      /*----------------------------------DEVICE-----------------------------------------*/
      /***********************************************************************************/
@@ -165,6 +173,8 @@ namespace ovEngineSDK {
      * @param[in]anisotropic Anisotropic level ( 0 - 16 ).
      * @param[in]wrapMode Mode in which texture border are treated ( WRAP, MIRROR,
                  CLAMP, BORDER, MIRROR_ONCE ).
+     * @param[in]compMode Function mode that compares sampled data against existing
+     *           sampled data.
      * @return   SamplerState pointer of the corresponding API.
      */
      virtual SPtr<SamplerState>
@@ -172,7 +182,8 @@ namespace ovEngineSDK {
                         FILTER_LEVEL::E,
                         FILTER_LEVEL::E,
                         uint32,
-                        WRAPPING::E) {
+                        WRAPPING::E,
+                        COMPARISON::E) {
       return nullptr;
      }
 

@@ -45,7 +45,8 @@ namespace ovEngineSDK {
                        FILTER_LEVEL::E min,
                        FILTER_LEVEL::E mip,
                        uint32 anisotropic,
-                       WRAPPING::E wrapMode)                          override;
+                       WRAPPING::E wrapMode,
+                       COMPARISON::E compMode)                        override;
     SPtr<VertexShader>
     createVertexShader(WString file)                                  override;
     SPtr<PixelShader>
@@ -61,6 +62,14 @@ namespace ovEngineSDK {
 
     Vector2
     getViewportDimensions()                                           override;
+
+    Matrix4
+    createCompatibleOrtho(float Left,
+                          float Right,
+                          float Top,
+                          float Bottom,
+                          float Near,
+                          float Far)                                  override;
 
     //DEVICE CONTEXT
 
