@@ -1106,5 +1106,7 @@ namespace ovEngineSDK {
     m_formats.insert(std::make_pair(FORMATS::kRGBA16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM));
     m_formats.insert(std::make_pair(FORMATS::kRGBA8_SRGB_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB));
     m_formats.insert(std::make_pair(FORMATS::kD24_S8, DXGI_FORMAT_D24_UNORM_S8_UINT));
+    m_formats.insert(std::make_pair(FORMATS::kD16_UNORM, DXGI_FORMAT_D16_UNORM));
+    m_formats.insert(std::make_pair(FORMATS::kD32_FLOAT, DXGI_FORMAT_D32_FLOAT));
   }
 }

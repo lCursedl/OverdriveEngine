@@ -1,6 +1,7 @@
 #pragma once
 #include <ovPrerequisitesRenderer.h>
 #include <ovBaseRenderer.h>
+#include <ovVector2.h>
 
 namespace ovEngineSDK {
 
@@ -39,6 +40,7 @@ namespace ovEngineSDK {
     SPtr<ShaderProgram> m_blurHProgram;
     SPtr<ShaderProgram> m_blurVProgram;
     SPtr<ShaderProgram> m_lightProgram;
+    SPtr<ShaderProgram> m_shadowProgram;
 
     Vector<SPtr<Texture>> m_gBufferTextures;
     Vector<SPtr<Texture>> m_ssaoTextures;
@@ -61,6 +63,8 @@ namespace ovEngineSDK {
 
     SPtr<SamplerState> m_comparisonSampler;
     SPtr<SamplerState> m_linearSampler;
+
+    Vector2 m_viewportDim;
   };
 
   extern "C" OV_PLUGIN_EXPORT BaseRenderer*

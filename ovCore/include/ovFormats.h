@@ -54,7 +54,9 @@ namespace ovEngineSDK {
       kRGB10A2_UNORM,
       kRGBA16_UNORM,
       kRGBA8_SRGB_UNORM,
-      kD24_S8
+      kD24_S8,
+      kD16_UNORM,
+      kD32_FLOAT
     };
   }
 }
