@@ -1,5 +1,5 @@
 struct PS_INPUT {
-	float4 psPos	: POSITION;
+	float4 psPos	: SV_POSITION;
 	float depthPos	: TEXCOORD0;
 };
 

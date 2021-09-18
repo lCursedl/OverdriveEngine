@@ -13,7 +13,7 @@ struct VS_INPUT {
 };
 
 struct VS_OUTPUT {
-	float4 psPos		: POSITION;
+	float4 psPos		: SV_POSITION;
 	float depthPos      : TEXCOORD0;
 };
 
@@ -27,9 +27,10 @@ VS_OUTPUT main(VS_INPUT Input) {
     Worldvs[3] = ObjectPos;
 	
 	matrix matWV = mul(Worldvs, View);
+	Output.depthPos = mul(float4(Input.msPos.xyz, 1.0f), matWV).z;
+	
 	matrix matClip = mul(matWV, Projection);
-	Output.psPos = mul(float4(Input.msPos, 1.0f), matClip);
-	Output.depthPos = mul(float4(Input.msPos, 1.0f), matWV).z;
+	Output.psPos = mul(float4(Input.msPos.xyz, 1.0f), matClip);	
 	
 	return Output;
 }
