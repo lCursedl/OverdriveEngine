@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c40c20ac-4bd0-45cb-8ed7-f2208715ff16}</ProjectGuid>
-    <RootNamespace>ovCore</RootNamespace>
+    <ProjectGuid>{e2c3cb69-be9c-4c34-85cb-2cd5240afad4}</ProjectGuid>
+    <RootNamespace>ovInputManagerOIS</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -96,17 +96,17 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OV_INPUTMANAGER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(DEVLIBS)SFML/include;$(DEVLIBS)Assimp/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(SolutionDir)ovCore/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>NotSet</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget);$(DEVLIBS)Assimp/lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-window-d.lib;ovUtilities_d.lib;assimp-vc142-mtd.lib;sfml-system-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)OIS/lib/$(PlatformTarget)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ov_Utilities_d.lib;ov_Core_d.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary />
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">
@@ -115,36 +115,36 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);OV_CORE_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OV_INPUTMANAGER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(DEVLIBS)SFML/include;$(DEVLIBS)Assimp/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(SolutionDir)ovCore/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>NotSet</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget);$(DEVLIBS)Assimp/lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-window.lib;ovUtilities.lib;assimp-vc142-mt.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)OIS/lib/$(PlatformTarget)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ov_Utilities.lib;ov_Core.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary />
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);OV_CORE_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;OV_INPUTMANAGER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(DEVLIBS)SFML/include/;$(DEVLIBS)Assimp/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(SolutionDir)ovCore/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>NotSet</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget);$(DEVLIBS)Assimp/lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-window-d.lib;ovUtilities_d.lib;assimp-vc142-mtd.lib;sfml-system-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)OIS/lib/$(PlatformTarget)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ov_Utilities_d.lib;ov_Core_d.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary />
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|x64'">
@@ -153,55 +153,27 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);OV_CORE_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;OV_INPUTMANAGER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(DEVLIBS)SFML/include;$(DEVLIBS)Assimp/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(SolutionDir)ovCore/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>NotSet</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget);$(DEVLIBS)Assimp/lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-window.lib;ovUtilities.lib;assimp-vc142-mt.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)OIS/lib/$(PlatformTarget)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ov_Utilities.lib;ov_Core.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary />
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\ovComponent.cpp" />
-    <ClCompile Include="src\ovActor.cpp" />
-    <ClCompile Include="src\ovBaseApp.cpp" />
-    <ClCompile Include="src\ovBaseInputManager.cpp" />
-    <ClCompile Include="src\ovBaseRenderer.cpp" />
-    <ClCompile Include="src\ovGraphicsAPI.cpp" />
-    <ClCompile Include="src\ovMesh.cpp" />
-    <ClCompile Include="src\ovModel.cpp" />
-    <ClCompile Include="src\ovPlugin.cpp" />
-    <ClCompile Include="src\ovSceneGraph.cpp" />
+    <ClCompile Include="src\ovInputManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ovActor.h" />
-    <ClInclude Include="include\ovBaseApp.h" />
-    <ClInclude Include="include\ovBaseInputManager.h" />
-    <ClInclude Include="include\ovBaseRenderer.h" />
-    <ClInclude Include="include\ovBuffer.h" />
-    <ClInclude Include="include\ovComponent.h" />
-    <ClInclude Include="include\ovDepthStencilState.h" />
-    <ClInclude Include="include\ovFormats.h" />
-    <ClInclude Include="include\ovGraphicsAPI.h" />
-    <ClInclude Include="include\ovInputLayout.h" />
-    <ClInclude Include="include\ovMesh.h" />
-    <ClInclude Include="include\ovModel.h" />
-    <ClInclude Include="include\ovGameObject.h" />
-    <ClInclude Include="include\ovPlugin.h" />
-    <ClInclude Include="include\ovPrerequisitesCore.h" />
-    <ClInclude Include="include\ovRasterizerState.h" />
-    <ClInclude Include="include\ovSamplerState.h" />
-    <ClInclude Include="include\ovSceneGraph.h" />
-    <ClInclude Include="include\ovShader.h" />
-    <ClInclude Include="include\ovShaderProgram.h" />
-    <ClInclude Include="include\ovTexture.h" />
+    <ClInclude Include="include\ovInputManager.h" />
+    <ClInclude Include="include\ovPrerequisitesInputManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

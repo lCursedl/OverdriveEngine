@@ -186,19 +186,16 @@ namespace ovEngineSDK {
                                     L"resources/shaders/PS_Shadow"));
     m_shadowProgram->linkProgram();
     Matrices lightMat;
-    lightMat.projection = graphicAPI.createCompatibleOrtho(0.f, 0.f, 10000.f, 10000.f, 0.01f, 10000.f);
-    /*graphicAPI.matrix4Policy(PerspectiveMatrix(70.f,
-      1024.f,
-      1024.f,
-      0.01f,
-      3000.f));*/
-    lightMat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(650.f, 300.f, -200.f),
-      Vector3(-0.87f, -0.40f, .26f),
-      Vector3(0.f, 1.f, 0.f)));
+    lightMat.projection = graphicAPI.createCompatibleOrtho(-200.f,
+                                                            200.f,
+                                                            -200.f,
+                                                            200.f,
+                                                            0.01f,
+                                                            500.f);
 
-    /*Vector3(650.f, 300.f, -200.f),
-      Vector3(-0.87f, -0.40f, .26f),
-      Vector3(0.f, 1.f, 0.f)*/
+    lightMat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(650.f, 300.f, -200.f),
+                                                          Vector3(-0.87f, -0.40f, .26f),
+                                                          Vector3(0.f, 1.f, 0.f)));
 
     lightMat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
 

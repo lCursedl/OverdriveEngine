@@ -143,9 +143,9 @@ namespace ovEngineSDK {
       v.Tangent.y = mesh->mTangents[i].y;
       v.Tangent.z = mesh->mTangents[i].z;
       //Bitangents
-      v.Tangent.x = mesh->mBitangents[i].x;
-      v.Tangent.y = mesh->mBitangents[i].y;
-      v.Tangent.z = mesh->mBitangents[i].z;
+      v.Bitangent.x = mesh->mBitangents[i].x;
+      v.Bitangent.y = mesh->mBitangents[i].y;
+      v.Bitangent.z = mesh->mBitangents[i].z;
       vertices->push_back(v);
     }
     //Go through each of the mesh's faces and retrieve the corresponding indices
