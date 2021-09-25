@@ -1,5 +1,6 @@
 #include "ovBaseApp.h"
 #include "ovBaseRenderer.h"
+#include "ovBaseInputManager.h"
 #include <Windows.h>
 
 namespace ovEngineSDK {
@@ -13,6 +14,7 @@ namespace ovEngineSDK {
     g_graphicsAPI().init(m_windowHandle);    
     onCreate();
     BaseRenderer::instance().init();
+    BaseInputManager::instance().init(m_windowHandle);
 
     MSG msg = {};
 
@@ -49,6 +51,7 @@ namespace ovEngineSDK {
   
   void BaseApp::update() {
     onUpdate(m_deltaTime);
+    BaseInputManager::instance().update();
   }
 
   void BaseApp::render() {
@@ -74,6 +77,13 @@ namespace ovEngineSDK {
       BaseRenderer* renderBase = createRenderer();
       g_baseRenderer().setObject(renderBase);
     }
+    if (m_inputPlugin.loadPlugin("ovInputManagerOIS_d.dll")) {
+      auto createInputManager = reinterpret_cast<funcCreateBaseInputManager>(
+                                m_inputPlugin.getProcedureByName("createInputManager"));
+      BaseInputManager::startUp();
+      BaseInputManager* inputBase = createInputManager();
+      g_baseInput().setObject(inputBase);
+    }
   }
 
   void
@@ -82,6 +92,7 @@ namespace ovEngineSDK {
     g_graphicsAPI().shutDown();
     SceneGraph::shutDown();
     BaseRenderer::shutDown();
+    BaseInputManager::shutDown();
   }
 
   void BaseApp::createWindow() {

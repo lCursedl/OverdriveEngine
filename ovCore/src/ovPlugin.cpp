@@ -11,6 +11,7 @@ namespace ovEngineSDK {
     if (!m_instance) {
       DWORD err = 0;
       err = GetLastError();
+      wprintf(L"Couldn't load dll. Error #%d.\n", err);
       destroy();
       return false;
     }

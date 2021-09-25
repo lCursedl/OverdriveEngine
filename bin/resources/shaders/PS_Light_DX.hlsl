@@ -9,14 +9,26 @@ cbuffer lightBuffer : register (b0) {
 	matrix matWV;
 }
 
+cbuffer lightMat : register (b1) {
+	matrix View;
+	matrix Projection;
+	float4 Pos;
+}
+
+cbuffer cameraMat : register(b2) {
+	matrix InverseView;
+}
+
 //Texture objects
 Texture2D positionTex : register(t0);
 Texture2D normalTex : register(t1);
 Texture2D albedoTex : register(t2);
 Texture2D ssaoTex : register(t3);
+Texture2D shadowTex : register(t4);
 
 //Sampler objects
 SamplerState lSampler : register(s0);
+SamplerState sSampler : register(s1);
 
 //Input structure
 struct PS_INPUT {
@@ -96,6 +108,32 @@ float4 main (PS_INPUT Input) : SV_Target {
 	float G = ga_SchlickGGX(NdL, NdV, roughness);
 	
 	float3 specular = (D * F * G) / max(EPSILON, (NdL * NdV * 4.0f));
+	
+	//Shadow
+	float shadow = 1.0f;
+	float4 shadowWPos = mul(mul(wsPos, InverseView), View);
+	float4 shadowClipPos = mul(shadowWPos, Projection);
+	float pixelDepth = shadowClipPos.z /= shadowClipPos.w;
+	float2 shadowTexCoords;
+	shadowTexCoords = 0.5f + (shadowClipPos.xy * 0.5f);
+	
+	// if(shadowtexcoords.x < 0.0f
+		// || shadowtexcoords.x > 1.0f
+		// || shadowtexcoords.y < 0.0f
+		// || shadowtexcoords.y > 1.0f) {
+		// shadowtest = float4(0, 0, 0, 1);
+	// }
+	
+	float shadowDepth = shadowTex.Sample(sSampler, shadowTexCoords).x;//float(shadowTex.SampleCmpLevelZero(
+							   // sSampler,
+							   // shadowTexCoords,
+							   // pixelDepth + EPSILON));
+	
+	if(shadowWPos.z > shadowDepth) {
+		shadow = 0.0f;
+	}
+	
+	return float4(shadow.xxx, 1.0f);
 	
 	return float4(pow(
 					((albedo.xyz * NdL * lightIntensity) +

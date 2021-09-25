@@ -56,6 +56,7 @@ namespace ovEngineSDK {
     SPtr<Buffer> m_blurBufferConstant;
     SPtr<Buffer> m_lightBufferConstant;
     SPtr<Buffer> m_shadowBufferConstant;
+    SPtr<Buffer> m_viewInverseBufferConstant;
     
     SPtr<InputLayout> m_gBufferLayout;
 

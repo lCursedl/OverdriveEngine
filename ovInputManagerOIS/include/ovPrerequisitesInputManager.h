@@ -10,7 +10,7 @@
 #if OV_PLATFORM == OV_PLATFORM_WIN32
 # if OV_COMPILER == OV_COMPILER_MSVC
 #   if defined( OV_STATIC_LIB )
-#     define OV_CORE_EXPORT
+#     define OV_INPUTMANAGER_EXPORT
 #   else
 #     if defined ( OV_INPUTMANAGER_EXPORTS )
 #       define OV_INPUTMANAGER_EXPORT __declspec( dllexport )

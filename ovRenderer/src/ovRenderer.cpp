@@ -34,6 +34,8 @@ namespace ovEngineSDK {
     Matrix4 matWV;
   };
 
+  Matrix4 viewInverse;
+
   void
   Renderer::init() {
     auto& graphicAPI =  g_graphicsAPI();
@@ -95,6 +97,13 @@ namespace ovEngineSDK {
                                                 sizeof(Matrices),
                                                 BUFFER_TYPE::kCONST_BUFFER);
     
+    viewInverse = graphicAPI.matrix4Policy(mat.view.inverse());
+
+    m_viewInverseBufferConstant = graphicAPI.createBuffer(&viewInverse,
+                                                          sizeof(Matrix4),
+                                                          BUFFER_TYPE::kCONST_BUFFER);
+
+
     //SSAO
     m_ssaoProgram = graphicAPI.createShaderProgram();
     m_ssaoProgram->setVertexShader(graphicAPI.createVertexShader(
@@ -177,7 +186,7 @@ namespace ovEngineSDK {
                                                         FILTER_LEVEL::FILTER_POINT,
                                                         0,
                                                         WRAPPING::WRAP,
-                                                        COMPARISON::LESS_EQUAL);
+                                                        COMPARISON::NEVER);
 
     m_shadowProgram = graphicAPI.createShaderProgram();
     m_shadowProgram->setVertexShader(graphicAPI.createVertexShader(
@@ -348,13 +357,20 @@ namespace ovEngineSDK {
     graphicAPI.setTexture(1, m_gBufferTextures[1]);
     graphicAPI.setTexture(2, m_gBufferTextures[2]);
     graphicAPI.setTexture(3, m_ssaoTextures[0]);
+    graphicAPI.setTexture(4, m_shadowTextures[0]);
 
     graphicAPI.setSamplerState(0, m_gBufferTextures[0], m_linearSampler);
     graphicAPI.setSamplerState(0, m_gBufferTextures[1], m_linearSampler);
     graphicAPI.setSamplerState(0, m_gBufferTextures[2], m_linearSampler);
+    graphicAPI.setSamplerState(0, m_ssaoTextures[0], m_linearSampler);
+    graphicAPI.setSamplerState(1, m_shadowTextures[0], m_comparisonSampler);
 
     graphicAPI.setConstantBuffer(0, m_lightBufferConstant, SHADER_TYPE::VERTEX_SHADER);
     graphicAPI.setConstantBuffer(0, m_lightBufferConstant, SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.setConstantBuffer(1, m_shadowBufferConstant, SHADER_TYPE::VERTEX_SHADER);
+    graphicAPI.setConstantBuffer(1, m_shadowBufferConstant, SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.setConstantBuffer(2, m_viewInverseBufferConstant, SHADER_TYPE::VERTEX_SHADER);
+    graphicAPI.setConstantBuffer(2, m_viewInverseBufferConstant, SHADER_TYPE::PIXEL_SHADER);
 
     m_screenQuad->render();
 
