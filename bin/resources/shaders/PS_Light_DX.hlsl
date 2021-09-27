@@ -111,11 +111,13 @@ float4 main (PS_INPUT Input) : SV_Target {
 	
 	//Shadow
 	float shadow = 1.0f;
-	float4 shadowWPos = mul(mul(wsPos, InverseView), View);
+	float4 shadowPos = mul(wsPos, InverseView);
+	float4 shadowWPos = mul(float4(shadowPos.xyz, 1.0f), View);
 	float4 shadowClipPos = mul(shadowWPos, Projection);
 	float pixelDepth = shadowClipPos.z /= shadowClipPos.w;
 	float2 shadowTexCoords;
-	shadowTexCoords = 0.5f + (shadowClipPos.xy * 0.5f);
+	shadowTexCoords = /*0.5f + */(shadowClipPos.xy /* * 0.5f*/);
+	//shadowTexCoords.y = 1.0f - shadowTexCoords.y;
 	
 	// if(shadowtexcoords.x < 0.0f
 		// || shadowtexcoords.x > 1.0f
@@ -133,7 +135,7 @@ float4 main (PS_INPUT Input) : SV_Target {
 		shadow = 0.0f;
 	}
 	
-	return float4(shadow.xxx, 1.0f);
+	return float4((shadowDepth / 710.0f).xxx, 1.0f);
 	
 	return float4(pow(
 					((albedo.xyz * NdL * lightIntensity) +

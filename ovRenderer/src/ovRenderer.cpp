@@ -178,7 +178,7 @@ namespace ovEngineSDK {
                                                  1024,
                                                  TEXTURE_BINDINGS::E::SHADER_RESOURCE |
                                                  TEXTURE_BINDINGS::E::RENDER_TARGET,
-                                                 FORMATS::kR8_UNORM);
+                                                 FORMATS::kR16_FLOAT);
     m_shadowRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
                                                   CULL_MODE::kBACK, false);
     m_comparisonSampler = graphicAPI.createSamplerState(FILTER_LEVEL::FILTER_POINT,
