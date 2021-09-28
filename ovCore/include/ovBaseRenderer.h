@@ -13,6 +13,8 @@ namespace ovEngineSDK {
     virtual void
     init() {}
     virtual void
+    update() {}
+    virtual void
     render() {}
 
     FORCEINLINE void

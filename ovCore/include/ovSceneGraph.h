@@ -6,6 +6,7 @@
 namespace ovEngineSDK {
   
   class Model;
+  class Camera;
 
   class OV_CORE_EXPORT SceneNode
   {
@@ -29,6 +30,7 @@ namespace ovEngineSDK {
 
     void
     insertModels(Vector<SPtr<Model>>& modelsVector);
+    SPtr<Camera>getCam();
   };
 
   class OV_CORE_EXPORT SceneGraph : public Module<SceneGraph>
@@ -43,6 +45,9 @@ namespace ovEngineSDK {
     update(float delta);
     void
     render();
+
+    SPtr<Camera>
+    getActiveCamera();
 
     Vector<SPtr<Model>>
     transferModels();

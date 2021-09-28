@@ -1,5 +1,6 @@
 #include "ovSceneGraph.h"
 #include <ovModel.h>
+#include <ovCamera.h>
 
 namespace ovEngineSDK {
   void
@@ -43,6 +44,29 @@ namespace ovEngineSDK {
     }
   }
 
+  SPtr<Camera> SceneNode::getCam() {
+    SPtr<Camera> camera;
+    if (m_pActor) {
+      for (auto& components : m_pActor->m_components ) {
+        if (COMPONENT_TYPE::kCAMERA == components->m_componentID) {
+          camera = static_pointer_cast<Camera>(components);
+        }
+        if (camera.get()) {
+          break;
+        }
+      }
+      if (!camera.get()) {
+        for (auto& childs : m_pChilds) {
+          camera = childs->getCam();
+          if (camera.get()) {
+            break;
+          }
+        }
+      }
+    }
+    return camera;
+  }
+
   SceneGraph::SceneGraph() {
     m_pRoot = make_shared<SceneNode>();
   }
@@ -69,6 +93,20 @@ namespace ovEngineSDK {
         m_pRoot->m_pChilds[i]->render();
       }
     }
+  }
+
+  SPtr<Camera>
+  SceneGraph::getActiveCamera() {
+    SPtr<Camera> camera;
+    if (m_pRoot) {
+      for (auto& node : m_pRoot->m_pChilds) {
+        camera = node->getCam();
+        if (camera.get()) {
+          break;
+        }
+      }
+    }
+    return camera;
   }
 
   Vector<SPtr<Model>>

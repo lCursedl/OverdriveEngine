@@ -50,8 +50,9 @@ namespace ovEngineSDK {
   }
   
   void BaseApp::update() {
-    onUpdate(m_deltaTime);
-    BaseInputManager::instance().update();
+    g_baseInput().update();
+    onUpdate(m_deltaTime); 
+    BaseRenderer::instance().update();
   }
 
   void BaseApp::render() {
@@ -82,7 +83,8 @@ namespace ovEngineSDK {
                                 m_inputPlugin.getProcedureByName("createInputManager"));
       BaseInputManager::startUp();
       BaseInputManager* inputBase = createInputManager();
-      g_baseInput().setObject(inputBase);
+      BaseInputManager::instance().setObject(inputBase);
+      //g_baseInput().setObject(inputBase);
     }
   }
 

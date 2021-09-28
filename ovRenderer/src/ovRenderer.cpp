@@ -7,6 +7,7 @@
 #include <ovInputLayout.h>
 #include <ovBuffer.h>
 #include <ovMatrix4.h>
+#include <ovCamera.h>
 
 namespace ovEngineSDK {
   
@@ -81,7 +82,7 @@ namespace ovEngineSDK {
                                                       600,
                                                       TEXTURE_BINDINGS::E::DEPTH_STENCIL,
                                                       FORMATS::kD24_S8);
-  //Vector3(-0.05f, -4.54f, -.8f),
+
     Matrices mat;
     mat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
     mat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(0.f, -150.f, 0.f),
@@ -93,7 +94,7 @@ namespace ovEngineSDK {
                                                                 0.01f,
                                                                 3000.f));
 
-    m_gBufferConstant = graphicAPI.createBuffer(&mat,
+    m_gBufferConstant = graphicAPI.createBuffer(nullptr,
                                                 sizeof(Matrices),
                                                 BUFFER_TYPE::kCONST_BUFFER);
     
@@ -226,6 +227,19 @@ namespace ovEngineSDK {
     m_screenQuad->load("resources/models/ScreenAlignedQuad.3ds");
 
     m_screenQuadLayout = graphicAPI.createInputLayout(m_ssaoProgram, lDesc);
+  }
+
+  void
+  Renderer::update() {
+    auto& graphicAPI = g_graphicsAPI();
+
+    m_activeCam = SceneGraph::instance().getActiveCamera();
+    Matrices mat;
+    mat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
+    mat.projection = graphicAPI.matrix4Policy(m_activeCam->getProjection());
+    mat.view = graphicAPI.matrix4Policy(m_activeCam->getView());
+
+    graphicAPI.updateBuffer(m_gBufferConstant, &mat);
   }
 
   void

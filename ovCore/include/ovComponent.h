@@ -6,7 +6,8 @@ namespace ovEngineSDK {
   namespace COMPONENT_TYPE {
     enum E {
       kSTATIC_MESH = 0,
-      kSKELETAL_MESH
+      kSKELETAL_MESH,
+      kCAMERA
     };
   };
 

@@ -37,12 +37,29 @@ namespace ovEngineSDK {
     void
     update()                                                          override;
 
-    OIS::InputManager* m_inputManager = nullptr;
+    bool
+    isKeyPressed(KEYS::E key)                                         override;
+    bool
+    isMouseKeyPressed(KEYSM::E key)                                   override;   
 
+   private:
+    
+    void
+    fillKeys();
+
+    void
+    fillMouseKeys();
+    
+   private:
+    OIS::InputManager* m_inputManager = nullptr;
     //Devices
     OIS::Keyboard* m_keyBoard = nullptr;
     OIS::Mouse* m_mouse = nullptr;
+
     EventHandler m_handler;
+
+    std::map<KEYS::E, OIS::KeyCode> m_keys;
+    std::map<KEYSM::E, OIS::MouseButtonID> m_mouseKeys;
   };
 
   extern "C" OV_PLUGIN_EXPORT BaseInputManager*

@@ -7,17 +7,17 @@ cbuffer lightBuffer : register (b0) {
 	float lightIntensity;
 	float4 viewPos;
 	matrix matWV;
-}
+};
 
 cbuffer lightMat : register (b1) {
 	matrix View;
 	matrix Projection;
 	float4 Pos;
-}
+};
 
 cbuffer cameraMat : register(b2) {
 	matrix InverseView;
-}
+};
 
 //Texture objects
 Texture2D positionTex : register(t0);
@@ -135,7 +135,7 @@ float4 main (PS_INPUT Input) : SV_Target {
 		shadow = 0.0f;
 	}
 	
-	return float4((shadowDepth / 710.0f).xxx, 1.0f);
+	//return float4((shadowDepth / 710.0f).xxx, 1.0f);
 	
 	return float4(pow(
 					((albedo.xyz * NdL * lightIntensity) +

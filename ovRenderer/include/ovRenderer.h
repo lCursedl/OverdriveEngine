@@ -15,6 +15,7 @@ namespace ovEngineSDK {
   class Buffer;
   class InputLayout;
   class SamplerState;
+  class Camera;
 
   class Renderer final : public BaseRenderer
   {
@@ -22,6 +23,7 @@ namespace ovEngineSDK {
     Renderer() = default;
     ~Renderer() = default;
     void init() override;
+    void update() override;
     void render() override;
    private:
     
@@ -64,6 +66,8 @@ namespace ovEngineSDK {
 
     SPtr<SamplerState> m_comparisonSampler;
     SPtr<SamplerState> m_linearSampler;
+
+    SPtr<Camera> m_activeCam;
 
     Vector2 m_viewportDim;
   };
