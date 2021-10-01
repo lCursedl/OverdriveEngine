@@ -2,9 +2,12 @@
 
 #include "ovPrerequisitesUtil.h"
 #include "ovVector3.h"
-#include "ovRadian.h"
+#include "ovMath.h"
 
 namespace ovEngineSDK {
+  
+  class Matrix4;
+
   class OV_UTILITY_EXPORT Quaternion
   {
    public:
@@ -13,6 +16,22 @@ namespace ovEngineSDK {
     Quaternion(Vector3& Vec, float AngleRad);
     Quaternion
     inverse() const;
+
+    float
+    magnitude() const;
+
+    bool
+    normalize();
+
+    static Quaternion
+    fromMat(const Matrix4& Mat);
+
+    static Quaternion
+    conjugate(const Quaternion& Quat);
+
+    Quaternion
+    operator * (const Quaternion & Q) const;
+
    public:
     float x;
     float y;

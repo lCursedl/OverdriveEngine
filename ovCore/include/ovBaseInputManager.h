@@ -5,8 +5,8 @@
 
 using sf::WindowHandle;
 
-namespace ovEngineSDK {  
-  
+namespace ovEngineSDK {
+
   namespace KEYS {
     enum E {
       kESCAPE = 0,
@@ -139,6 +139,15 @@ namespace ovEngineSDK {
 
     virtual bool
     isMouseKeyPressed(KEYSM::E key) {return false;}
+
+    virtual float
+    getXAxis() { return 0.f; }
+
+    virtual float
+    getYAxis() { return 0.f; }
+
+    virtual void
+    getMouseAxis(float& X, float& Y) {}
 
     FORCEINLINE void
     setObject(BaseInputManager* _api) {

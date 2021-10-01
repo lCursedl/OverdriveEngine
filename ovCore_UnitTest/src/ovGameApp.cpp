@@ -38,10 +38,20 @@ GameApp::onCreate() {
   SPtr<SceneNode>camNode = make_shared<SceneNode>();
   camNode->setActor(camActor);
 
+  SPtr<Model>plane = make_shared<Model>();
+  plane->load("resources/models/plano.fbx");
+
+  SPtr<Actor>planeActor = make_shared<Actor>();
+  planeActor->addComponent(plane);
+
+  SPtr<SceneNode>planeNode = make_shared<SceneNode>();
+  planeNode->setActor(planeActor);
+
   auto& scene = SceneGraph::instance();
 
   scene.addNode(myNode);
   scene.addNode(camNode);
+  scene.addNode(planeNode);
 }
 
 void
@@ -59,48 +69,29 @@ GameApp::onUpdate(float delta) {
   graphicAPI.updateBuffer(m_bBuffer, &cbBone);*/
   SPtr<Camera> cam = SceneGraph::instance().getActiveCamera();
   if (cam) {
-    if (g_baseInput().isKeyPressed(KEYS::kW)) {
-      cam->setForward(true);
-    }
-    else {
-      cam->setForward(false);
-    }
-    
-    if (g_baseInput().isKeyPressed(KEYS::kS)) {
-      cam->setBackward(true);
-    }
-    else {
-      cam->setBackward(false);
-    }
+    //Get forward input
+    cam->setForward(g_baseInput().isKeyPressed(KEYS::kW));
+    //Get backard input
+    cam->setBackward(g_baseInput().isKeyPressed(KEYS::kS));
+    //Get left input
+    cam->setLeft(g_baseInput().isKeyPressed(KEYS::kA));
+    //Get right input
+    cam->setRight(g_baseInput().isKeyPressed(KEYS::kD));
+    //Get up input
+    cam->setUp(g_baseInput().isKeyPressed(KEYS::kQ));
+    //Get down input
+    cam->setDown(g_baseInput().isKeyPressed(KEYS::kE));
+    //Get roll left input
+    cam->setRotateLeft(g_baseInput().isKeyPressed(KEYS::kLEFT));
+    //Get roll right input
+    cam->setRotateRight(g_baseInput().isKeyPressed(KEYS::kRIGHT));
 
-    if (g_baseInput().isKeyPressed(KEYS::kA)) {
-      cam->setLeft(true);
+    float mouseX, mouseY;
+    g_baseInput().getMouseAxis(mouseX, mouseY);
+    if (mouseX != 0 && mouseY != 0) {
+      cam->rotate(Vector2(mouseX, mouseY), delta);
     }
-    else {
-      cam->setLeft(false);
-    }
-
-    if (g_baseInput().isKeyPressed(KEYS::kD)) {
-      cam->setRight(true);
-    }
-    else {
-      cam->setRight(false);
-    }
-
-    if (g_baseInput().isKeyPressed(KEYS::kQ)) {
-      cam->setUp(true);
-    }
-    else {
-      cam->setUp(false);
-    }
-
-    if (g_baseInput().isKeyPressed(KEYS::kE)) {
-      cam->setDown(true);
-    }
-    else {
-      cam->setDown(false);
-    }
-
+    cam->roll(delta);
     cam->update(delta);
   }
 }

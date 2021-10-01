@@ -98,9 +98,9 @@ namespace ovEngineSDK {
                                                 sizeof(Matrices),
                                                 BUFFER_TYPE::kCONST_BUFFER);
     
-    viewInverse = graphicAPI.matrix4Policy(mat.view.inverse());
+    //viewInverse = graphicAPI.matrix4Policy(mat.view.inverse());
 
-    m_viewInverseBufferConstant = graphicAPI.createBuffer(&viewInverse,
+    m_viewInverseBufferConstant = graphicAPI.createBuffer(nullptr,
                                                           sizeof(Matrix4),
                                                           BUFFER_TYPE::kCONST_BUFFER);
 
@@ -160,18 +160,7 @@ namespace ovEngineSDK {
                                    L"resources/shaders/PS_Light"));
     m_lightProgram->linkProgram();
 
-    Lighting light;
-    light.lightPos = Vector3(650.f, 300.f, -200.f);
-    light.lightIntensity = 2.0f;
-    light.viewPos = Vector4(mat.view.zVector.x,
-                            mat.view.zVector.y,
-                            mat.view.zVector.z,
-                            1.0f);
-    light.matWV = Matrix4::IDENTITY;
-    light.matWV.zVector = mat.objectPos;
-    light.matWV = graphicAPI.matrix4Policy(light.matWV * mat.view);
-
-    m_lightBufferConstant = graphicAPI.createBuffer(&light,
+    m_lightBufferConstant = graphicAPI.createBuffer(nullptr,
                                                     sizeof(Lighting),
                                                     BUFFER_TYPE::kCONST_BUFFER);
     //Shadow map
@@ -186,7 +175,7 @@ namespace ovEngineSDK {
                                                         FILTER_LEVEL::FILTER_POINT,
                                                         FILTER_LEVEL::FILTER_POINT,
                                                         0,
-                                                        WRAPPING::WRAP,
+                                                        WRAPPING::CLAMP,
                                                         COMPARISON::NEVER);
 
     m_shadowProgram = graphicAPI.createShaderProgram();
@@ -202,9 +191,9 @@ namespace ovEngineSDK {
                                                             200.f,
                                                             0.01f,
                                                             500.f);
-
-    lightMat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(650.f, 300.f, -200.f),
-                                                          Vector3(-0.87f, -0.40f, .26f),
+    //650.f, 300.f, -200.f
+    lightMat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(0.f, -80.f, 350.f),
+      Vector3(0.f, 0.f, 0.f), //Vector3(-0.87f, -0.40f, .26f),
                                                           Vector3(0.f, 1.f, 0.f)));
 
     lightMat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
@@ -240,6 +229,23 @@ namespace ovEngineSDK {
     mat.view = graphicAPI.matrix4Policy(m_activeCam->getView());
 
     graphicAPI.updateBuffer(m_gBufferConstant, &mat);
+
+    Matrix4 tempMat = graphicAPI.matrix4Policy( m_activeCam->getView().inverse());
+
+    graphicAPI.updateBuffer(m_viewInverseBufferConstant, &tempMat);
+
+    Lighting light;
+    light.lightPos = Vector3(0.f, -80.f, 350.f);
+    light.lightIntensity = 2.0f;
+    light.viewPos = Vector4(mat.view.zVector.x,
+                            mat.view.zVector.y,
+                            mat.view.zVector.z,
+                            1.0f);
+    light.matWV = Matrix4::IDENTITY;
+    light.matWV.zVector = mat.objectPos;
+    light.matWV = graphicAPI.matrix4Policy(light.matWV) * mat.view;
+
+    graphicAPI.updateBuffer(m_lightBufferConstant, &light);
   }
 
   void
@@ -388,7 +394,7 @@ namespace ovEngineSDK {
 
     m_screenQuad->render();
 
-    for (int32 i = 0; i < 4; ++i) {
+    for (int32 i = 0; i < 5; ++i) {
       graphicAPI.setTexture(i, nullptr);
     }
   }

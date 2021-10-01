@@ -12,9 +12,11 @@
 #include "ovMath.h"
 #include "ovVector3.h"
 #include "ovVector4.h"
-#include "ovQuaternion.h"
 
 namespace ovEngineSDK {
+  
+  class Quaternion;
+
   class OV_UTILITY_EXPORT Matrix4
   {
    public:

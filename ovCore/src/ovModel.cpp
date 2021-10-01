@@ -1,5 +1,6 @@
 #include "ovModel.h"
 #include <ovGraphicsAPI.h>
+#include <ovQuaternion.h>
 
 namespace ovEngineSDK {
   

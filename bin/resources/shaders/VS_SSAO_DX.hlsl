@@ -17,6 +17,6 @@ VS_OUTPUT main(VS_INPUT Input) {
 	VS_OUTPUT Output;
 	Output.psPos = float4(Input.msPos, 1.0f);
 	Output.texCoord = Input.texCoord;
-	
+	Output.texCoord.y = 1 - Output.texCoord.y;
 	return Output;
 }

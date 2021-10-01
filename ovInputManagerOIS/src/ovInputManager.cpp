@@ -34,6 +34,7 @@ namespace ovEngineSDK {
     ms.width = 800;
     ms.height = 600;
     fillKeys();
+    fillMouseKeys();
   }
   
   void InputManager::update() {
@@ -49,6 +50,13 @@ namespace ovEngineSDK {
   bool
   InputManager::isMouseKeyPressed(KEYSM::E key) {
     return m_mouse->getMouseState().buttonDown(m_mouseKeys[key]);
+  }
+
+  void
+  InputManager::getMouseAxis(float& X, float& Y) {
+    const OIS::MouseState& ms = m_mouse->getMouseState();
+    X = ms.X.rel;
+    Y = ms.Y.rel;
   }
 
   void

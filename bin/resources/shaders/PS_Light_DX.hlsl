@@ -1,5 +1,6 @@
 #define M_PI 3.14159265359
 #define EPSILON 0.00001
+#define SHADOW_BIAS 0.1
 
 //Constant buffers
 cbuffer lightBuffer : register (b0) {
@@ -66,10 +67,7 @@ float ga_SchlickGGX(float cosLi, float cosLo, float roughness)
 float4 main (PS_INPUT Input) : SV_Target {
 	float gamma = 2.2f;
 	//Position sampler
-	float4 wsPos = positionTex.Sample(lSampler, Input.texCoord);
-	if(wsPos.w == 0) {
-		return 0;
-	}
+	float4 wsPos = float4(positionTex.Sample(lSampler, Input.texCoord).xyz, 1.0f);
 	//Normal sampler
 	float4 wsNormal = normalTex.Sample(lSampler, Input.texCoord);
 	float roughness = wsNormal.w;
@@ -111,12 +109,12 @@ float4 main (PS_INPUT Input) : SV_Target {
 	
 	//Shadow
 	float shadow = 1.0f;
-	float4 shadowPos = mul(wsPos, InverseView);
-	float4 shadowWPos = mul(float4(shadowPos.xyz, 1.0f), View);
+	float4 shadowPos = mul(wsPos, InverseView);	
+	float4 shadowWPos = mul(float4(shadowPos.xyz, 1.0f), View);	
 	float4 shadowClipPos = mul(shadowWPos, Projection);
-	float pixelDepth = shadowClipPos.z /= shadowClipPos.w;
-	float2 shadowTexCoords;
-	shadowTexCoords = /*0.5f + */(shadowClipPos.xy /* * 0.5f*/);
+	shadowClipPos /= shadowClipPos.w;
+	//float pixelDepth = shadowClipPos.z /= shadowClipPos.w;
+	float3 shadowTexCoords = 0.5f + (shadowClipPos.xyz * 0.5f);
 	//shadowTexCoords.y = 1.0f - shadowTexCoords.y;
 	
 	// if(shadowtexcoords.x < 0.0f
@@ -125,20 +123,17 @@ float4 main (PS_INPUT Input) : SV_Target {
 		// || shadowtexcoords.y > 1.0f) {
 		// shadowtest = float4(0, 0, 0, 1);
 	// }
+	shadowTexCoords.y = 1 - shadowTexCoords.y;
+	float shadowDepth = shadowTex.Sample(sSampler, shadowTexCoords.xy).x;
 	
-	float shadowDepth = shadowTex.Sample(sSampler, shadowTexCoords).x;//float(shadowTex.SampleCmpLevelZero(
-							   // sSampler,
-							   // shadowTexCoords,
-							   // pixelDepth + EPSILON));
-	
-	if(shadowWPos.z > shadowDepth) {
-		shadow = 0.0f;
-	}
-	
-	//return float4((shadowDepth / 710.0f).xxx, 1.0f);
+	float currentDepth = shadowTexCoords.z;
+	shadow = currentDepth + SHADOW_BIAS > shadowDepth ? 0.0f : 1.0f;
+	// if(shadowWPos.z - SHADOW_BIAS > shadowDepth) {
+		// shadow = 0.0f;
+	// }
 	
 	return float4(pow(
-					((albedo.xyz * NdL * lightIntensity) +
-					(specular)) * ao
+					( (1.0f - shadow) * (albedo.xyz * NdL * lightIntensity) +
+					(specular))
 					,1.0f / gamma), 1.0f);
 }

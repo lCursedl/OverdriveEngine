@@ -93,6 +93,10 @@ namespace ovEngineSDK {
     }
     
     graphicAPI->drawIndexed(static_cast<int32>(m_indices->size()));
+
+    for (uint32 i = 0; i < numTextures; ++i) {
+      graphicAPI->setTexture(i, nullptr);
+    }
   }
 
   void VertexBoneData::addBoneData(uint32 boneID, float weight) {

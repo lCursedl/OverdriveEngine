@@ -42,6 +42,9 @@ namespace ovEngineSDK {
     bool
     isMouseKeyPressed(KEYSM::E key)                                   override;   
 
+    void
+    getMouseAxis(float& X, float& Y)                                  override;
+
    private:
     
     void

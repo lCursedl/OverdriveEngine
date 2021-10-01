@@ -1,4 +1,5 @@
 #include "ovMatrix4.h"
+#include "ovQuaternion.h"
 
 namespace ovEngineSDK {
   
