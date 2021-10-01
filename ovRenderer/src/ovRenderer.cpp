@@ -193,7 +193,7 @@ namespace ovEngineSDK {
                                                             500.f);
     //650.f, 300.f, -200.f
     lightMat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(0.f, -80.f, 350.f),
-      Vector3(0.f, 0.f, 0.f), //Vector3(-0.87f, -0.40f, .26f),
+                                                          Vector3(0.f, 0.f, 0.f),
                                                           Vector3(0.f, 1.f, 0.f)));
 
     lightMat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
@@ -237,9 +237,9 @@ namespace ovEngineSDK {
     Lighting light;
     light.lightPos = Vector3(0.f, -80.f, 350.f);
     light.lightIntensity = 2.0f;
-    light.viewPos = Vector4(mat.view.zVector.x,
-                            mat.view.zVector.y,
-                            mat.view.zVector.z,
+    light.viewPos = Vector4(mat.view.xVector.w,
+                            mat.view.yVector.w,
+                            mat.view.zVector.w,
                             1.0f);
     light.matWV = Matrix4::IDENTITY;
     light.matWV.zVector = mat.objectPos;

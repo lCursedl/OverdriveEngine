@@ -108,9 +108,9 @@ float4 main (PS_INPUT Input) : SV_Target {
 	float3 specular = (D * F * G) / max(EPSILON, (NdL * NdV * 4.0f));
 	
 	//Shadow
-	float shadow = 1.0f;
-	float4 shadowPos = mul(wsPos, InverseView);	
-	float4 shadowWPos = mul(float4(shadowPos.xyz, 1.0f), View);	
+	float shadow = 0.0f;
+	float4 shadowPos = mul(wsPos, InverseView);
+	float4 shadowWPos = mul(float4(shadowPos.xyz, 1.0f), View);
 	float4 shadowClipPos = mul(shadowWPos, Projection);
 	shadowClipPos /= shadowClipPos.w;
 	//float pixelDepth = shadowClipPos.z /= shadowClipPos.w;
@@ -127,10 +127,16 @@ float4 main (PS_INPUT Input) : SV_Target {
 	float shadowDepth = shadowTex.Sample(sSampler, shadowTexCoords.xy).x;
 	
 	float currentDepth = shadowTexCoords.z;
-	shadow = currentDepth + SHADOW_BIAS > shadowDepth ? 0.0f : 1.0f;
-	// if(shadowWPos.z - SHADOW_BIAS > shadowDepth) {
-		// shadow = 0.0f;
-	// }
+	//shadow = currentDepth + SHADOW_BIAS > shadowDepth ? 0.0f : 1.0f;
+	
+	float2 texelSize = 1.0f / 1024.0f;
+	for(int x = -1; x <= 1; ++x) {
+		for(int y = -1; y <= 1; ++y) {
+			float pcfDepth = shadowTex.Sample(sSampler, shadowTexCoords.xy + float2(x, y) * texelSize).r;
+			shadow += currentDepth - SHADOW_BIAS > pcfDepth ? 0.0f : 1.0f;
+		}
+	}	
+	shadow /= 9.0f;
 	
 	return float4(pow(
 					( (1.0f - shadow) * (albedo.xyz * NdL * lightIntensity) +
