@@ -35,6 +35,15 @@ namespace ovEngineSDK {
      }
 
      /**
+     * @fn       ComputeShader* getComputeShader()
+     * @brief    Obtains the pointer to the ComputeShader member
+     * @return   ComputeShader pointer
+     */
+     SPtr<ComputeShader> getComputeShader() {
+       return m_pComputeShader;
+     }
+
+     /**
      * @fn       virtual void setVertexShader(VertexShader* vertexShader)
      * @brief    Sets the received VS pointer as the one to store.
      * @param[in]vertexShader VertexShader pointer to store
@@ -53,6 +62,15 @@ namespace ovEngineSDK {
      }
 
      /**
+     * @fn       virtual void setComputeShader(ComputeShader* computeShader)
+     * @brief    Sets the received CS pointer as the one to store.
+     * @param[in]computeShader ComputeShader pointer to store
+     */
+     virtual void setComputeShader(SPtr<ComputeShader> computeShader) {
+       m_pComputeShader = computeShader;
+     }
+
+     /**
      * @fn       virtual void linkProgram()
      * @brief    Links the attached shaders to the program
      */
@@ -61,5 +79,6 @@ namespace ovEngineSDK {
    protected:
     SPtr<VertexShader> m_pVertexShader = nullptr;	/**< VertexShader pointer */
     SPtr<PixelShader> m_pPixelShader = nullptr;		/**< PixelShader pointer */
+    SPtr<ComputeShader> m_pComputeShader = nullptr; /**< ComputeShader pointer*/
   };
 }

@@ -9,7 +9,9 @@ namespace ovEngineSDK {
     enum E {
       kVERTEX_BUFFER = 0x1L,	/**< Vertex buffer enum value (1)*/
       kINDEX_BUFFER = 0x2L,	/**< Index buffer enum value (2)*/
-      kCONST_BUFFER = 0x4L		/**< Constant buffer enum value (4)*/
+      kCONST_BUFFER = 0x4L,		/**< Constant buffer enum value (4)*/
+      kSHADER_BUFFER = 0x08L, /**< Shader resource buffer enum value (8)*/
+      kUNORDERED_BUFER = 0x80L /**<Unordered Access buffer enum value (128)*/
     };
   }
 

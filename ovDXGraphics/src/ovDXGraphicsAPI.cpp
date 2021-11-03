@@ -9,7 +9,7 @@
 #include <ovDXSamplerState.h>
 #include <ovDXRasterizerState.h>
 #include <ovDXDepthStencilState.h>
-
+#include <ovDXBlendState.h>
 #include <wincodec.h>
 
 namespace ovEngineSDK {
@@ -191,6 +191,9 @@ namespace ovEngineSDK {
       if (binding & TEXTURE_BINDINGS::E::DEPTH_STENCIL) {
         Desc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
       }
+      if (binding & TEXTURE_BINDINGS::E::UNORDERED_ACCESS) {
+        Desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+      }
       Desc.MiscFlags = 0;
 
       //Create texture with descriptor
@@ -238,6 +241,18 @@ namespace ovEngineSDK {
                    texture->m_texture,
                    &descDSV,
                    &texture->m_dsv))) {
+          return nullptr;
+        }
+      }
+      if (binding & TEXTURE_BINDINGS::E::UNORDERED_ACCESS) {
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+        ZeroMemory(&uavDesc, sizeof(uavDesc));
+        uavDesc.Format = Desc.Format;
+        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+
+        if (FAILED(m_device->CreateUnorderedAccessView(texture->m_texture,
+                                                       &uavDesc,
+                                                       &texture->m_uav))) {
           return nullptr;
         }
       }
@@ -302,6 +317,107 @@ namespace ovEngineSDK {
     return nullptr;
   }
 
+  SPtr<Texture>
+  DXGraphicsAPI::createTextureFromMemory(int32 width,
+                                         int32 height,
+                                         TEXTURE_BINDINGS::E binding,
+                                         FORMATS::E format,
+                                         uint8* data) {
+    if (data) {
+      SPtr<DXTexture>texture(new DXTexture);
+      //Texture descriptor
+      D3D11_TEXTURE2D_DESC desc;
+      ZeroMemory(&desc, sizeof(desc));
+
+      desc.Width = width;
+      desc.Height = height;
+      desc.MipLevels = 1;
+      desc.ArraySize = 1;
+      desc.Format = m_formats[format];
+      desc.SampleDesc.Count = 1;
+      desc.Usage = D3D11_USAGE_DEFAULT;
+
+      if (binding & TEXTURE_BINDINGS::E::SHADER_RESOURCE) {
+        desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+      }
+      if (binding & TEXTURE_BINDINGS::E::RENDER_TARGET) {
+        desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+      }
+      if (binding & TEXTURE_BINDINGS::E::DEPTH_STENCIL) {
+        desc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
+      }
+      if (binding & TEXTURE_BINDINGS::E::UNORDERED_ACCESS) {
+        desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+      }
+
+      D3D11_SUBRESOURCE_DATA subResource;
+      ZeroMemory(&subResource, sizeof(subResource));
+      subResource.pSysMem = data;
+      subResource.SysMemPitch = width * 4;
+
+      //Create texture with descriptor and data
+      if (FAILED(m_device->CreateTexture2D(&desc, &subResource, &texture->m_texture))) {
+        return nullptr;
+      }
+      if (binding & TEXTURE_BINDINGS::E::SHADER_RESOURCE) {
+        D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+        ZeroMemory(&viewDesc, sizeof(viewDesc));
+        viewDesc.Format = desc.Format;
+        viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        viewDesc.Texture2D.MostDetailedMip = 0;
+        viewDesc.Texture2D.MipLevels = 1;
+
+        if (FAILED(m_device->CreateShaderResourceView(texture->m_texture,
+          &viewDesc,
+          &texture->m_srv))) {
+            return nullptr;
+        }
+      }
+      if (binding & TEXTURE_BINDINGS::E::RENDER_TARGET) {
+        D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+        ZeroMemory(&rtvDesc, sizeof(rtvDesc));
+        rtvDesc.Format = desc.Format;
+        rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+        rtvDesc.Texture2D.MipSlice = 0;
+
+        if (FAILED(m_device->CreateRenderTargetView(
+          texture->m_texture,
+          &rtvDesc,
+          &texture->m_rtv))) {
+            return nullptr;
+        }
+      }
+      if (binding & TEXTURE_BINDINGS::E::DEPTH_STENCIL) {
+        D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+        ZeroMemory(&descDSV, sizeof(descDSV));
+        descDSV.Format = desc.Format;
+        descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+        descDSV.Texture2D.MipSlice = 0;
+
+        if (FAILED(m_device->CreateDepthStencilView(
+          texture->m_texture,
+          &descDSV,
+          &texture->m_dsv))) {
+            return nullptr;
+        }
+      }
+      if (binding & TEXTURE_BINDINGS::E::UNORDERED_ACCESS) {
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+        ZeroMemory(&uavDesc, sizeof(uavDesc));
+        uavDesc.Format = desc.Format;
+        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+
+        if (FAILED(m_device->CreateUnorderedAccessView(texture->m_texture,
+          &uavDesc,
+          &texture->m_uav))) {
+            return nullptr;
+        }
+      }
+      return texture;
+    }
+    return nullptr;
+  }
+
   WString getFileName(WString vsfile)
   {
     size_t realPos = 0;
@@ -334,14 +450,15 @@ namespace ovEngineSDK {
 
   SPtr<Buffer> DXGraphicsAPI::createBuffer(const void* data,
                                            SIZE_T size,
-                                           BUFFER_TYPE::E type) {
+                                           BUFFER_TYPE::E type,
+                                           uint32 elements,
+                                           FORMATS::E format) {
     if (size != 0) {
       D3D11_BUFFER_DESC buffDesc;
       ZeroMemory(&buffDesc, sizeof(buffDesc));
 
       buffDesc.Usage = D3D11_USAGE_DEFAULT;
       buffDesc.ByteWidth = static_cast<uint32>(size);
-      buffDesc.CPUAccessFlags = 0;
       buffDesc.BindFlags = (D3D11_BIND_FLAG)type;
 
       SPtr<DXBuffer> buffer(new DXBuffer);
@@ -365,6 +482,38 @@ namespace ovEngineSDK {
           return nullptr;
         }
       }
+
+      if (type & BUFFER_TYPE::kUNORDERED_BUFER) {
+        D3D11_BUFFER_UAV uavDesc;
+        ZeroMemory(&uavDesc, sizeof(uavDesc));
+        uavDesc.NumElements = elements;
+        
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavViewDesc;
+        ZeroMemory(&uavViewDesc, sizeof(uavViewDesc));
+        uavViewDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+        uavViewDesc.Format = m_formats[format];
+        uavViewDesc.Buffer = uavDesc;
+
+        if (FAILED(m_device->CreateUnorderedAccessView(buffer->m_buffer,
+                                                       &uavViewDesc,
+                                                       &buffer->m_uav))) {
+          return nullptr;
+        }
+      }
+
+      if (type & BUFFER_TYPE::kSHADER_BUFFER) {
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvuavDesc;
+        ZeroMemory(&srvuavDesc, sizeof(srvuavDesc));
+        srvuavDesc.Format = m_formats[format];
+        srvuavDesc.ViewDimension = D3D_SRV_DIMENSION_BUFFER;
+
+        if (FAILED(m_device->CreateShaderResourceView(buffer->m_buffer,
+                                                      &srvuavDesc,
+                                                      &buffer->m_srv))) {
+          return nullptr;
+        }
+      }
+
       return buffer;
     }
     else {
@@ -596,13 +745,38 @@ namespace ovEngineSDK {
     return ps;
   }
 
+ SPtr<ComputeShader>
+ DXGraphicsAPI::createComputeShader(WString file) {
+   WString realFileName = getFileName(file) + L"_DX.hlsl";
+   
+   SPtr<DXComputeShader> cs(new DXComputeShader);
+   if (FAILED(compileShaderFromFile(realFileName,
+                                    "cs_5_0",
+                                    &cs->m_blob))) {
+      return nullptr;
+   }
+
+   //Create compute shader from compilation and check errors
+   if (FAILED(m_device->CreateComputeShader(
+              cs->m_blob->GetBufferPointer(),
+              cs->m_blob->GetBufferSize(),
+              nullptr,
+              &cs->m_cs))) {
+      return nullptr;
+   }
+   return cs;
+ }
+
   SPtr<RasterizerState>
   DXGraphicsAPI::createRasterizerState(FILL_MODE::E fillMode,
                                       CULL_MODE::E cullMode,
-                                      bool counterClockWise) {
+                                      bool counterClockWise,
+                                      bool scissorEnable) {
     D3D11_RASTERIZER_DESC desc;
     ZeroMemory(&desc, sizeof(desc));
     desc.FrontCounterClockwise = counterClockWise;
+    desc.DepthClipEnable = true;
+    desc.ScissorEnable = scissorEnable;
     switch (fillMode) {
     case FILL_MODE::kWIREFRAME:
       desc.FillMode = D3D11_FILL_WIREFRAME;
@@ -633,7 +807,9 @@ namespace ovEngineSDK {
   }
 
   SPtr<DepthStencilState>
-  DXGraphicsAPI::createDepthStencilState(bool stencilEnable, bool depthEnable) {
+  DXGraphicsAPI::createDepthStencilState(bool stencilEnable,
+                                         bool depthEnable,
+                                         COMPARISON::E compMode) {
     D3D11_DEPTH_STENCIL_DESC desc;
     ZeroMemory(&desc, sizeof(desc));
 
@@ -641,7 +817,7 @@ namespace ovEngineSDK {
     desc.DepthEnable = depthEnable;
 
     desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-    desc.DepthFunc = D3D11_COMPARISON_LESS;
+    desc.DepthFunc = static_cast<D3D11_COMPARISON_FUNC>(compMode);
 
     desc.StencilReadMask = 0xFF;
     desc.StencilWriteMask = 0xFF;
@@ -681,6 +857,35 @@ namespace ovEngineSDK {
     return OrthoMatrix(Left, Right, Top, Bottom, Near, Far, true);
   }
 
+  SPtr<BlendState>
+  DXGraphicsAPI::createBlendState(bool enable,
+                                  BLEND_TYPE::E src,
+                                  BLEND_TYPE::E dest,
+                                  BLEND_OP::E operation,
+                                  BLEND_TYPE::E alphaSrc,
+                                  BLEND_TYPE::E alphaDest,
+                                  BLEND_OP::E alphaOp,
+                                  Vector4 blendFactor) {
+      D3D11_BLEND_DESC desc;
+      ZeroMemory(&desc, sizeof(desc));
+      desc.AlphaToCoverageEnable = false;
+      desc.RenderTarget[0].BlendEnable = enable;
+      desc.RenderTarget[0].SrcBlend = static_cast<D3D11_BLEND>(src);
+      desc.RenderTarget[0].DestBlend = static_cast<D3D11_BLEND>(dest);
+      desc.RenderTarget[0].BlendOp = static_cast<D3D11_BLEND_OP>(operation);
+      desc.RenderTarget[0].SrcBlendAlpha = static_cast<D3D11_BLEND>(alphaSrc);
+      desc.RenderTarget[0].DestBlendAlpha = static_cast<D3D11_BLEND>(alphaDest);
+      desc.RenderTarget[0].BlendOpAlpha = static_cast<D3D11_BLEND_OP>(alphaOp);
+      desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+      SPtr<DXBlendState> bState(new DXBlendState);
+      bState->m_blendFactor = blendFactor;
+      if (FAILED(m_device->CreateBlendState(&desc, &bState->m_bs))) {
+        return nullptr;
+      }
+      return bState;
+  }
+
   void
   DXGraphicsAPI::setBackBuffer() {
     m_deviceContext->OMSetRenderTargets(1,
@@ -709,17 +914,37 @@ namespace ovEngineSDK {
   DXGraphicsAPI::setShaders(SPtr<ShaderProgram> program) {
     auto VS = static_pointer_cast<DXVertexShader>(program->getVertexShader());
     auto PS = static_pointer_cast<DXPixelShader>(program->getPixelShader());
+    auto CS = static_pointer_cast<DXComputeShader>(program->getComputeShader());
 
-    m_deviceContext->VSSetShader(VS->m_vs, 0, 0);
-    m_deviceContext->PSSetShader(PS->m_ps, 0, 0);
+    if (VS) {
+      m_deviceContext->VSSetShader(VS->m_vs, 0, 0);
+    }
+    if (PS) {
+      m_deviceContext->PSSetShader(PS->m_ps, 0, 0);
+    }
+    if (CS) {
+      m_deviceContext->CSSetShader(CS->m_cs, 0, 0);
+    }   
   }
 
-  void DXGraphicsAPI::drawIndexed(uint32 indices) {
+  void
+  DXGraphicsAPI::drawIndexed(uint32 indices) {
     m_deviceContext->DrawIndexed(indices, 0, 0);
   }
 
-  void DXGraphicsAPI::draw(uint32 count, uint32 first) {
+  void
+  DXGraphicsAPI::draw(uint32 count, uint32 first) {
     m_deviceContext->Draw(count, first);
+  }
+
+  void
+  DXGraphicsAPI::drawIndexedInstanced(uint32 indices, uint32 instances) {
+    m_deviceContext->DrawIndexedInstanced(indices, instances, 0, 0, 0);
+  }
+
+  void
+  DXGraphicsAPI::drawInstanced(uint32 count, uint32 instances, uint32 first) {
+    m_deviceContext->DrawInstanced(count, instances, first, 0);
   }
 
   void DXGraphicsAPI::clearBackBuffer(Color clearColor) {
@@ -755,33 +980,35 @@ namespace ovEngineSDK {
   DXGraphicsAPI::setRenderTarget(int32 amount,
                                  Vector<SPtr<Texture>> textures,
                                  SPtr<Texture> depth) {
-    if (!textures.empty()) {
-      ID3D11RenderTargetView* arrRTV[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+    ID3D11RenderTargetView* arrRTV[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+    ID3D11DepthStencilView* pDSV = nullptr;
+    for (int32 i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i) {
+      arrRTV[i] = nullptr;
+    }
 
-      for (int32 i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i) {
-        arrRTV[i] = nullptr;
-      }
-
-      for (int32 i = 0; i < amount; i++) {
-        arrRTV[i] = static_pointer_cast<DXTexture>(textures[i])->m_rtv;
-      }
-
-      if (depth) {
-        auto dsv = static_pointer_cast<DXTexture>(depth)->m_dsv;
-        if (dsv) {
-          m_deviceContext->OMSetRenderTargets(amount, arrRTV, dsv);
-        }
-        else {
-          OutputDebugStringA("Invalid DepthStencilView.\n");
+    if (depth) {
+      auto dsv = static_pointer_cast<DXTexture>(depth);
+      if (dsv) {
+        if (dsv->m_dsv) {
+          pDSV = dsv->m_dsv;
         }
       }
       else {
-        m_deviceContext->OMSetRenderTargets(amount, arrRTV, nullptr);
+        OutputDebugStringA("Invalid DepthStencilView received.\n");
       }
     }
-    else {
-      OutputDebugStringA("Received nullptr pointer for texture.\n");
+
+    if (!textures.empty()) {
+      for (int32 i = 0; i < amount; i++) {
+        auto temp = static_pointer_cast<DXTexture>(textures[i]);
+        if (temp) {
+          if (temp->m_rtv) {
+            arrRTV[i] = temp->m_rtv;
+          }
+        }
+      }
     }
+    m_deviceContext->OMSetRenderTargets(amount, arrRTV, pDSV);
   }
 
   void
@@ -844,7 +1071,8 @@ namespace ovEngineSDK {
   void
   DXGraphicsAPI::setSamplerState(uint32 slot,
                                  SPtr<Texture> texture,
-                                 SPtr<SamplerState> sampler) {
+                                 SPtr<SamplerState> sampler,
+                                 SHADER_TYPE::E shaderType) {
     if (!sampler) {
       OutputDebugStringA("Invalid sampler received.\n");
       return;
@@ -854,7 +1082,19 @@ namespace ovEngineSDK {
       OutputDebugStringA("Sampler missing initialization.\n");
       return;
     }
-    m_deviceContext->PSSetSamplers(slot, 1, &samp->m_sampler);
+    switch (shaderType)
+    {
+    case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
+      m_deviceContext->VSSetSamplers(slot, 1, &samp->m_sampler);
+      break;
+    case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
+      m_deviceContext->PSSetSamplers(slot, 1, &samp->m_sampler);
+      break;
+    case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+      m_deviceContext->CSSetSamplers(slot, 1, &samp->m_sampler);
+      break;
+    }
+   
   }
 
   void
@@ -864,11 +1104,16 @@ namespace ovEngineSDK {
     if (buffer) {
       auto buff = static_pointer_cast<DXBuffer>(buffer);
       if (buff) {
-        if (shaderType == SHADER_TYPE::VERTEX_SHADER) {
+        switch (shaderType) {
+        case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
           m_deviceContext->VSSetConstantBuffers(slot, 1, &buff->m_buffer);
-        }
-        else {
+          break;
+        case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
           m_deviceContext->PSSetConstantBuffers(slot, 1, &buff->m_buffer);
+          break;
+        case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+          m_deviceContext->CSSetConstantBuffers(slot, 1, &buff->m_buffer);
+          break;
         }
       }
       else {
@@ -971,6 +1216,177 @@ namespace ovEngineSDK {
   DXGraphicsAPI::setDepthStencilState(SPtr<DepthStencilState> depthState) {
     auto depth = static_pointer_cast<DXDepthStencilState>(depthState);
     m_deviceContext->OMSetDepthStencilState(depth->m_depthState, 0);
+  }
+
+  void
+  DXGraphicsAPI::dispatch(uint32 threadX, uint32 threadY, uint32 threadZ) {
+    m_deviceContext->Dispatch(threadX, threadY, threadZ);
+  }
+
+  void
+  DXGraphicsAPI::setBufferShaderResource(uint32 slot,
+                                   SPtr<Buffer> buffer,
+                                   SHADER_TYPE::E shader) {
+    auto buff = static_pointer_cast<DXBuffer>(buffer);
+    if (!buff) {
+      ID3D11ShaderResourceView* temp = nullptr;
+      switch (shader)
+      {
+      case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
+        m_deviceContext->VSSetShaderResources(slot, 1, &temp);
+        break;
+      case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
+        m_deviceContext->PSSetShaderResources(slot, 1, &temp);
+        break;
+      case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+        m_deviceContext->CSSetShaderResources(slot, 1, &temp);
+        break;
+      }
+      return;
+    }
+    if (!buff->m_buffer || !buff->m_srv) {
+      OutputDebugStringA("Uninitialized buffer received.\n");
+      return;
+    }
+    switch (shader)
+    {
+    case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
+      m_deviceContext->VSSetShaderResources(slot, 1, &buff->m_srv);
+      break;
+    case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
+      m_deviceContext->PSSetShaderResources(slot, 1, &buff->m_srv);
+      break;
+    case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+      m_deviceContext->CSSetShaderResources(slot, 1, &buff->m_srv);
+      break;
+    }
+  }
+
+  void
+  DXGraphicsAPI::setTextureShaderResource(uint32 slot,
+                                   SPtr<Texture> texture,
+                                   SHADER_TYPE::E shader) {
+    auto tex = static_pointer_cast<DXTexture>(texture);
+    if (!tex) {
+      ID3D11ShaderResourceView* temp = nullptr;
+      switch (shader)
+      {
+      case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
+        m_deviceContext->VSSetShaderResources(slot, 1, &temp);
+        break;
+      case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
+        m_deviceContext->PSSetShaderResources(slot, 1, &temp);
+        break;
+      case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+        m_deviceContext->CSSetShaderResources(slot, 1, &temp);
+        break;
+      }
+      return;
+    }
+    if (!tex->m_texture || !tex->m_srv) {
+      OutputDebugStringA("Uninitialized texture received.\n");
+      return;
+    }
+    switch (shader)
+    {
+    case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
+      m_deviceContext->VSSetShaderResources(slot, 1, &tex->m_srv);
+      break;
+    case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
+      m_deviceContext->PSSetShaderResources(slot, 1, &tex->m_srv);
+      break;
+    case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+      m_deviceContext->CSSetShaderResources(slot, 1, &tex->m_srv);
+      break;
+    }
+  }
+
+  void
+  DXGraphicsAPI::setBufferUnorderedAccess(uint32 slot, SPtr<Buffer> buffer) {
+    auto buff = static_pointer_cast<DXBuffer>(buffer);
+    if (!buff) {
+      ID3D11UnorderedAccessView* temp = nullptr;
+      m_deviceContext->CSSetUnorderedAccessViews(slot, 1, &temp, 0);
+      return;
+    }
+    if (!buff->m_buffer || !buff->m_uav) {
+      OutputDebugStringA("Uninitialized buffer received.\n");
+      return;
+    }
+    m_deviceContext->CSSetUnorderedAccessViews(slot, 1, &buff->m_uav, 0);
+  }
+
+  void
+  DXGraphicsAPI::setTextureUnorderedAccess(uint32 slot, SPtr<Texture> texture) {
+    auto tex = static_pointer_cast<DXTexture>(texture);
+    if (!tex) {
+      ID3D11UnorderedAccessView* temp = nullptr;
+      m_deviceContext->CSSetUnorderedAccessViews(slot, 1, &temp, 0);
+      return;
+    }
+    if (!tex->m_texture || !tex->m_uav) {
+      OutputDebugStringA("Uninitialized texture received.\n");
+      return;
+    }
+    m_deviceContext->CSSetUnorderedAccessViews(slot, 1, &tex->m_uav, 0);
+  }
+
+  void
+  DXGraphicsAPI::getRaterizerState(SPtr<RasterizerState>& pRS) {
+    pRS.reset(new DXRasterizerState);
+    m_deviceContext->RSGetState(&static_pointer_cast<DXRasterizerState>(pRS)->m_rState);
+  }
+
+  void
+  DXGraphicsAPI::getBlendState(SPtr<BlendState>& pBS) {
+    pBS.reset(new DXBlendState);
+    auto temp = static_pointer_cast<DXBlendState>(pBS);
+    float bf[4];
+    uint32 mask;
+    m_deviceContext->OMGetBlendState(&temp->m_bs,
+                                     bf,
+                                     &mask);
+    temp->m_blendFactor.x = bf[0];
+    temp->m_blendFactor.y = bf[1];
+    temp->m_blendFactor.z = bf[2];
+    temp->m_blendFactor.w = bf[3];
+  }
+
+  void
+  DXGraphicsAPI::getDepthStencilState(SPtr<DepthStencilState>& pDSS) {
+    
+  }
+
+  void
+  DXGraphicsAPI::getTexture(SPtr<Texture>& pTex, SHADER_TYPE::E shaderType) {
+    
+  }
+
+  void
+  DXGraphicsAPI::getSampler(SPtr<SamplerState>& pSamp, SHADER_TYPE::E shaderType) {
+    
+  }
+
+  void
+  DXGraphicsAPI::getShaderProgram(SPtr<ShaderProgram>& pProgram) {
+    
+  }
+
+  void
+  DXGraphicsAPI::getConstantBuffer(SPtr<Buffer>& pBuffer,
+                                   uint32 slot,
+                                   SHADER_TYPE::E shaderType) {
+    
+  }
+
+  void
+  DXGraphicsAPI::getBuffer(SPtr<Buffer>& pBuffer, BUFFER_TYPE::E bufferType) {
+    
+  }
+
+  void
+  DXGraphicsAPI::getInputLayout(SPtr<InputLayout>& pILayout) {
+    
   }
 
   void DXGraphicsAPI::swapBuffer() {

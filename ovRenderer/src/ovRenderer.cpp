@@ -44,9 +44,9 @@ namespace ovEngineSDK {
     //GBuffer
     m_gBufferRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
                                                    CULL_MODE::kFRONT,
-                                                    true);
+                                                    true, false);
     
-    m_gBufferDS = graphicAPI.createDepthStencilState(true, true);
+    m_gBufferDS = graphicAPI.createDepthStencilState(true, true, COMPARISON::LESS);
 
     m_linearSampler = graphicAPI.createSamplerState(FILTER_LEVEL::FILTER_LINEAR,
                                                     FILTER_LEVEL::FILTER_LINEAR,
@@ -56,7 +56,8 @@ namespace ovEngineSDK {
                                                     COMPARISON::NEVER);
 
     m_gBufferProgram = graphicAPI.createShaderProgram();
-    m_gBufferProgram->setVertexShader(graphicAPI.createVertexShader(L"resources/shaders/VertexGBuffer"));
+    m_gBufferProgram->setVertexShader(graphicAPI.createVertexShader(
+                                      L"resources/shaders/VertexGBuffer"));
     m_gBufferProgram->setPixelShader(graphicAPI.createPixelShader(
                                      L"resources/shaders/PixelGBuffer"));
     m_gBufferProgram->linkProgram();
@@ -97,8 +98,6 @@ namespace ovEngineSDK {
     m_gBufferConstant = graphicAPI.createBuffer(nullptr,
                                                 sizeof(Matrices),
                                                 BUFFER_TYPE::kCONST_BUFFER);
-    
-    //viewInverse = graphicAPI.matrix4Policy(mat.view.inverse());
 
     m_viewInverseBufferConstant = graphicAPI.createBuffer(nullptr,
                                                           sizeof(Matrix4),
@@ -107,17 +106,17 @@ namespace ovEngineSDK {
 
     //SSAO
     m_ssaoProgram = graphicAPI.createShaderProgram();
-    m_ssaoProgram->setVertexShader(graphicAPI.createVertexShader(
-                                   L"resources/shaders/VS_SSAO"));
-    m_ssaoProgram->setPixelShader(graphicAPI.createPixelShader(
-                                  L"resources/shaders/PS_SSAO"));
+    m_ssaoProgram->setComputeShader(graphicAPI.createComputeShader(
+                                    L"resources/shaders/CS_SSAO"));
     m_ssaoProgram->linkProgram();
 
-    m_ssaoTextures.push_back(graphicAPI.createTexture(800,
-                                                      600,
-                                                      TEXTURE_BINDINGS::E::RENDER_TARGET |
-                                                        TEXTURE_BINDINGS::E::SHADER_RESOURCE,
-                                                      FORMATS::kRGBA16_FLOAT));
+    m_ssaoTextures.push_back(graphicAPI.createTexture(
+                             800,
+                             600,
+                             TEXTURE_BINDINGS::E::RENDER_TARGET |
+                             TEXTURE_BINDINGS::E::SHADER_RESOURCE |
+                             TEXTURE_BINDINGS::E::UNORDERED_ACCESS,
+                             FORMATS::kRGBA16_FLOAT));
     SSAO ssaobuffer;
     ssaobuffer.intensity = 2.f;
     ssaobuffer.scale = .8f;
@@ -170,7 +169,7 @@ namespace ovEngineSDK {
                                                  TEXTURE_BINDINGS::E::RENDER_TARGET,
                                                  FORMATS::kR16_FLOAT);
     m_shadowRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
-                                                  CULL_MODE::kBACK, false);
+                                                  CULL_MODE::kBACK, false, false);
     m_comparisonSampler = graphicAPI.createSamplerState(FILTER_LEVEL::FILTER_POINT,
                                                         FILTER_LEVEL::FILTER_POINT,
                                                         FILTER_LEVEL::FILTER_POINT,
@@ -207,15 +206,15 @@ namespace ovEngineSDK {
     //Screen Aligned Quad
     m_screenQuadRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
                                                       CULL_MODE::kNONE,
-                                                      true);
+                                                      true, false);
 
     
-    m_screenQuadDS = graphicAPI.createDepthStencilState(false, false);
+    m_screenQuadDS = graphicAPI.createDepthStencilState(false, false, COMPARISON::LESS);
 
     m_screenQuad = make_shared<Model>();
     m_screenQuad->load("resources/models/ScreenAlignedQuad.3ds");
 
-    m_screenQuadLayout = graphicAPI.createInputLayout(m_ssaoProgram, lDesc);
+    m_screenQuadLayout = graphicAPI.createInputLayout(m_lightProgram, lDesc);
   }
 
   void
@@ -286,32 +285,42 @@ namespace ovEngineSDK {
       graphicAPI.setTexture(i, nullptr);
     }
 
-    //SSAO
+    Vector<SPtr<Texture>> emptyTex;
+    graphicAPI.setRenderTarget(4, emptyTex, nullptr);
 
-    graphicAPI.setRenderTarget(1, m_ssaoTextures, nullptr);
+    //SSAO
+    graphicAPI.setTextureUnorderedAccess(0, m_ssaoTextures[0]);
 
     for (auto& target : m_ssaoTextures) {
       graphicAPI.clearRenderTarget(target, clearColor);
     }
 
-    graphicAPI.setInputLayout(m_screenQuadLayout);
-    graphicAPI.setShaders(m_ssaoProgram);
-    graphicAPI.setRasterizerState(m_screenQuadRS);
-    graphicAPI.setDepthStencilState(m_screenQuadDS);
+    graphicAPI.setShaders(m_ssaoProgram);    
 
-    graphicAPI.setConstantBuffer(0, m_ssaoBufferConstant, SHADER_TYPE::VERTEX_SHADER);
-    graphicAPI.setConstantBuffer(0, m_ssaoBufferConstant, SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.setConstantBuffer(0, m_ssaoBufferConstant, SHADER_TYPE::COMPUTE_SHADER);
 
-    graphicAPI.setTexture(0, m_gBufferTextures[0]);
-    graphicAPI.setTexture(1, m_gBufferTextures[1]);
-    graphicAPI.setSamplerState(0, m_gBufferTextures[0], m_linearSampler);
-    graphicAPI.setSamplerState(0, m_gBufferTextures[1], m_linearSampler);
+    graphicAPI.setTextureShaderResource(0,
+                                        m_gBufferTextures[0],
+                                        SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setTextureShaderResource(1,
+                                        m_gBufferTextures[1],
+                                        SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setSamplerState(0,
+                               m_gBufferTextures[0],
+                               m_linearSampler,
+                               SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setSamplerState(0,
+                               m_gBufferTextures[1],
+                               m_linearSampler,
+                               SHADER_TYPE::COMPUTE_SHADER);
 
-    m_screenQuad->render();
+    graphicAPI.dispatch(Math::ceil(800 / 32), Math::ceil(600 / 32), 1);
 
     for (int32 i = 0; i < 2; ++i) {
-      graphicAPI.setTexture(i, nullptr);
+      graphicAPI.setTextureShaderResource(i, nullptr, SHADER_TYPE::COMPUTE_SHADER);
     }
+
+    graphicAPI.setTextureUnorderedAccess(0, nullptr);
 
     //BlurH - SSAO
     graphicAPI.setRenderTarget(1, m_tempBlurTextures, nullptr);
@@ -321,7 +330,9 @@ namespace ovEngineSDK {
     }
 
     graphicAPI.setShaders(m_blurHProgram);    
-
+    graphicAPI.setRasterizerState(m_screenQuadRS);
+    graphicAPI.setDepthStencilState(m_screenQuadDS);
+    graphicAPI.setInputLayout(m_screenQuadLayout);
     Dimension dim;
     Vector2 tempVec = graphicAPI.getViewportDimensions();
     dim.viewportDim.x = tempVec.x;
@@ -333,7 +344,10 @@ namespace ovEngineSDK {
     graphicAPI.setConstantBuffer(0, m_blurBufferConstant, SHADER_TYPE::PIXEL_SHADER);
 
     graphicAPI.setTexture(0, m_ssaoTextures[0]);
-    graphicAPI.setSamplerState(0, m_ssaoTextures[0], m_linearSampler);
+    graphicAPI.setSamplerState(0,
+                               m_ssaoTextures[0],
+                               m_linearSampler,
+                               SHADER_TYPE::PIXEL_SHADER);
 
     m_screenQuad->render();
 
@@ -349,7 +363,10 @@ namespace ovEngineSDK {
     graphicAPI.setShaders(m_blurVProgram);
 
     graphicAPI.setTexture(0, m_tempBlurTextures[0]);
-    graphicAPI.setSamplerState(0, m_tempBlurTextures[0], m_linearSampler);
+    graphicAPI.setSamplerState(0,
+                               m_tempBlurTextures[0],
+                               m_linearSampler,
+                               SHADER_TYPE::PIXEL_SHADER);
 
     m_screenQuad->render();
     
@@ -379,11 +396,26 @@ namespace ovEngineSDK {
     graphicAPI.setTexture(3, m_ssaoTextures[0]);
     graphicAPI.setTexture(4, m_shadowTextures[0]);
 
-    graphicAPI.setSamplerState(0, m_gBufferTextures[0], m_linearSampler);
-    graphicAPI.setSamplerState(0, m_gBufferTextures[1], m_linearSampler);
-    graphicAPI.setSamplerState(0, m_gBufferTextures[2], m_linearSampler);
-    graphicAPI.setSamplerState(0, m_ssaoTextures[0], m_linearSampler);
-    graphicAPI.setSamplerState(1, m_shadowTextures[0], m_comparisonSampler);
+    graphicAPI.setSamplerState(0,
+                               m_gBufferTextures[0],
+                               m_linearSampler,
+                               SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.setSamplerState(0,
+                               m_gBufferTextures[1],
+                               m_linearSampler,
+                               SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.setSamplerState(0,
+                               m_gBufferTextures[2],
+                               m_linearSampler,
+                               SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.setSamplerState(0,
+                               m_ssaoTextures[0],
+                               m_linearSampler,
+                               SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.setSamplerState(1,
+                               m_shadowTextures[0],
+                               m_comparisonSampler,
+                               SHADER_TYPE::PIXEL_SHADER);
 
     graphicAPI.setConstantBuffer(0, m_lightBufferConstant, SHADER_TYPE::VERTEX_SHADER);
     graphicAPI.setConstantBuffer(0, m_lightBufferConstant, SHADER_TYPE::PIXEL_SHADER);

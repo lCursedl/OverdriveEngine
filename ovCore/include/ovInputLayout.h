@@ -15,7 +15,8 @@ namespace ovEngineSDK {
       kBINORMAL,
       kTANGENT,
       kBLENDINDICES,
-      kBLENDWEIGHT
+      kBLENDWEIGHT,
+      kCOLOR
     };
   }
   /** 

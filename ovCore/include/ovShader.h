@@ -8,7 +8,8 @@ namespace ovEngineSDK {
   namespace SHADER_TYPE {
     enum E {
       VERTEX_SHADER = 0,
-      PIXEL_SHADER
+      PIXEL_SHADER,
+      COMPUTE_SHADER
     };
   }
 
@@ -36,5 +37,12 @@ namespace ovEngineSDK {
   public:
     PixelShader() = default;
     virtual ~PixelShader() = default;
+  };
+
+  class ComputeShader
+  {
+   public:
+    ComputeShader() = default;
+    virtual ~ComputeShader() = default;
   };
 }

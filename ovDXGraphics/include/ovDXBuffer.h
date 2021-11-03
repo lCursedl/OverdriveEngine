@@ -29,6 +29,8 @@ namespace ovEngineSDK {
    private:
 
     ID3D11Buffer* m_buffer;     /**< ID3D11Buffer pointer */
+    ID3D11ShaderResourceView* m_srv;
+    ID3D11UnorderedAccessView* m_uav;
 
     friend class DXGraphicsAPI;
   };

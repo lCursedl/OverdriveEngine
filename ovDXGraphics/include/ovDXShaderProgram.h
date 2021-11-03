@@ -2,6 +2,7 @@
 #include <ovShaderProgram.h>
 #include <ovDXVertexShader.h>
 #include <ovDXPixelShader.h>
+#include <ovDXComputeShader.h>
 
 namespace ovEngineSDK {
   /**
@@ -18,7 +19,7 @@ namespace ovEngineSDK {
     /** 
     * @fn        DXShaderProgram()
     * @brief     Class constructor.
-    *            Initializes m_pVertexShader & m_pPixelShader.
+    *            Initializes m_pVertexShader, m_pPixelShader & m_pComputeShader.
     */
     DXShaderProgram() = default;
 

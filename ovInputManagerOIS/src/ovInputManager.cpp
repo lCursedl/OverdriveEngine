@@ -158,6 +158,7 @@ namespace ovEngineSDK {
     m_keys.insert(std::make_pair(KEYS::kINSERT, OIS::KeyCode::KC_INSERT));
     m_keys.insert(std::make_pair(KEYS::kDELETE, OIS::KeyCode::KC_DELETE));
     m_keys.insert(std::make_pair(KEYS::kHOME, OIS::KeyCode::KC_HOME));
+    m_keys.insert(std::make_pair(KEYS::kEND, OIS::KeyCode::KC_END));
     m_keys.insert(std::make_pair(KEYS::kINSERT, OIS::KeyCode::KC_INSERT));
   }
 

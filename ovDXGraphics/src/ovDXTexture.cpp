@@ -6,20 +6,24 @@ namespace ovEngineSDK {
     m_rtv = nullptr;
     m_dsv = nullptr;
     m_srv = nullptr;
+    m_uav = nullptr;
   }
 
   DXTexture::~DXTexture() {
-    if (nullptr != m_texture) {
+    if ( m_texture) {
       m_texture->Release();
     }
-    if (nullptr != m_rtv) {
+    if (m_rtv) {
       m_rtv->Release();
     }
-    if (nullptr != m_dsv) {
+    if ( m_dsv) {
       m_dsv->Release();
     }
-    if (nullptr != m_srv) {
+    if (m_srv) {
       m_srv->Release();
+    }
+    if (m_uav) {
+      m_uav->Release();
     }
   }
 }

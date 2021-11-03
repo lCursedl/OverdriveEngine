@@ -34,6 +34,7 @@ namespace ovEngineSDK {
     ID3D11RenderTargetView* m_rtv;		/**< ID3D11RenderTargetView pointer */
     ID3D11DepthStencilView* m_dsv;		/**< ID3D11DepthStencilView pointer */
     ID3D11ShaderResourceView* m_srv;		/**< ID3D11ShaderResourceView pointer */
+    ID3D11UnorderedAccessView* m_uav;
 
     friend class DXGraphicsAPI;
   };

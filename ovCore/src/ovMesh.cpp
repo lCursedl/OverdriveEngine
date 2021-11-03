@@ -11,7 +11,7 @@ namespace ovEngineSDK {
     m_indices = index;
     m_textures = texture;
     m_numBones = 0;
-    
+    mesh;
     /*uint32 boneIndex;
     String boneName;
 
@@ -88,7 +88,9 @@ namespace ovEngineSDK {
     SIZE_T numTextures = m_textures.size();
 
     for (uint32 i = 0; i < numTextures; ++i) {
-      graphicAPI->setSamplerState(0, m_textures[i].TextureMesh, sstate);
+      graphicAPI->setSamplerState(0, m_textures[i].TextureMesh,
+                                  sstate,
+                                  SHADER_TYPE::PIXEL_SHADER);
       graphicAPI->setTexture(i, m_textures[i].TextureMesh);
     }
     

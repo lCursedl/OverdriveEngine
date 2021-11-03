@@ -12,8 +12,10 @@
 #include <ovMatrix4.h>
 #include <ovRasterizerState.h>
 #include <ovDepthStencilState.h>
+#include <ovBlendState.h>
 
 namespace ovEngineSDK {
+
   /**
   * @struct      COLOR
   *	@brief       Structure which defines a color with Red, Green, Blue and
@@ -84,12 +86,8 @@ namespace ovEngineSDK {
      }
 
      virtual Matrix4
-     createCompatibleOrtho(float Left,
-                           float Right,
-                           float Top,
-                           float Bottom,
-                           float Near,
-                           float Far) {return Matrix4();}
+     createCompatibleOrtho(float, float, float, float, float, float) {
+      return Matrix4();}
 
      /***********************************************************************************/
      /*----------------------------------DEVICE-----------------------------------------*/
@@ -124,6 +122,25 @@ namespace ovEngineSDK {
      }
 
      /**
+     * @fn       SPtr<Texture> createTextureFromMemory(int32 width, int32 height,
+                 TEXTURE_BINDINGS binding, FORMATS format, uint8* data)
+     * @brief    Creates a texture with the received parameters and data and returns it.
+     * @param[in]width Specifies texture's width.
+     * @param[in]height Specifies texture's height.
+     * @param[in]binding Specifies tpye of texture to create.
+     * @param[in]format Specifies texture's format.
+     * @param[in]data Pointer to the texture's data.
+     * @return   Texture pointer of the corresponding API.
+     */
+     virtual SPtr<Texture>
+       createTextureFromMemory(int32,
+                               int32,
+                               TEXTURE_BINDINGS::E,
+                               FORMATS::E,
+                               uint8*) {
+       return nullptr;
+     }
+     /**
      * @fn       ShaderProgram* createShaderProgram()
      * @brief    Creates a shader program and returns it.
      * @return   ShaderProgram pointer of the corresponding API.
@@ -145,7 +162,9 @@ namespace ovEngineSDK {
      virtual SPtr<Buffer>
      createBuffer(const void*,
                   SIZE_T,
-                  BUFFER_TYPE::E) {
+                  BUFFER_TYPE::E,
+                  uint32 = 0,
+                  FORMATS::E = FORMATS::kR32_FLOAT) {
       return nullptr;
      }
 
@@ -210,6 +229,17 @@ namespace ovEngineSDK {
      }
 
      /**
+     * @fn       ComputeShader* createComputeShader(WString file)
+     * @brief    Creates a commpute shader from the specified file, if available.
+     * @param[in]file Filename of the compute shader.
+     * @return   ComputeShader pointer of the corresponding API.
+     */
+     virtual SPtr<ComputeShader>
+       createComputeShader(WString) {
+       return nullptr;
+     }
+
+     /**
      * @fn       SPtr<RasterizerState> createRasterizerState(FILL_MODE::E fillmode,
                                                              CULL_MODE::E cullmode,
                                                              bool counterClockWise)
@@ -219,11 +249,13 @@ namespace ovEngineSDK {
      * @param[in]cullMode Indicates triangles facing a particular direction are not drawn
      *                    ( NONE, FRONT, BACK ).
      * @param[in]counterClockWise Determines if a triangle is front- or back-facing.
+     * @param[in]scissor Determines if scissor-rectangle culling is active.
      * @return   Rasterizer state smart pointer of the corresponding API.
      */
      virtual SPtr<RasterizerState>
      createRasterizerState(FILL_MODE::E,
                            CULL_MODE::E,
+                           bool,
                            bool) {
        return nullptr;
      }
@@ -234,17 +266,32 @@ namespace ovEngineSDK {
      * @brief    Creates a depth stencil state from the defined parameters and returns it.
      * @param[in]stencilEnable Enable depth testing.
      * @param[in]depthEnable Enable stencil testing.
+     * @param[in]compMode Function mode that compares sampled data against existing
+     *           sampled data.
      * @return   Depth stencil state smart pointer of the corresponding API.
      */
      virtual SPtr<DepthStencilState>
        createDepthStencilState(bool,
-                               bool) {
+                               bool,
+                               COMPARISON::E) {
        return nullptr;
      }
 
      virtual Vector2
      getViewportDimensions() {
        return Vector2();
+     }
+
+     virtual SPtr<BlendState>
+     createBlendState(bool,
+                      BLEND_TYPE::E,
+                      BLEND_TYPE::E,
+                      BLEND_OP::E,
+                      BLEND_TYPE::E,
+                      BLEND_TYPE::E,
+                      BLEND_OP::E,
+                      Vector4) {
+       return nullptr;
      }
 
      /***********************************************************************************/
@@ -287,6 +334,10 @@ namespace ovEngineSDK {
      *	@param[in] first Start location to read the vertices.
      */
      virtual void draw(uint32, uint32) {}
+
+     virtual void drawIndexedInstanced(uint32, uint32) {}
+
+     virtual void drawInstanced(uint32, uint32, uint32) {}
 
      /**
      * @fn       void setShaders(CShaderProgram* program)
@@ -357,7 +408,8 @@ namespace ovEngineSDK {
      */
      virtual void setSamplerState(uint32,
                                   SPtr<Texture>,
-                                  SPtr<SamplerState>) {}
+                                  SPtr<SamplerState>,
+                                  SHADER_TYPE::E) {}
 
      /**
      * @fn       void setConstantBuffer(uint32 slot, CBuffer* buffer,
@@ -399,7 +451,56 @@ namespace ovEngineSDK {
      * @brief    Sets the topology type for vertex data.
      * @param[in]topology TOPOLOGY type to set.
      */
-     virtual void setTopology(TOPOLOGY::E) {}
+     virtual
+     void setTopology(TOPOLOGY::E) {}
+
+     virtual
+     void setBufferShaderResource(uint32, SPtr<Buffer>, SHADER_TYPE::E) {}
+
+     virtual
+     void setTextureShaderResource(uint32, SPtr<Texture>, SHADER_TYPE::E) {}
+
+     virtual
+     void setBufferUnorderedAccess(uint32, SPtr<Buffer>) {}
+
+     virtual
+     void setTextureUnorderedAccess(uint32, SPtr<Texture>) {}
+
+     virtual
+     void setRasterizerState(SPtr<RasterizerState>) {}
+
+     virtual
+     void setDepthStencilState(SPtr<DepthStencilState>) {}
+
+     virtual
+     void dispatch(uint32, uint32, uint32) {}
+
+     virtual
+     void getRaterizerState(SPtr<RasterizerState>&) {}
+
+     virtual
+     void getBlendState(SPtr<BlendState>&) {}
+
+     virtual
+     void getDepthStencilState(SPtr<DepthStencilState>&) {}
+
+     virtual
+     void getTexture(SPtr<Texture>&, SHADER_TYPE::E) {}
+
+     virtual
+     void getSampler(SPtr<SamplerState>&, SHADER_TYPE::E) {}
+
+     virtual
+     void getShaderProgram(SPtr<ShaderProgram>&) {}
+
+     virtual
+     void getConstantBuffer(SPtr<Buffer>&, uint32, SHADER_TYPE::E) {}
+
+     virtual
+     void getBuffer(SPtr<Buffer>&, BUFFER_TYPE::E) {}
+
+     virtual
+     void getInputLayout(SPtr<InputLayout>&) {}
 
      //SWAPCHAIN
 
@@ -417,9 +518,7 @@ namespace ovEngineSDK {
      */
      virtual void resizeBackBuffer(uint32, uint32) {}
 
-     virtual void setRasterizerState(SPtr<RasterizerState>) {}
-
-     virtual void setDepthStencilState(SPtr<DepthStencilState>) {}
+     
   };
 
   OV_CORE_EXPORT GraphicsAPI&

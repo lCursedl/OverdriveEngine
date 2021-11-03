@@ -169,7 +169,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ovDXBlendState.cpp" />
     <ClCompile Include="src\ovDXBuffer.cpp" />
+    <ClCompile Include="src\ovDXComputeShader.cpp" />
     <ClCompile Include="src\ovDXDepthStencilState.cpp" />
     <ClCompile Include="src\ovDXGraphicsAPI.cpp" />
     <ClCompile Include="src\ovDXInputLayout.cpp" />
@@ -180,7 +182,9 @@
     <ClCompile Include="src\ovDXVertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ovDXBlendState.h" />
     <ClInclude Include="include\ovDXBuffer.h" />
+    <ClInclude Include="include\ovDXComputeShader.h" />
     <ClInclude Include="include\ovDXDepthStencilState.h" />
     <ClInclude Include="include\ovDXGraphicsAPI.h" />
     <ClInclude Include="include\ovDXInputLayout.h" />

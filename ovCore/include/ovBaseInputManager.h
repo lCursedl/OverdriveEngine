@@ -105,7 +105,8 @@ namespace ovEngineSDK {
       kPGUP,
       kINSERT,
       kDELETE,
-      kHOME
+      kHOME,
+      kEND
     };
   }
 
@@ -129,16 +130,16 @@ namespace ovEngineSDK {
     virtual ~BaseInputManager() = default;
 
     virtual void
-    init(WindowHandle wHndl) {}
+    init(WindowHandle) {}
 
     virtual void
     update() {}
 
     virtual bool
-    isKeyPressed(KEYS::E key) {return false;}
+    isKeyPressed(KEYS::E) {return false;}
 
     virtual bool
-    isMouseKeyPressed(KEYSM::E key) {return false;}
+    isMouseKeyPressed(KEYSM::E) {return false;}
 
     virtual float
     getXAxis() { return 0.f; }
@@ -147,7 +148,7 @@ namespace ovEngineSDK {
     getYAxis() { return 0.f; }
 
     virtual void
-    getMouseAxis(float& X, float& Y) {}
+    getMouseAxis(float&, float&) {}
 
     FORCEINLINE void
     setObject(BaseInputManager* _api) {

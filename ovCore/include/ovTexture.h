@@ -18,7 +18,8 @@ namespace ovEngineSDK {
     enum class E {
       SHADER_RESOURCE = 0x01,
       RENDER_TARGET = 0x02,
-      DEPTH_STENCIL = 0x04
+      DEPTH_STENCIL = 0x04,
+      UNORDERED_ACCESS = 0x08
     };
   }
 

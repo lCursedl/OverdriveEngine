@@ -13,8 +13,10 @@ namespace ovEngineSDK {
 
     bool
     init(void* window)                                                override;
+
     void
     shutdown()                                                        override;
+
     Matrix4
     matrix4Policy(const Matrix4& mat)                                 override;
 
@@ -29,13 +31,22 @@ namespace ovEngineSDK {
     SPtr<Texture>
     createTextureFromFile(String path)                                override;
 
+    SPtr<Texture>
+    createTextureFromMemory(int32 width,
+                            int32 height,
+                            TEXTURE_BINDINGS::E binding,
+                            FORMATS::E format,
+                            uint8* data)                              override;
+
     SPtr<ShaderProgram>
     createShaderProgram()                                             override;
 
     SPtr<Buffer>
     createBuffer(const void* data,
                  SIZE_T size,
-                 BUFFER_TYPE::E type)                                 override;
+                 BUFFER_TYPE::E type,
+                 uint32 elements = 0,
+                 FORMATS::E format = FORMATS::kR32_FLOAT)             override;
 
     SPtr<InputLayout>
     createInputLayout(SPtr<ShaderProgram> program,
@@ -51,14 +62,19 @@ namespace ovEngineSDK {
     createVertexShader(WString file)                                  override;
     SPtr<PixelShader>
     createPixelShader(WString file)                                   override;
+    SPtr<ComputeShader>
+    createComputeShader(WString file)                                 override;
 
     SPtr<RasterizerState>
     createRasterizerState(FILL_MODE::E fillMode,
                           CULL_MODE::E cullMode,
-                          bool counterClockWise)                      override;
+                          bool counterClockWise,
+                          bool scissorEnable)                         override;
 
     SPtr<DepthStencilState>
-    createDepthStencilState(bool stencilEnable, bool depthEnable)     override;
+    createDepthStencilState(bool stencilEnable,
+                            bool depthEnable,
+                            COMPARISON::E compMode)                   override;
 
     Vector2
     getViewportDimensions()                                           override;
@@ -70,6 +86,15 @@ namespace ovEngineSDK {
                           float Bottom,
                           float Near,
                           float Far)                                  override;
+    SPtr<BlendState>
+    createBlendState(bool enable,
+                     BLEND_TYPE::E src,
+                     BLEND_TYPE::E dest,
+                     BLEND_OP::E operation,
+                     BLEND_TYPE::E alphaSrc,
+                     BLEND_TYPE::E alphaDest,
+                     BLEND_OP::E alphaOp,
+                     Vector4 blendFactor)                             override;
 
     //DEVICE CONTEXT
 
@@ -89,6 +114,13 @@ namespace ovEngineSDK {
     void
     draw(uint32 count, uint32 first)                                  override;
     void
+    drawIndexedInstanced(uint32 indices,
+                        uint32 instances)                             override;
+    void
+    drawInstanced(uint32 count,
+                  uint32 instances,
+                  uint32 first)                                       override;
+    void
     clearBackBuffer(Color clearColor)                                 override;
     void
     setInputLayout(SPtr<InputLayout> layout)                          override;
@@ -107,25 +139,79 @@ namespace ovEngineSDK {
     void
     setSamplerState(uint32 slot,
                     SPtr<Texture> texture,
-                    SPtr<SamplerState> sampler)                       override;
+                    SPtr<SamplerState> sampler,
+                    SHADER_TYPE::E shaderType)                        override;
     void
     setConstantBuffer(uint32 slot,
                       SPtr<Buffer> buffer,
                       SHADER_TYPE::E shaderType)                      override;
     void
     clearRenderTarget(SPtr<Texture> rt, Color clearColor)             override;
+
     void
     clearDepthStencil(SPtr<Texture> ds)                               override;
+
     void
     setTexture(uint32 slot, SPtr<Texture> texture)                    override;
+
     void
     setTopology(TOPOLOGY::E topology)                                 override;
+
     void
     setRasterizerState(SPtr<RasterizerState> rasterState)             override;
+
     void
     setDepthStencilState(SPtr<DepthStencilState> depthState)          override;
-    //SWAPCHAIN
 
+    void
+    dispatch(uint32 threadX, uint32 threadY, uint32 threadZ)          override;
+
+    void
+    setBufferShaderResource(uint32 slot,
+                      SPtr<Buffer>,
+                      SHADER_TYPE::E shader)                          override;
+
+    void
+    setTextureShaderResource(uint32 slot,
+                      SPtr<Texture> texture,
+                      SHADER_TYPE::E shader)                          override;
+
+    void
+    setBufferUnorderedAccess(uint32 slot, SPtr<Buffer> buffer)              override;
+
+    void
+    setTextureUnorderedAccess(uint32 slot, SPtr<Texture> texture)            override;
+
+    void
+    getRaterizerState(SPtr<RasterizerState>& pRS)                     override;
+
+    void
+    getBlendState(SPtr<BlendState>& pBS)                              override;
+
+    void
+    getDepthStencilState(SPtr<DepthStencilState>& pDSS)               override;
+
+    void
+    getTexture(SPtr<Texture>& pTex, SHADER_TYPE::E shaderType)        override;
+
+    void
+    getSampler(SPtr<SamplerState>& pSamp, SHADER_TYPE::E shaderType)  override;
+
+    void
+    getShaderProgram(SPtr<ShaderProgram>& pProgram)                   override;
+
+    void
+    getConstantBuffer(SPtr<Buffer>& pBuffer,
+                      uint32 slot,
+                      SHADER_TYPE::E shaderType)                      override;
+
+    void
+    getBuffer(SPtr<Buffer>& pBuffer, BUFFER_TYPE::E bufferType)       override;
+
+    void
+    getInputLayout(SPtr<InputLayout>& pILayout)                       override;
+
+    //SWAPCHAIN
     void
     swapBuffer()                                                      override;
     void
