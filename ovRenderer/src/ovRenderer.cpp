@@ -132,23 +132,21 @@ namespace ovEngineSDK {
                                                    sizeof(Dimension),
                                                    BUFFER_TYPE::kCONST_BUFFER);
     m_blurHProgram = graphicAPI.createShaderProgram();
-    m_blurHProgram->setVertexShader(graphicAPI.createVertexShader(
-                                    L"resources/shaders/VS_SSAO"));
-    m_blurHProgram->setPixelShader(graphicAPI.createPixelShader(
-                                   L"resources/shaders/PS_BlurH"));
+    m_blurHProgram->setComputeShader(graphicAPI.createComputeShader(
+                                     L"resources/shaders/CS_BlurH"));
     m_blurHProgram->linkProgram();
-    m_tempBlurTextures.push_back(graphicAPI.createTexture(800,
-                                                          600,
-                                                          TEXTURE_BINDINGS::E::RENDER_TARGET |
-                                                           TEXTURE_BINDINGS::E::SHADER_RESOURCE,
-                                                          FORMATS::kRGBA16_FLOAT));
+    m_tempBlurTextures.push_back(graphicAPI.createTexture(
+                                 800,
+                                 600,
+                                 TEXTURE_BINDINGS::E::RENDER_TARGET |
+                                 TEXTURE_BINDINGS::E::SHADER_RESOURCE |
+                                 TEXTURE_BINDINGS::E::UNORDERED_ACCESS,
+                                 FORMATS::kRGBA16_FLOAT));
 
     //BlurV
     m_blurVProgram = graphicAPI.createShaderProgram();
-    m_blurVProgram->setVertexShader(graphicAPI.createVertexShader(
-                                    L"resources/shaders/VS_SSAO"));
-    m_blurVProgram->setPixelShader(graphicAPI.createPixelShader(
-                                   L"resources/shaders/PS_BlurV"));
+    m_blurVProgram->setComputeShader(graphicAPI.createComputeShader(
+                                     L"resources/shaders/CS_BlurV"));
     m_blurVProgram->linkProgram();
 
     //Light
@@ -323,16 +321,14 @@ namespace ovEngineSDK {
     graphicAPI.setTextureUnorderedAccess(0, nullptr);
 
     //BlurH - SSAO
-    graphicAPI.setRenderTarget(1, m_tempBlurTextures, nullptr);
+    graphicAPI.setTextureUnorderedAccess(0, m_tempBlurTextures[0]);
 
     for (auto& target : m_tempBlurTextures) {
       graphicAPI.clearRenderTarget(target, clearColor);
     }
 
     graphicAPI.setShaders(m_blurHProgram);    
-    graphicAPI.setRasterizerState(m_screenQuadRS);
-    graphicAPI.setDepthStencilState(m_screenQuadDS);
-    graphicAPI.setInputLayout(m_screenQuadLayout);
+    
     Dimension dim;
     Vector2 tempVec = graphicAPI.getViewportDimensions();
     dim.viewportDim.x = tempVec.x;
@@ -340,21 +336,21 @@ namespace ovEngineSDK {
 
     graphicAPI.updateBuffer(m_blurBufferConstant, &dim);
 
-    graphicAPI.setConstantBuffer(0, m_blurBufferConstant, SHADER_TYPE::VERTEX_SHADER);
-    graphicAPI.setConstantBuffer(0, m_blurBufferConstant, SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.setConstantBuffer(0, m_blurBufferConstant, SHADER_TYPE::COMPUTE_SHADER);
 
-    graphicAPI.setTexture(0, m_ssaoTextures[0]);
+    graphicAPI.setTextureShaderResource(0, m_ssaoTextures[0], SHADER_TYPE::COMPUTE_SHADER);
     graphicAPI.setSamplerState(0,
                                m_ssaoTextures[0],
                                m_linearSampler,
-                               SHADER_TYPE::PIXEL_SHADER);
+                               SHADER_TYPE::COMPUTE_SHADER);
 
-    m_screenQuad->render();
+    graphicAPI.dispatch(Math::ceil(800 / 32), Math::ceil(600 / 32), 1);
 
-    graphicAPI.setTexture(0, nullptr);
+    graphicAPI.setTextureShaderResource(0, nullptr, SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setTextureUnorderedAccess(0, nullptr);
 
     //BLURV - SSAO
-    graphicAPI.setRenderTarget(1, m_ssaoTextures, nullptr);
+    graphicAPI.setTextureUnorderedAccess(0, m_ssaoTextures[0]);
 
     for (auto& target : m_ssaoTextures) {
       graphicAPI.clearRenderTarget(target, clearColor);
@@ -362,15 +358,16 @@ namespace ovEngineSDK {
 
     graphicAPI.setShaders(m_blurVProgram);
 
-    graphicAPI.setTexture(0, m_tempBlurTextures[0]);
+    graphicAPI.setTextureShaderResource(0, m_tempBlurTextures[0], SHADER_TYPE::COMPUTE_SHADER);
     graphicAPI.setSamplerState(0,
                                m_tempBlurTextures[0],
                                m_linearSampler,
-                               SHADER_TYPE::PIXEL_SHADER);
+                               SHADER_TYPE::COMPUTE_SHADER);
 
-    m_screenQuad->render();
+    graphicAPI.dispatch(Math::ceil(800 / 32), Math::ceil(600 / 32), 1);
     
-    graphicAPI.setTexture(0, nullptr);
+    graphicAPI.setTextureShaderResource(0, nullptr, SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setTextureUnorderedAccess(0, nullptr);
 
     //SHADOW MAP
     graphicAPI.setRenderTarget(1, m_shadowTextures, nullptr);
@@ -388,7 +385,9 @@ namespace ovEngineSDK {
     graphicAPI.setBackBuffer();
     graphicAPI.clearBackBuffer(clearColor);
 
-    graphicAPI.setRasterizerState(m_gBufferRS);
+    graphicAPI.setRasterizerState(m_screenQuadRS);
+    graphicAPI.setDepthStencilState(m_screenQuadDS);
+    graphicAPI.setInputLayout(m_screenQuadLayout);
     graphicAPI.setShaders(m_lightProgram);
     graphicAPI.setTexture(0, m_gBufferTextures[0]);
     graphicAPI.setTexture(1, m_gBufferTextures[1]);
