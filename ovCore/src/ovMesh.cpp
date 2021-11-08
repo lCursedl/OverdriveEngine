@@ -83,7 +83,7 @@ namespace ovEngineSDK {
     auto graphicAPI = &g_graphicsAPI();
 
     graphicAPI->setVertexBuffer(m_vertexBuffer, static_cast<int32>(sizeof(MeshVertex)), 0);
-    graphicAPI->setIndexBuffer(m_indexBuffer);
+    graphicAPI->setIndexBuffer(m_indexBuffer, FORMATS::kR32_UINT);
 
     SIZE_T numTextures = m_textures.size();
 
@@ -94,7 +94,7 @@ namespace ovEngineSDK {
       graphicAPI->setTexture(i, m_textures[i].TextureMesh);
     }
     
-    graphicAPI->drawIndexed(static_cast<int32>(m_indices->size()));
+    graphicAPI->drawIndexed(static_cast<int32>(m_indices->size()), 0, 0);
 
     for (uint32 i = 0; i < numTextures; ++i) {
       graphicAPI->setTexture(i, nullptr);

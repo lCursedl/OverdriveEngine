@@ -533,6 +533,7 @@ namespace ovEngineSDK {
     uint32 tangentindex = 0;
     uint32 blendindex = 0;
     uint32 weightindex = 0;
+    uint32 colorIndex = 0;
 
     D3D11_INPUT_ELEMENT_DESC D;
 
@@ -542,35 +543,42 @@ namespace ovEngineSDK {
       case SEMANTIC::kPOSITION:
         D.SemanticName = "POSITION";
         D.SemanticIndex = positionindex;
-        positionindex++;
+        ++positionindex;
         break;
       case SEMANTIC::kTEXCOORD:
         D.SemanticName = "TEXCOORD";
         D.SemanticIndex = texcoordindex;
-        texcoordindex++;
+        ++texcoordindex;
         break;
       case SEMANTIC::kNORMAL:
         D.SemanticName = "NORMAL";
         D.SemanticIndex = normalindex;
-        normalindex++;
+        ++normalindex;
         break;
       case SEMANTIC::kBINORMAL:
         D.SemanticName = "BINORMAL";
         D.SemanticIndex = binormalindex;
-        binormalindex++;
+        ++binormalindex;
         break;
       case SEMANTIC::kTANGENT:
         D.SemanticName = "TANGENT";
         D.SemanticIndex = tangentindex;
-        tangentindex++;
+        ++tangentindex;
         break;
       case SEMANTIC::kBLENDINDICES:
         D.SemanticName = "BLENDINDICES";
         D.SemanticIndex = blendindex;
+        ++blendindex;
         break;
       case SEMANTIC::kBLENDWEIGHT:
         D.SemanticName = "BLENDWEIGHT";
         D.SemanticIndex = weightindex;
+        ++weightindex;
+        break;
+      case SEMANTIC::kCOLOR:
+        D.SemanticName = "COLOR";
+        D.SemanticIndex = colorIndex;
+        ++colorIndex;
         break;
       }
       //FORMAT
@@ -601,6 +609,7 @@ namespace ovEngineSDK {
   DXGraphicsAPI::createSamplerState(FILTER_LEVEL::E mag,
                                     FILTER_LEVEL::E min,
                                     FILTER_LEVEL::E mip,
+                                    bool filterCompare,
                                     uint32 anisotropic,
                                     WRAPPING::E wrapMode,
                                     COMPARISON::E compMode) {
@@ -637,59 +646,59 @@ namespace ovEngineSDK {
       break;
     }
     desc.MinLOD = 0;
-    desc.MaxLOD = D3D11_FLOAT32_MAX;
+    desc.MaxLOD = 0;
 
     desc.MaxAnisotropy = std::clamp<int32>(anisotropic, 0, D3D11_MAX_MAXANISOTROPY);
 
     if (mag == FILTER_LEVEL::FILTER_POINT) {
       if (min == FILTER_LEVEL::FILTER_POINT) {
         if (mip == FILTER_LEVEL::FILTER_POINT) {
-          desc.Filter = compMode == COMPARISON::NEVER ?
-                        D3D11_FILTER_MIN_MAG_MIP_POINT : 
-                        D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+          desc.Filter = filterCompare ?
+                        D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT :
+                        D3D11_FILTER_MIN_MAG_MIP_POINT;
         }
         else {
-          desc.Filter = compMode == COMPARISON::NEVER ?
-                        D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR :
-                        D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
+          desc.Filter = filterCompare ?
+                        D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR :
+                        D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
         }
       }
       else {
         if (mip == FILTER_LEVEL::FILTER_POINT) {
-          desc.Filter = compMode == COMPARISON::NEVER ?
-                        D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT :
-                        D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
+          desc.Filter = filterCompare ?
+                        D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT :
+                        D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
         }
         else {
-          desc.Filter = compMode == COMPARISON::NEVER ?
-                        D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR :
-                        D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+          desc.Filter = filterCompare ?
+                        D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR :
+                        D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
         }
       }
     }
     else {
       if (min == FILTER_LEVEL::FILTER_POINT) {
         if (mip == FILTER_LEVEL::FILTER_POINT) {
-          desc.Filter = compMode == COMPARISON::NEVER ?
-                        D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :
-                        D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT;
+          desc.Filter = filterCompare ?
+                        D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT :
+                        D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
         }
         else {
-          desc.Filter = compMode == COMPARISON::NEVER ?
-                        D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR :
-                        D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
+          desc.Filter = filterCompare ?
+                        D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR :
+                        D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
         }
       }
       else {
         if (mip == FILTER_LEVEL::FILTER_POINT) {
-          desc.Filter = compMode == COMPARISON::NEVER ?
-                        D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :
-                        D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+          desc.Filter = filterCompare ?
+                        D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT :
+                        D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
         }
         else {
-          desc.Filter = compMode == COMPARISON::NEVER ?
-                        D3D11_FILTER_MIN_MAG_MIP_LINEAR :
-                        D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+          desc.Filter = filterCompare ?
+                        D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR :
+                        D3D11_FILTER_MIN_MAG_MIP_LINEAR ;
         }
       }
     }
@@ -928,8 +937,10 @@ namespace ovEngineSDK {
   }
 
   void
-  DXGraphicsAPI::drawIndexed(uint32 indices) {
-    m_deviceContext->DrawIndexed(indices, 0, 0);
+  DXGraphicsAPI::drawIndexed(uint32 indices,
+                             uint32 indexlocation,
+                             uint32 vertexlocation) {
+    m_deviceContext->DrawIndexed(indices, indexlocation, vertexlocation);
   }
 
   void
@@ -1053,11 +1064,15 @@ namespace ovEngineSDK {
   }
 
   void
-  DXGraphicsAPI::setIndexBuffer(SPtr<Buffer> buffer) {
+  DXGraphicsAPI::setIndexBuffer(SPtr<Buffer> buffer, FORMATS::E format) {
     if (buffer != nullptr) {
       auto buff = static_pointer_cast<DXBuffer>(buffer);
       if (buff->m_buffer != nullptr) {
-        m_deviceContext->IASetIndexBuffer(buff->m_buffer, DXGI_FORMAT_R32_UINT, 0);
+        if (format != FORMATS::kR32_UINT && format != FORMATS::kR16_UINT) {
+          OutputDebugStringA("Invalid index buffer format.\n");
+          return;
+        }
+        m_deviceContext->IASetIndexBuffer(buff->m_buffer, m_formats[format], 0);
       }
       else {
         OutputDebugStringA("Buffer missing initialization.\n");
@@ -1285,7 +1300,7 @@ namespace ovEngineSDK {
     }
     if (!tex->m_texture || !tex->m_srv) {
       OutputDebugStringA("Uninitialized texture received.\n");
-      return;
+      //return;
     }
     switch (shader)
     {
@@ -1354,39 +1369,127 @@ namespace ovEngineSDK {
 
   void
   DXGraphicsAPI::getDepthStencilState(SPtr<DepthStencilState>& pDSS) {
-    
+    pDSS.reset(new DXDepthStencilState);
+    auto temp = static_pointer_cast<DXDepthStencilState>(pDSS);
+    m_deviceContext->OMGetDepthStencilState(&temp->m_depthState, nullptr);
   }
 
   void
-  DXGraphicsAPI::getTexture(SPtr<Texture>& pTex, SHADER_TYPE::E shaderType) {
-    
+  DXGraphicsAPI::getTextureShaderResource(uint32 slot,
+                                          SPtr<Texture>& pTex,
+                                          SHADER_TYPE::E shaderType) {
+    pTex.reset(new DXTexture);
+    auto temp = static_pointer_cast<DXTexture>(pTex);
+    switch (shaderType) {
+    case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
+      m_deviceContext->VSGetShaderResources(slot, 1, &temp->m_srv);
+      break;
+    case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
+      m_deviceContext->PSGetShaderResources(slot, 1, &temp->m_srv);
+      break;
+    case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+      m_deviceContext->CSGetShaderResources(slot, 1, &temp->m_srv);
+      break;
+    }
   }
 
   void
-  DXGraphicsAPI::getSampler(SPtr<SamplerState>& pSamp, SHADER_TYPE::E shaderType) {
-    
+  DXGraphicsAPI::getSampler(uint32 slot,
+                            SPtr<SamplerState>& pSamp,
+                            SHADER_TYPE::E shaderType) {
+    pSamp.reset(new DXSamplerState);
+    auto temp = static_pointer_cast<DXSamplerState>(pSamp);
+    switch (shaderType) {
+    case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
+      m_deviceContext->VSGetSamplers(slot, 1, &temp->m_sampler);
+      break;
+    case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
+      m_deviceContext->PSGetSamplers(slot, 1, &temp->m_sampler);
+      break;
+    case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+      m_deviceContext->CSGetSamplers(slot, 1, &temp->m_sampler);
+      break;
+    }
   }
 
   void
   DXGraphicsAPI::getShaderProgram(SPtr<ShaderProgram>& pProgram) {
-    
+    pProgram.reset(new DXShaderProgram);
+    auto temp = static_pointer_cast<DXShaderProgram>(pProgram);
+    SPtr<DXVertexShader>vs(new DXVertexShader);
+    SPtr<DXPixelShader>ps(new DXPixelShader);
+    SPtr<DXComputeShader>cs(new DXComputeShader);
+    m_deviceContext->VSGetShader(&vs->m_vs, nullptr, nullptr);
+    m_deviceContext->PSGetShader(&ps->m_ps, nullptr, nullptr);
+    m_deviceContext->CSGetShader(&cs->m_cs, nullptr, nullptr);
+    temp->setVertexShader(vs);
+    temp->setPixelShader(ps);
+    temp->setComputeShader(cs);
   }
 
   void
   DXGraphicsAPI::getConstantBuffer(SPtr<Buffer>& pBuffer,
                                    uint32 slot,
                                    SHADER_TYPE::E shaderType) {
-    
+    pBuffer.reset(new DXBuffer);
+    auto temp = static_pointer_cast<DXBuffer>(pBuffer);
+    switch (shaderType) {
+    case ovEngineSDK::SHADER_TYPE::VERTEX_SHADER:
+      m_deviceContext->VSGetConstantBuffers(slot, 1, &temp->m_buffer);
+      break;
+    case ovEngineSDK::SHADER_TYPE::PIXEL_SHADER:
+      m_deviceContext->PSGetConstantBuffers(slot, 1, &temp->m_buffer);
+      break;
+    case ovEngineSDK::SHADER_TYPE::COMPUTE_SHADER:
+      m_deviceContext->CSGetConstantBuffers(slot, 1, &temp->m_buffer);
+      break;
+    }
   }
 
   void
   DXGraphicsAPI::getBuffer(SPtr<Buffer>& pBuffer, BUFFER_TYPE::E bufferType) {
-    
+    pBuffer.reset(new DXBuffer);
+    auto temp = static_pointer_cast<DXBuffer>(pBuffer);
+    switch (bufferType) {
+    case ovEngineSDK::BUFFER_TYPE::kVERTEX_BUFFER:
+      m_deviceContext->IAGetVertexBuffers(0, 1, &temp->m_buffer, nullptr, nullptr);
+      break;
+    case ovEngineSDK::BUFFER_TYPE::kINDEX_BUFFER:
+      m_deviceContext->IAGetIndexBuffer(&temp->m_buffer, nullptr, nullptr);
+      break;
+    }
+  }
+
+  void
+  DXGraphicsAPI::getVertexBuffer(SPtr<Buffer>& buffer, uint32& stride, uint32& offset) {
+    buffer.reset(new DXBuffer);
+    auto temp = static_pointer_cast<DXBuffer>(buffer);
+    m_deviceContext->IAGetVertexBuffers(0, 1, &temp->m_buffer, &stride, &offset);
+  }
+
+  void
+  DXGraphicsAPI::getIndexBuffer(SPtr<Buffer>& buffer) {
+    buffer.reset(new DXBuffer);
+    auto temp = static_pointer_cast<DXBuffer>(buffer);
+    m_deviceContext->IAGetIndexBuffer(&temp->m_buffer, nullptr, nullptr);
   }
 
   void
   DXGraphicsAPI::getInputLayout(SPtr<InputLayout>& pILayout) {
-    
+    pILayout.reset(new DXInputLayout);
+    auto temp = static_pointer_cast<DXInputLayout>(pILayout);
+    m_deviceContext->IAGetInputLayout(&temp->m_inputLayout);
+  }
+
+  void
+  DXGraphicsAPI::setScissorRects(float left, float right, float top, float bottom) {
+    const D3D11_RECT r = {
+      (LONG)left,
+      (LONG)top,
+      (LONG)right,
+      (LONG)bottom
+    };
+    m_deviceContext->RSSetScissorRects(1, &r);
   }
 
   void DXGraphicsAPI::swapBuffer() {
@@ -1446,6 +1549,28 @@ namespace ovEngineSDK {
     m_depthStencil.reset();
     m_backBuffer = backBuffer;
     m_depthStencil = depthTexture;
+  }
+
+  void
+  DXGraphicsAPI::setBlendState(SPtr<BlendState> blend, uint32 mask) {
+    auto blendState = static_pointer_cast<DXBlendState>(blend);
+    if (blendState) {
+      const float bfactor[4] = {blendState->m_blendFactor.x,
+                                blendState->m_blendFactor.y,
+                                blendState->m_blendFactor.z,
+                                blendState->m_blendFactor.w};
+      m_deviceContext->OMSetBlendState(blendState->m_bs, bfactor, mask);
+    }
+    else {
+      m_deviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+    }
+  }
+
+  void
+  DXGraphicsAPI::getBackBuffer(SPtr<Texture>& tex) {
+    if (m_backBuffer) {
+      tex = m_backBuffer;
+    }
   }
 
   HRESULT DXGraphicsAPI::compileShaderFromFile(WString fileName,

@@ -49,9 +49,11 @@ namespace ovEngineSDK {
     Vector<SPtr<Texture>> m_tempBlurTextures;
     Vector<SPtr<Texture>> m_lightTextures;
     Vector<SPtr<Texture>> m_shadowTextures;
+    Vector<SPtr<Texture>> m_backBufferTextures;
 
     SPtr<Texture> m_depthStencilTexture;
     SPtr<Texture> m_depthMapTexture;
+    SPtr<Texture> m_backTexture;
 
     SPtr<Buffer> m_gBufferConstant;  
     SPtr<Buffer> m_ssaoBufferConstant;

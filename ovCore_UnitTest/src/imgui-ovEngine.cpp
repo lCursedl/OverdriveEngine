@@ -8,6 +8,7 @@
 #endif // OV_PLATFORM == OV_PlATFORM_WIN32
 
 using ovEngineSDK::int32;
+using ovEngineSDK::uint32;
 using ovEngineSDK::uint8;
 using ovEngineSDK::SPtr;
 using ovEngineSDK::Matrix4;
@@ -44,7 +45,6 @@ namespace ImGui {
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     io.KeyMap[ImGuiKey_Tab] = ovEngineSDK::KEYS::kTAB;
     io.KeyMap[ImGuiKey_LeftArrow] = ovEngineSDK::KEYS::kLEFT;
@@ -75,19 +75,15 @@ namespace ImGui {
 
     ImGui::StyleColorsDark();
 
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-      style.WindowRounding = 0.0f;
-      style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
-
     ImGui_ImplOV_Data* bd = IM_NEW(ImGui_ImplOV_Data);
     io.BackendRendererName = "imgui_impl_ov";
     io.BackendRendererUserData = static_cast<void*>(bd);
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 
     auto& graphicApi = ovEngineSDK::g_graphicsAPI();
 
     //Create and compile VS and PS
+    bd->m_pSP = graphicApi.createShaderProgram();
     bd->m_pSP->setVertexShader(graphicApi.createVertexShader(L"resources/shaders/ImguiVS"));
     bd->m_pSP->setPixelShader(graphicApi.createPixelShader(L"resources/shaders/ImguiPS"));
     bd->m_pSP->linkProgram();
@@ -95,15 +91,15 @@ namespace ImGui {
     ovEngineSDK::LAYOUT_DESC lDesc;
     lDesc.addToDesc(ovEngineSDK::SEMANTIC::kPOSITION,
                     ovEngineSDK::FORMATS::kRG32_FLOAT,
-                    static_cast<int32>(IM_OFFSETOF(ImDrawVert, pos)),
+                    IM_OFFSETOF(ImDrawVert, pos),
                     2);
     lDesc.addToDesc(ovEngineSDK::SEMANTIC::kTEXCOORD,
                     ovEngineSDK::FORMATS::kRG32_FLOAT,
-                    static_cast<int32>(IM_OFFSETOF(ImDrawVert, uv)),
+                    IM_OFFSETOF(ImDrawVert, uv),
                     2);
     lDesc.addToDesc(ovEngineSDK::SEMANTIC::kCOLOR,
                     ovEngineSDK::FORMATS::kRGBA8_UNORM,
-                    static_cast<int32>(IM_OFFSETOF(ImDrawVert, col)),
+                    IM_OFFSETOF(ImDrawVert, col),
                     4);
     //Create input layout
     bd->m_pIL = graphicApi.createInputLayout(bd->m_pSP, lDesc);
@@ -123,7 +119,7 @@ namespace ImGui {
     //Create rasterizer state
     bd->m_pRS = graphicApi.createRasterizerState(ovEngineSDK::FILL_MODE::kSOLID,
                                                  ovEngineSDK::CULL_MODE::kNONE,
-                                                 true, true);
+                                                 false, true);
     //Create depth-stencil state
     bd->m_pDS = graphicApi.createDepthStencilState(false,
                                                    false,
@@ -143,6 +139,7 @@ namespace ImGui {
     bd->m_pFontSS = graphicApi.createSamplerState(ovEngineSDK::FILTER_LEVEL::FILTER_LINEAR,
                                                   ovEngineSDK::FILTER_LEVEL::FILTER_LINEAR,
                                                   ovEngineSDK::FILTER_LEVEL::FILTER_LINEAR,
+                                                  false,
                                                   0,
                                                   ovEngineSDK::WRAPPING::WRAP,
                                                   ovEngineSDK::COMPARISON::ALWAYS);
@@ -180,7 +177,7 @@ namespace ImGui {
       if (bd->m_pVB) {
         bd->m_pVB.reset();
       }
-      bd->m_vertexSize = data->TotalVtxCount + 5000;
+      bd->m_vertexSize = data->TotalVtxCount;
       bd->m_pVB = graphicAPI.createBuffer(nullptr,
                                           bd->m_vertexSize * sizeof(ImDrawVert),
                                           ovEngineSDK::BUFFER_TYPE::kVERTEX_BUFFER);
@@ -189,7 +186,7 @@ namespace ImGui {
       if (bd->m_pIB) {
         bd->m_pIB.reset();
       }
-      bd->m_indexSize = data->TotalIdxCount + 10000;
+      bd->m_indexSize = data->TotalIdxCount;
       bd->m_pIB = graphicAPI.createBuffer(nullptr,
                                           bd->m_indexSize * sizeof(ImDrawIdx),
                                           ovEngineSDK::BUFFER_TYPE::kINDEX_BUFFER);
@@ -199,21 +196,35 @@ namespace ImGui {
     Vector<ImDrawIdx> indices;
     for (int32 n = 0; n < data->CmdListsCount; ++n) {
       const ImDrawList* cmd_list = data->CmdLists[n];
-      vertices.push_back(*cmd_list->VtxBuffer.Data);
-      indices.push_back(*cmd_list->IdxBuffer.Data);
+      for (int32 x = 0; x < cmd_list->VtxBuffer.Size; ++x) {
+        vertices.push_back(cmd_list->VtxBuffer[x]);
+      }
+      for (int32 y = 0; y < cmd_list->IdxBuffer.Size; ++y) {
+        indices.push_back(cmd_list->IdxBuffer[y]);
+      }
     }
     graphicAPI.updateBuffer(bd->m_pVB, vertices.data());
     graphicAPI.updateBuffer(bd->m_pIB, indices.data());
     //Setup ortographic projection matrix into constant buffer
-    Matrix4 ortho = graphicAPI.matrix4Policy(
-                    graphicAPI.createCompatibleOrtho(
+    /*Matrix4 ortho = graphicAPI.matrix4Policy(graphicAPI.createCompatibleOrtho(
                                      data->DisplayPos.x,
                                      data->DisplayPos.x + data->DisplaySize.x,
                                      data->DisplayPos.y,
                                      data->DisplayPos.y + data->DisplaySize.y,
                                      0.01f,
-                                     1.0f));
-    graphicAPI.updateBuffer(bd->m_pVertexCB, &ortho);
+                                     1.0f));*/
+    float L = data->DisplayPos.x;
+    float R = data->DisplayPos.x + data->DisplaySize.x;
+    float T = data->DisplayPos.y;
+    float B = data->DisplayPos.y + data->DisplaySize.y;
+    float mvp[4][4] =
+    {
+        { 2.0f / (R - L),   0.0f,           0.0f,       0.0f },
+        { 0.0f,         2.0f / (T - B),     0.0f,       0.0f },
+        { 0.0f,         0.0f,           0.5f,       0.0f },
+        { (R + L) / (L - R),  (T + B) / (B - T),    0.5f,       1.0f },
+    };
+    graphicAPI.updateBuffer(bd->m_pVertexCB, &mvp);
     //Backup state that will be modified to restore it later
     struct BACKUP_STATE {
       SPtr<ovEngineSDK::RasterizerState> RS;
@@ -226,18 +237,107 @@ namespace ImGui {
       SPtr<ovEngineSDK::Buffer> vConstantBuffer;
       SPtr<ovEngineSDK::InputLayout> iLayout;
       SPtr<ovEngineSDK::Texture> shaderResource;
+      uint32 vertexStride = 0;
+      uint32 vertexOffset = 0;
     };
     BACKUP_STATE old = {};
-    
+    graphicAPI.getRaterizerState(old.RS);
+    graphicAPI.getBlendState(old.BS);
+    graphicAPI.getDepthStencilState(old.DS);
+    graphicAPI.getTextureShaderResource(0,
+                                        old.shaderResource,
+                                        ovEngineSDK::SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.getSampler(0, old.PSSampler, ovEngineSDK::SHADER_TYPE::PIXEL_SHADER);
+    graphicAPI.getShaderProgram(old.Shaders);
+    graphicAPI.getConstantBuffer(old.vConstantBuffer,
+                                 0,
+                                 ovEngineSDK::SHADER_TYPE::VERTEX_SHADER);
+    graphicAPI.getIndexBuffer(old.indexBuffer);
+    graphicAPI.getVertexBuffer(old.vertexBuffer, old.vertexStride, old.vertexOffset);
+    graphicAPI.getInputLayout(old.iLayout);
     //Setup desired state
-
+    {
+      //Setup shader and buffers
+      uint32 stride = static_cast<uint32>(sizeof(ImDrawVert));
+      graphicAPI.setInputLayout(bd->m_pIL);
+      graphicAPI.setVertexBuffer(bd->m_pVB, stride, 0);
+      graphicAPI.setIndexBuffer(bd->m_pIB, ovEngineSDK::FORMATS::kR16_UINT);
+      graphicAPI.setShaders(bd->m_pSP);
+      graphicAPI.setConstantBuffer(0,
+                                   bd->m_pVertexCB,
+                                   ovEngineSDK::SHADER_TYPE::VERTEX_SHADER);
+      graphicAPI.setSamplerState(0,
+                                 bd->m_pTex,
+                                 bd->m_pFontSS,
+                                 ovEngineSDK::SHADER_TYPE::PIXEL_SHADER);
+      //Setup blend state
+      graphicAPI.setBlendState(bd->m_pBS, 0xffffffff);
+      graphicAPI.setDepthStencilState(bd->m_pDS);
+      graphicAPI.setRasterizerState(bd->m_pRS);
+    }
     //Render command lists
+    {
+      int32 global_idx_offset = 0;
+      int32 global_vtx_offset = 0;
+      ImVec2 clip_off = data->DisplayPos;
+      for (int32 n = 0; n < data->CmdListsCount; ++n) {
+        const ImDrawList* cmd_list = data->CmdLists[n];
 
+        for (int32 cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; ++cmd_i) {
+          const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+          //Project scissor/clipping rectangles into framebuffer space
+          ImVec2 clip_min(pcmd->ClipRect.x - clip_off.x, pcmd->ClipRect.y - clip_off.y);
+          ImVec2 clip_max(pcmd->ClipRect.z - clip_off.x, pcmd->ClipRect.w - clip_off.y);
+          if (clip_max.x < clip_min.x || clip_max.y < clip_min.y)
+            continue;
+          //Apply scissor / clipping rectangle
+          graphicAPI.setScissorRects(clip_min.x, clip_max.x, clip_min.y, clip_max.y);
+          //Bind texture, Draw
+          SPtr<ovEngineSDK::Texture>* texture = static_cast<SPtr<ovEngineSDK::Texture>*>(pcmd->GetTexID());
+          graphicAPI.setTextureShaderResource(0,
+                                              *texture,
+                                              ovEngineSDK::SHADER_TYPE::PIXEL_SHADER);
+          graphicAPI.drawIndexed(pcmd->ElemCount,
+                                 pcmd->IdxOffset + global_idx_offset,
+                                 pcmd->VtxOffset + global_vtx_offset);
+        }
+        global_idx_offset += cmd_list->IdxBuffer.Size;
+        global_vtx_offset += cmd_list->VtxBuffer.Size;
+      }
+      
+    }
     //Restore modified state
+    {
+      graphicAPI.setRasterizerState(old.RS);
+      graphicAPI.setBlendState(old.BS, 0xffffffff);
+      graphicAPI.setDepthStencilState(old.DS);
+      graphicAPI.setShaders(old.Shaders);
+      graphicAPI.setTextureShaderResource(0,
+                                          old.shaderResource,
+                                          ovEngineSDK::SHADER_TYPE::PIXEL_SHADER);
+      graphicAPI.setSamplerState(0,
+                                 old.shaderResource,
+                                 old.PSSampler,
+                                 ovEngineSDK::SHADER_TYPE::PIXEL_SHADER);
+      graphicAPI.setConstantBuffer(0,
+                                   old.vConstantBuffer,
+                                   ovEngineSDK::SHADER_TYPE::VERTEX_SHADER);
+      graphicAPI.setVertexBuffer(old.vertexBuffer, old.vertexStride, old.vertexOffset);
+      graphicAPI.setIndexBuffer(old.indexBuffer, ovEngineSDK::FORMATS::kR32_UINT);
+      graphicAPI.setInputLayout(old.iLayout);
+    }
   }
 
   void
   shutDown() {
+    ImGui_ImplOV_Data* bd = ImGui_ImplOV_GetBackendData();
+    IM_ASSERT(bd != nullptr && "No renderer backend to shitdon, or already shutdown?");
+    ImGuiIO& io = ImGui::GetIO();
+
+    ImGui::DestroyPlatformWindows();
+    io.BackendRendererName = nullptr;
+    io.BackendRendererUserData = nullptr;
+    IM_DELETE(bd);
     ImGui::DestroyContext();
   }
 }

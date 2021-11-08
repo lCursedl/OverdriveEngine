@@ -4,6 +4,8 @@
 #if OV_PLATFORM == OV_PLATFORM_WIN32
 #include <Windows.h>
 #endif // OV_PLATFORM == OV_PLATFORM_WIN32
+#include <imgui.h>
+#include "imgui-ovEngine.h"
 
 void
 GameApp::onCreate() {
@@ -12,6 +14,8 @@ GameApp::onCreate() {
   RECT rc;
   GetClientRect(m_windowHandle, &rc);
   graphicAPI.setViewport(0, 0, rc.right, rc.bottom, 0.f, 1.f);
+
+  ImGui::init(m_windowHandle);
 
   SPtr<Model>model = make_shared<Model>();
   model->load("resources/models/Vela/Vela2.fbx");
@@ -56,6 +60,8 @@ GameApp::onCreate() {
 
 void
 GameApp::onUpdate(float delta) {
+  ImGui::NewFrame();
+  ImGui::ShowDemoWindow(&m_showDemo);
   //auto& graphicAPI = g_graphicsAPI();
   /*Vector<Matrix4> transforms;
   myModel->transformBones(delta, transforms);
@@ -98,8 +104,11 @@ GameApp::onUpdate(float delta) {
 
 void
 GameApp::onRender() {
+  //ImGui::Render();
+  ImGui::render(m_windowHandle);
 }
 
 void
 GameApp::onClear() {
+  ImGui::shutDown();
 }

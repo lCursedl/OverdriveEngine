@@ -59,7 +59,7 @@ namespace ovEngineSDK {
      * @param[in]window Window handler of the window properly created for use.
      */
      virtual bool
-     init(void*) {return false;}
+     init(void* window) { OV_UNREFERENCED_PARAMETER(window); return false;}
 
      /** 
      * @fn       void shutdown()
@@ -75,7 +75,10 @@ namespace ovEngineSDK {
      * @return   the received matrix in the correct order.
      */
      virtual Matrix4
-     matrix4Policy(const Matrix4&) {return Matrix4();}
+     matrix4Policy(const Matrix4& mat) {
+      OV_UNREFERENCED_PARAMETER(mat);
+      return Matrix4();
+     }
 
      /**
      * @fn
@@ -85,17 +88,39 @@ namespace ovEngineSDK {
       GraphicsAPI::_instance() = _api;
      }
 
+     /**
+     * @fn       Matrix4 createCompatibleOrtho(float left, float right, float top,
+     *           float bottom, float near, float far)
+     * @brief    Creates an API compatible orthographic Matrix4.
+     * @param[in] left 
+     * @param[in] right
+     * @param[in] top
+     * @param[in] bottom
+     * @param[in] near
+     * @param[in] far
+     * @return   Compatible orthographic matrix por the API.
+     */
      virtual Matrix4
-     createCompatibleOrtho(float, float, float, float, float, float) {
-      return Matrix4();}
+     createCompatibleOrtho(float Left,
+                           float Right,
+                           float Top,
+                           float Bottom,
+                           float Near,
+                           float Far) {
+      OV_UNREFERENCED_PARAMETER(Left); OV_UNREFERENCED_PARAMETER(Right);
+      OV_UNREFERENCED_PARAMETER(Top); OV_UNREFERENCED_PARAMETER(Bottom);
+      OV_UNREFERENCED_PARAMETER(Near); OV_UNREFERENCED_PARAMETER(Far);
+      return Matrix4();
+     }
 
      /***********************************************************************************/
      /*----------------------------------DEVICE-----------------------------------------*/
      /***********************************************************************************/
 
-     /** \fn     Texture* createTexture(int32 width, int32 height,
-     *								                  TEXTURE_BINDINGS binding,
-                                        FORMATS format)
+     /**
+     * @fn       SPtr<Texture> createTexture(int32 width, int32 height,
+     *								                       TEXTURE_BINDINGS binding,
+     *                                       FORMATS format)
      * @brief    Creates a texture with the received parameters and returns it.
      * @param[in]width	Specificates texture's width.
      * @param[in]height	Specificates texture's height.
@@ -104,14 +129,18 @@ namespace ovEngineSDK {
      * @return   Texture pointer of the corresponding API.
      */
      virtual SPtr<Texture>
-     createTexture(int32,
-                   int32,
-                   TEXTURE_BINDINGS::E,
-                   FORMATS::E) {
+     createTexture(int32 width,
+                   int32 height,
+                   TEXTURE_BINDINGS::E binding,
+                   FORMATS::E format) {
+      OV_UNREFERENCED_PARAMETER(width);
+      OV_UNREFERENCED_PARAMETER(height);
+      OV_UNREFERENCED_PARAMETER(binding);
+      OV_UNREFERENCED_PARAMETER(format);
       return nullptr;
      }
      /**
-     * @fn       Texture* createTextureFromFile(std::string path)
+     * @fn       Texture createTextureFromFile(std::string path)
      * @brief    Loads a texture file and returns a CTexture pointer with its data.
      * @param[in]path The path to the file.
      * @return   Texture pointer for the corresponding API with data.
@@ -141,7 +170,7 @@ namespace ovEngineSDK {
        return nullptr;
      }
      /**
-     * @fn       ShaderProgram* createShaderProgram()
+     * @fn       SPtr<ShaderProgram> createShaderProgram()
      * @brief    Creates a shader program and returns it.
      * @return   ShaderProgram pointer of the corresponding API.
      */
@@ -151,40 +180,51 @@ namespace ovEngineSDK {
      }
 
      /**
-     * @fn       CBuffer* createBuffer(const void * data, int32 size, BUFFER_TYPE type)
+     * @fn       SPtr<Buffer> createBuffer(const void * data, int32 size, BUFFER_TYPE type)
      * @brief    Creates a buffer with the received parameters and optionally data.
      * @param[in]data Pointer to the data to load. Can be nullptr.
      * @param[in]size Size of the data to load.
      * @param[in]type	Type of buffer to create (VERTEX_BUFFER,
      *            INDEX_BUFFER, CONST_BUFFER).
+     * @param[in]elements Number of elements in buffer.
+     * @param[in]format Format type for the buffer data.
      * @return   Buffer pointer of the corresponding API.
      */
      virtual SPtr<Buffer>
-     createBuffer(const void*,
-                  SIZE_T,
-                  BUFFER_TYPE::E,
-                  uint32 = 0,
-                  FORMATS::E = FORMATS::kR32_FLOAT) {
+     createBuffer(const void* data,
+                  SIZE_T size,
+                  BUFFER_TYPE::E type,
+                  uint32 elements= 0,
+                  FORMATS::E format = FORMATS::kR32_FLOAT) {
+      OV_UNREFERENCED_PARAMETER(data);
+      OV_UNREFERENCED_PARAMETER(size);
+      OV_UNREFERENCED_PARAMETER(type);
+      OV_UNREFERENCED_PARAMETER(elements);
+      OV_UNREFERENCED_PARAMETER(format);
       return nullptr;
      }
 
      /**
-     * @fn       InputLayout* createInputLayout(CShaderProgram* program, LAYOUT_DESC desc)
+     * @fn       SPtr<InputLayout> createInputLayout(SPtr<ShaderProgram> program,
+                                                     LAYOUT_DESC desc)
      * @brief    Creates an input layout from a descriptor and shader program.
      * @param[in]program ShaderProgram from where to extract info.
      * @param[in]desc The layout descriptor.
      * @return   InputLayout pointer of the corresponding API.
      */
      virtual SPtr<InputLayout>
-     createInputLayout(SPtr<ShaderProgram>,
-                       LAYOUT_DESC&) {
+     createInputLayout(SPtr<ShaderProgram> program,
+                       LAYOUT_DESC& desc) {
+      OV_UNREFERENCED_PARAMETER(program);
+      OV_UNREFERENCED_PARAMETER(desc);
       return nullptr;
      }
 
      /**
-     * @fn       SamplerState* createSamplerState(FILTER_LEVEL mag, FILTER_LEVEL min,
-     *										                        FILTER_LEVEL mip, uint32 anisotropic,
-     *                                            WRAPPING wrapMode)
+     * @fn       SPtr<SamplerState> createSamplerState(FILTER_LEVEL mag, FILTER_LEVEL min,
+     *										                             FILTER_LEVEL mip, uint32 anisotropic,
+     *                                                 WRAPPING wrapMode,
+     *                                                 COMPARISON compMode)
      * @brief    Creates a sampler state from defined parameters and returns it.
      * @param[in]mag Magnification filter ( LINEAR, POINT ).
      * @param[in]min Minification filter ( LINEAR, POINT ).
@@ -197,12 +237,17 @@ namespace ovEngineSDK {
      * @return   SamplerState pointer of the corresponding API.
      */
      virtual SPtr<SamplerState>
-     createSamplerState(FILTER_LEVEL::E,
-                        FILTER_LEVEL::E,
-                        FILTER_LEVEL::E,
-                        uint32,
-                        WRAPPING::E,
-                        COMPARISON::E) {
+     createSamplerState(FILTER_LEVEL::E mag,
+                        FILTER_LEVEL::E min,
+                        FILTER_LEVEL::E mip,
+                        bool filterCompare,
+                        uint32 anisotropic,
+                        WRAPPING::E wrapMode,
+                        COMPARISON::E compMode) {
+      OV_UNREFERENCED_PARAMETER(mag);OV_UNREFERENCED_PARAMETER(min);
+      OV_UNREFERENCED_PARAMETER(filterCompare);
+      OV_UNREFERENCED_PARAMETER(mip);OV_UNREFERENCED_PARAMETER(anisotropic);
+      OV_UNREFERENCED_PARAMETER(wrapMode);OV_UNREFERENCED_PARAMETER(compMode);
       return nullptr;
      }
 
@@ -244,13 +289,13 @@ namespace ovEngineSDK {
                                                              CULL_MODE::E cullmode,
                                                              bool counterClockWise)
      * @brief    Creates a rasterizer state from the defined parameters and returns it.
-     * @param[in]fillMode Determines the fill mode to use when rendering triangles
+     * @param[in] fillMode Determines the fill mode to use when rendering triangles
      *                    ( WIREFRAME, SOLID ).
-     * @param[in]cullMode Indicates triangles facing a particular direction are not drawn
+     * @param[in] cullMode Indicates triangles facing a particular direction are not drawn
      *                    ( NONE, FRONT, BACK ).
-     * @param[in]counterClockWise Determines if a triangle is front- or back-facing.
-     * @param[in]scissor Determines if scissor-rectangle culling is active.
-     * @return   Rasterizer state smart pointer of the corresponding API.
+     * @param[in] counterClockWise Determines if a triangle is front- or back-facing.
+     * @param[in] scissor Determines if scissor-rectangle culling is active.
+     * @return    Rasterizer state smart pointer of the corresponding API.
      */
      virtual SPtr<RasterizerState>
      createRasterizerState(FILL_MODE::E,
@@ -325,8 +370,18 @@ namespace ovEngineSDK {
      * @fn void  drawIndexed(uint32 indices)
      * @brief    Makes a draw call with the specified amount of indices.
      * @param[in]indices Amount of indices in geometry to draw.
+     * @param[in]indexlocation Location of the first index to read.
+     * @param[in]vertexlocation Value added to each index before reading a vertex from
+     *           vertex buffer.
      */
-     virtual void drawIndexed(uint32) {}
+     virtual
+     void drawIndexed(uint32 indices,
+                      uint32 indexlocation = 0,
+                      uint32 vertexlocation = 0) {
+       OV_UNREFERENCED_PARAMETER(indices);
+       OV_UNREFERENCED_PARAMETER(indexlocation);
+       OV_UNREFERENCED_PARAMETER(vertexlocation);
+     }
 
      /**	\fn void draw()
      *	\brief Makes a draw call with the currently bound vertex buffer.
@@ -364,9 +419,9 @@ namespace ovEngineSDK {
      /** 
      * @fn       void setRenderTarget(CTexture* texture, CTexture* depth)
      * @brief    Sets the specified render targets and depth stencil as current.
-     * @param[in]amount Number of render targets to set
-     * @param[in]texture Texture pointer which contains the render target.
-     * @param[in]depth Texture pointer which contains the depth stencil.
+     * @param[in] amount Number of render targets to set
+     * @param[in] texture Texture pointer which contains the render target.
+     * @param[in] depth Texture pointer which contains the depth stencil.
      *	         depth can be nullptr if only render target wants to be set.
      */
      virtual void setRenderTarget(int32 , Vector<SPtr<Texture>>, SPtr<Texture>) {}
@@ -395,9 +450,12 @@ namespace ovEngineSDK {
      * @fn       void setIndexBuffer(CBuffer* buffer)
      * @brief    Sets the specified buffer as the current index buffer.
      * @param[in]buffer Buffer to set.
+     * @param[in]format Format of the index buffer (R16 - short, R32 - normal).
      * @warning  If buffer is nullptr, no operations are done.
      */
-     virtual void setIndexBuffer(SPtr<Buffer>) {}
+     virtual void setIndexBuffer(SPtr<Buffer> buffer, FORMATS::E format) {
+      OV_UNREFERENCED_PARAMETER(buffer); OV_UNREFERENCED_PARAMETER(format);
+     }
 
      /** 
      * @fn       void setSamplerState(CTexture* texture, CSamplerState* sampler)
@@ -454,6 +512,10 @@ namespace ovEngineSDK {
      virtual
      void setTopology(TOPOLOGY::E) {}
 
+     /**
+     * @fn       void setBufferShaderResource(uint32 )
+     * @brief    
+     */
      virtual
      void setBufferShaderResource(uint32, SPtr<Buffer>, SHADER_TYPE::E) {}
 
@@ -485,10 +547,12 @@ namespace ovEngineSDK {
      void getDepthStencilState(SPtr<DepthStencilState>&) {}
 
      virtual
-     void getTexture(SPtr<Texture>&, SHADER_TYPE::E) {}
+     void getTextureShaderResource(uint32,
+                                   SPtr<Texture>&,
+                                   SHADER_TYPE::E) {}
 
      virtual
-     void getSampler(SPtr<SamplerState>&, SHADER_TYPE::E) {}
+     void getSampler(uint32, SPtr<SamplerState>&, SHADER_TYPE::E) {}
 
      virtual
      void getShaderProgram(SPtr<ShaderProgram>&) {}
@@ -500,7 +564,25 @@ namespace ovEngineSDK {
      void getBuffer(SPtr<Buffer>&, BUFFER_TYPE::E) {}
 
      virtual
+     void getVertexBuffer(SPtr<Buffer>& buffer, uint32& stride, uint32& offset) {
+      OV_UNREFERENCED_PARAMETER(buffer);
+      OV_UNREFERENCED_PARAMETER(stride);
+      OV_UNREFERENCED_PARAMETER(offset);
+     }
+
+     virtual
+     void getIndexBuffer(SPtr<Buffer>& buffer) {
+      OV_UNREFERENCED_PARAMETER(buffer);
+     }
+
+     virtual
      void getInputLayout(SPtr<InputLayout>&) {}
+
+     virtual
+     void setScissorRects(float left, float right, float top, float bottom) {
+       OV_UNREFERENCED_PARAMETER(left); OV_UNREFERENCED_PARAMETER(right);
+       OV_UNREFERENCED_PARAMETER(top); OV_UNREFERENCED_PARAMETER(bottom);
+     }
 
      //SWAPCHAIN
 
@@ -508,7 +590,8 @@ namespace ovEngineSDK {
      * @fn       void swapBuffer()
      * @brief    Swaps the back buffer with the front buffer and presents it.
      */
-     virtual void swapBuffer() {}
+     virtual
+     void swapBuffer() {}
 
      /**
      * @fn       void resizeBackBuffer(uint32 width, uint32 height)
@@ -516,9 +599,21 @@ namespace ovEngineSDK {
      * @param[in]width New X dimension for back buffer.
      * @param[in]height New Y dimension for back buffer.
      */
-     virtual void resizeBackBuffer(uint32, uint32) {}
+     virtual
+     void resizeBackBuffer(uint32, uint32) {}
 
-     
+     //OUTPUT MERGER
+
+     virtual
+     void setBlendState(SPtr<BlendState> blend, uint32 mask) {
+      OV_UNREFERENCED_PARAMETER(blend);
+      OV_UNREFERENCED_PARAMETER(mask);
+     }
+
+     virtual
+     void getBackBuffer(SPtr<Texture>& tex) {
+      OV_UNREFERENCED_PARAMETER(tex);
+     }
   };
 
   OV_CORE_EXPORT GraphicsAPI&

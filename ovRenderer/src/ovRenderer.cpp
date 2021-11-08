@@ -40,6 +40,8 @@ namespace ovEngineSDK {
   void
   Renderer::init() {
     auto& graphicAPI =  g_graphicsAPI();
+    graphicAPI.getBackBuffer(m_backTexture);
+    m_backBufferTextures.push_back(m_backTexture);
     m_viewportDim = graphicAPI.getViewportDimensions();
     //GBuffer
     m_gBufferRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
@@ -51,6 +53,7 @@ namespace ovEngineSDK {
     m_linearSampler = graphicAPI.createSamplerState(FILTER_LEVEL::FILTER_LINEAR,
                                                     FILTER_LEVEL::FILTER_LINEAR,
                                                     FILTER_LEVEL::FILTER_LINEAR,
+                                                    false,
                                                     0,
                                                     WRAPPING::WRAP,
                                                     COMPARISON::NEVER);
@@ -171,6 +174,7 @@ namespace ovEngineSDK {
     m_comparisonSampler = graphicAPI.createSamplerState(FILTER_LEVEL::FILTER_POINT,
                                                         FILTER_LEVEL::FILTER_POINT,
                                                         FILTER_LEVEL::FILTER_POINT,
+                                                        false,
                                                         0,
                                                         WRAPPING::CLAMP,
                                                         COMPARISON::NEVER);
@@ -182,12 +186,12 @@ namespace ovEngineSDK {
                                     L"resources/shaders/PS_Shadow"));
     m_shadowProgram->linkProgram();
     Matrices lightMat;
-    lightMat.projection = graphicAPI.createCompatibleOrtho(-200.f,
+    lightMat.projection = graphicAPI.matrix4Policy(graphicAPI.createCompatibleOrtho(-200.f,
                                                             200.f,
                                                             -200.f,
                                                             200.f,
                                                             0.01f,
-                                                            500.f);
+                                                            500.f));
     //650.f, 300.f, -200.f
     lightMat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(0.f, -80.f, 350.f),
                                                           Vector3(0.f, 0.f, 0.f),
@@ -336,9 +340,13 @@ namespace ovEngineSDK {
 
     graphicAPI.updateBuffer(m_blurBufferConstant, &dim);
 
-    graphicAPI.setConstantBuffer(0, m_blurBufferConstant, SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setConstantBuffer(0,
+                                 m_blurBufferConstant,
+                                 SHADER_TYPE::COMPUTE_SHADER);
 
-    graphicAPI.setTextureShaderResource(0, m_ssaoTextures[0], SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setTextureShaderResource(0,
+                                        m_ssaoTextures[0],
+                                        SHADER_TYPE::COMPUTE_SHADER);
     graphicAPI.setSamplerState(0,
                                m_ssaoTextures[0],
                                m_linearSampler,
@@ -358,7 +366,9 @@ namespace ovEngineSDK {
 
     graphicAPI.setShaders(m_blurVProgram);
 
-    graphicAPI.setTextureShaderResource(0, m_tempBlurTextures[0], SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setTextureShaderResource(0,
+                                        m_tempBlurTextures[0],
+                                        SHADER_TYPE::COMPUTE_SHADER);
     graphicAPI.setSamplerState(0,
                                m_tempBlurTextures[0],
                                m_linearSampler,
@@ -382,8 +392,8 @@ namespace ovEngineSDK {
     //LIGHTING
 
     graphicAPI.setViewport(0.f, 0.f, m_viewportDim.x, m_viewportDim.y, 0.f, 1.f);
-    graphicAPI.setBackBuffer();
-    graphicAPI.clearBackBuffer(clearColor);
+    graphicAPI.setRenderTarget(1, m_backBufferTextures, nullptr);
+    graphicAPI.clearRenderTarget(m_backTexture, clearColor);
 
     graphicAPI.setRasterizerState(m_screenQuadRS);
     graphicAPI.setDepthStencilState(m_screenQuadDS);

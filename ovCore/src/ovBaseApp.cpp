@@ -57,8 +57,8 @@ namespace ovEngineSDK {
   }
 
   void BaseApp::render() {
-    onRender();
     BaseRenderer::instance().render();
+    onRender();
     g_graphicsAPI().swapBuffer();
   }
 

@@ -72,6 +72,7 @@ namespace ovEngineSDK {
     m_textureSampler = g_graphicsAPI().createSamplerState(FILTER_LEVEL::FILTER_LINEAR,
                                                           FILTER_LEVEL::FILTER_LINEAR,
                                                           FILTER_LEVEL::FILTER_LINEAR,
+                                                          false,
                                                           0,
                                                           WRAPPING::WRAP,
                                                           COMPARISON::NEVER);

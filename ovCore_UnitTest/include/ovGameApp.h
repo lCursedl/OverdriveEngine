@@ -27,14 +27,10 @@ class GameApp : public BaseApp
   onClear() override;
 
  private:
-  SPtr<VertexShader> m_vs;
-  SPtr<PixelShader> m_ps;
-  SPtr<ShaderProgram> m_shaderProgram;
-  SPtr<InputLayout> m_layout;
-  SPtr<Buffer> m_cBuffer;
-  SPtr<Buffer> m_bBuffer;
   Color m_color;
-  SPtr<Model> myModel;
+  SPtr<Texture> m_pBack;
+  Vector<SPtr<Texture>> m_vTextures;
+  bool m_showDemo = true;
 
   struct Bones {
     Matrix4 bones[MAXBONES];

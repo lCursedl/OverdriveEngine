@@ -55,6 +55,7 @@ namespace ovEngineSDK {
     createSamplerState(FILTER_LEVEL::E mag,
                        FILTER_LEVEL::E min,
                        FILTER_LEVEL::E mip,
+                       bool filterCompare,
                        uint32 anisotropic,
                        WRAPPING::E wrapMode,
                        COMPARISON::E compMode)                        override;
@@ -110,7 +111,9 @@ namespace ovEngineSDK {
     void
     setShaders(SPtr<ShaderProgram> program)                           override;
     void
-    drawIndexed(uint32 indices)                                       override;
+    drawIndexed(uint32 indices,
+                uint32 indexlocation = 0,
+                uint32 vertexlocation = 0)                            override;
     void
     draw(uint32 count, uint32 first)                                  override;
     void
@@ -135,7 +138,7 @@ namespace ovEngineSDK {
                     uint32 stride,
                     uint32 offset)                                    override;
     void
-    setIndexBuffer(SPtr<Buffer> buffer)                               override;
+    setIndexBuffer(SPtr<Buffer> buffer, FORMATS::E format)            override;
     void
     setSamplerState(uint32 slot,
                     SPtr<Texture> texture,
@@ -177,10 +180,10 @@ namespace ovEngineSDK {
                       SHADER_TYPE::E shader)                          override;
 
     void
-    setBufferUnorderedAccess(uint32 slot, SPtr<Buffer> buffer)              override;
+    setBufferUnorderedAccess(uint32 slot, SPtr<Buffer> buffer)        override;
 
     void
-    setTextureUnorderedAccess(uint32 slot, SPtr<Texture> texture)            override;
+    setTextureUnorderedAccess(uint32 slot, SPtr<Texture> texture)     override;
 
     void
     getRaterizerState(SPtr<RasterizerState>& pRS)                     override;
@@ -192,10 +195,14 @@ namespace ovEngineSDK {
     getDepthStencilState(SPtr<DepthStencilState>& pDSS)               override;
 
     void
-    getTexture(SPtr<Texture>& pTex, SHADER_TYPE::E shaderType)        override;
+    getTextureShaderResource(uint32 slot,
+                             SPtr<Texture>& pTex,
+                             SHADER_TYPE::E shaderType)              override;
 
     void
-    getSampler(SPtr<SamplerState>& pSamp, SHADER_TYPE::E shaderType)  override;
+    getSampler(uint32 slot,
+               SPtr<SamplerState>& pSamp,
+               SHADER_TYPE::E shaderType)                            override;
 
     void
     getShaderProgram(SPtr<ShaderProgram>& pProgram)                   override;
@@ -203,19 +210,38 @@ namespace ovEngineSDK {
     void
     getConstantBuffer(SPtr<Buffer>& pBuffer,
                       uint32 slot,
-                      SHADER_TYPE::E shaderType)                      override;
+                      SHADER_TYPE::E shaderType)                     override;
 
     void
-    getBuffer(SPtr<Buffer>& pBuffer, BUFFER_TYPE::E bufferType)       override;
+    getBuffer(SPtr<Buffer>& pBuffer, BUFFER_TYPE::E bufferType)      override;
+
+    void
+    getVertexBuffer(SPtr<Buffer>& buffer,
+                    uint32& stride,
+                    uint32& offset)                                   override;
+
+    void
+    getIndexBuffer(SPtr<Buffer>& buffer)                              override;
 
     void
     getInputLayout(SPtr<InputLayout>& pILayout)                       override;
+
+    void
+    setScissorRects(float left, float right, float top, float bottom) override;
 
     //SWAPCHAIN
     void
     swapBuffer()                                                      override;
     void
     resizeBackBuffer(uint32 width, uint32 height)                     override;
+
+    //OUTPUT MERGER
+    void
+    setBlendState(SPtr<BlendState> blend,
+                       uint32 mask)                                   override;
+   
+    void
+    getBackBuffer(SPtr<Texture>& tex)                                 override;
 
    private:
     ID3D11Device* m_device = nullptr;
