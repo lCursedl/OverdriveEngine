@@ -48,6 +48,9 @@
     <ClCompile Include="src\ovDXBlendState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ovParticleSystemDX.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovDXBuffer.h">
@@ -87,6 +90,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ovDXBlendState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovParticleDX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ovParticleSystemDX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

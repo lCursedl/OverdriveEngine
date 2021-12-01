@@ -54,6 +54,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.5.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -137,15 +138,19 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(SolutionDir)ovCore/include;$(DEVLIBS)STB/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(SolutionDir)ovCore/include;$(DEVLIBS)STB/include;$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
       <ImportLibrary />
-      <AdditionalDependencies>ovUtilities_d.lib;d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ovUtilities_d.lib;d3d11.lib;d3dcompiler.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <HostDebugInfo>true</HostDebugInfo>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|x64'">
     <ClCompile>
@@ -156,7 +161,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(SolutionDir)ovCore/include;$(DEVLIBS)STB/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)ovUtilities/include;$(SolutionDir)ovCore/include;$(DEVLIBS)STB/include;$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -167,6 +172,9 @@
       <ImportLibrary />
       <AdditionalDependencies>ovUtilities.lib;d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ovDXBlendState.cpp" />
@@ -180,6 +188,7 @@
     <ClCompile Include="src\ovDXSamplerState.cpp" />
     <ClCompile Include="src\ovDXTexture.cpp" />
     <ClCompile Include="src\ovDXVertexShader.cpp" />
+    <ClCompile Include="src\ovParticleSystemDX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovDXBlendState.h" />
@@ -194,9 +203,12 @@
     <ClInclude Include="include\ovDXShaderProgram.h" />
     <ClInclude Include="include\ovDXTexture.h" />
     <ClInclude Include="include\ovDXVertexShader.h" />
+    <ClInclude Include="include\ovParticleDX.h" />
+    <ClInclude Include="include\ovParticleSystemDX.h" />
     <ClInclude Include="include\ovPrerequisitesDX.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.5.targets" />
   </ImportGroup>
 </Project>
