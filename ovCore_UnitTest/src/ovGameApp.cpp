@@ -61,6 +61,7 @@ GameApp::onCreate() {
 void
 GameApp::onUpdate(float delta) {
   ImGui::NewFrame();
+  ImGui::update(m_windowHandle, delta);
   ImGui::ShowDemoWindow(&m_showDemo);
   //auto& graphicAPI = g_graphicsAPI();
   /*Vector<Matrix4> transforms;
@@ -75,30 +76,32 @@ GameApp::onUpdate(float delta) {
   graphicAPI.updateBuffer(m_bBuffer, &cbBone);*/
   SPtr<Camera> cam = SceneGraph::instance().getActiveCamera();
   if (cam) {
-    //Get forward input
-    cam->setForward(g_baseInput().isKeyPressed(KEYS::kW));
-    //Get backard input
-    cam->setBackward(g_baseInput().isKeyPressed(KEYS::kS));
-    //Get left input
-    cam->setLeft(g_baseInput().isKeyPressed(KEYS::kA));
-    //Get right input
-    cam->setRight(g_baseInput().isKeyPressed(KEYS::kD));
-    //Get up input
-    cam->setUp(g_baseInput().isKeyPressed(KEYS::kQ));
-    //Get down input
-    cam->setDown(g_baseInput().isKeyPressed(KEYS::kE));
-    //Get roll left input
-    cam->setRotateLeft(g_baseInput().isKeyPressed(KEYS::kLEFT));
-    //Get roll right input
-    cam->setRotateRight(g_baseInput().isKeyPressed(KEYS::kRIGHT));
+    if (g_baseInput().isMouseKeyPressed(KEYSM::kRIGHT)) {
+      //Get forward input
+      cam->setForward(g_baseInput().isKeyPressed(KEYS::kW));
+      //Get backard input
+      cam->setBackward(g_baseInput().isKeyPressed(KEYS::kS));
+      //Get left input
+      cam->setLeft(g_baseInput().isKeyPressed(KEYS::kA));
+      //Get right input
+      cam->setRight(g_baseInput().isKeyPressed(KEYS::kD));
+      //Get up input
+      cam->setUp(g_baseInput().isKeyPressed(KEYS::kQ));
+      //Get down input
+      cam->setDown(g_baseInput().isKeyPressed(KEYS::kE));
+      //Get roll left input
+      cam->setRotateLeft(g_baseInput().isKeyPressed(KEYS::kLEFT));
+      //Get roll right input
+      cam->setRotateRight(g_baseInput().isKeyPressed(KEYS::kRIGHT));
 
-    float mouseX, mouseY;
-    g_baseInput().getMouseAxis(mouseX, mouseY);
-    if (mouseX != 0 && mouseY != 0) {
-      cam->rotate(Vector2(mouseX, mouseY), delta);
+      float mouseX, mouseY;
+      g_baseInput().getMouseAxis(mouseX, mouseY);
+      if (mouseX != 0 && mouseY != 0) {
+        cam->rotate(Vector2(mouseX, mouseY), delta);
+      }
+      cam->roll(delta);
+      cam->update(delta);
     }
-    cam->roll(delta);
-    cam->update(delta);
   }
 }
 

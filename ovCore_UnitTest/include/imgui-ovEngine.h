@@ -14,6 +14,8 @@ namespace ImGui {
   void update(void* window, float delta);
   void render(void* window);
   void shutDown();
+
+  void inputCallback();
 }
 
 #endif // !IMGUI_OVENGINE_H

@@ -13,6 +13,8 @@ namespace ovEngineSDK {
     std::ostringstream windowHndStr;
     windowHndStr << (SIZE_T)wHndl;
     pl.insert(std::make_pair(String("WINDOW"), windowHndStr.str()));
+    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
+    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
   
     m_inputManager = OIS::InputManager::createInputSystem(pl);
     uint32 v = m_inputManager->getVersionNumber();

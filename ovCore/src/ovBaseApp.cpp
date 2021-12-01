@@ -1,6 +1,7 @@
 #include "ovBaseApp.h"
 #include "ovBaseRenderer.h"
 #include "ovBaseInputManager.h"
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
 namespace ovEngineSDK {
@@ -20,7 +21,7 @@ namespace ovEngineSDK {
 
     while (WM_QUIT != msg.message) {
       m_deltaTime = m_appClock.getElapsedTime().asSeconds();
-      if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+      if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
       }
@@ -100,30 +101,40 @@ namespace ovEngineSDK {
 
   void BaseApp::createWindow() {
     //Register window class
-    WNDCLASS wc = {};
+    WNDCLASSEX wc;
+    wc.style = CS_HREDRAW | CS_VREDRAW;
+    wc.cbSize = sizeof(WNDCLASSEX);
     wc.lpfnWndProc = WndProc;
-    wc.hInstance = GetModuleHandle(0);
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance = 0;
+    wc.hIcon = 0;
+    wc.hCursor = LoadCursor(0, IDC_ARROW);
+    wc.hbrBackground = 0;
+    wc.lpszMenuName = 0;
     wc.lpszClassName = "overdrive";
+    wc.hIconSm = 0;
 
-    RegisterClass(&wc);
-
+    if (!RegisterClassEx(&wc)) {
+      return;
+    }
+    RECT rc = {0, 0, 800, 600};
+    AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, false);
     //Create window
-    HWND hwnd = CreateWindowEx(
-      0,
+    m_windowHandle = CreateWindow(
       "overdrive",
       "Overdrive Engine",
       WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT,
-      CW_USEDEFAULT,
-      800,
-      600,
-      nullptr,
-      nullptr,
-      wc.hInstance,
-      nullptr);
+      0,
+      rc.right - rc.left,
+      rc.bottom - rc.top,
+      0,
+      0,
+      0,
+      0);
 
-    ShowWindow(hwnd, 10);
-    m_windowHandle = hwnd;
+    ShowWindow(m_windowHandle, 1);
   }
 
   LRESULT CALLBACK WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam) {
@@ -140,7 +151,6 @@ namespace ovEngineSDK {
       break;
     default:
       return DefWindowProc(hWnd, message, wParam, lParam);
-      break;
     }
     return 0;
   }

@@ -15,6 +15,11 @@ using ovEngineSDK::Matrix4;
 using ovEngineSDK::Vector;
 using ovEngineSDK::static_pointer_cast;
 
+struct ImGui_ImplWin32_Data {
+  bool MouseTracked = false;
+  ImGuiMouseCursor LastMouseCursor = ImGuiMouseCursor_COUNT;
+};
+
 struct ImGui_ImplOV_Data {
   SPtr<ovEngineSDK::Buffer> m_pVB;
   SPtr<ovEngineSDK::Buffer> m_pIB;
@@ -32,10 +37,16 @@ struct ImGui_ImplOV_Data {
 
 namespace ImGui {
   
+  static ImGui_ImplWin32_Data* ImGui_ImplWin32_GetBackendData() {
+    return ImGui::GetCurrentContext() ? 
+      static_cast<ImGui_ImplWin32_Data*>(ImGui::GetIO().BackendPlatformUserData) : 
+      nullptr;
+  }
+
   static ImGui_ImplOV_Data* ImGui_ImplOV_GetBackendData() {
     return ImGui::GetCurrentContext() ?
-      static_cast<ImGui_ImplOV_Data*>(ImGui::GetIO().BackendRendererUserData)
-      : nullptr;
+      static_cast<ImGui_ImplOV_Data*>(ImGui::GetIO().BackendRendererUserData) :
+      nullptr;
   }
 
   void
@@ -45,6 +56,15 @@ namespace ImGui {
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    ImGui_ImplWin32_Data* be = IM_NEW(ImGui_ImplWin32_Data);
+    io.BackendPlatformUserData = (void*)be;
+    io.BackendPlatformName = "imgui_impl_win32";
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;    
+
+    ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+    main_viewport->PlatformHandle = main_viewport->PlatformHandleRaw = window;
 
     io.KeyMap[ImGuiKey_Tab] = ovEngineSDK::KEYS::kTAB;
     io.KeyMap[ImGuiKey_LeftArrow] = ovEngineSDK::KEYS::kLEFT;
@@ -147,7 +167,55 @@ namespace ImGui {
 
   void
   update(void* window, float delta) {
-    window;
+    //Update OS mouse position
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui_ImplWin32_Data* be = ImGui_ImplWin32_GetBackendData();
+    IM_ASSERT(be != nullptr && "Failed backend platform initialization.\n");
+    const ImVec2 mouse_pos_prev = io.MousePos;
+    io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
+    io.MouseHoveredViewport = 0;
+
+    if (io.WantSetMousePos) {
+      ovEngineSDK::Vector2 pos(mouse_pos_prev.x, mouse_pos_prev.y);
+      ::SetCursorPos(pos.x, pos.y);
+    }
+    //Set Dear ImGui mouse position from OS position
+    POINT mouse_screen_pos;
+    if (!::GetCursorPos(&mouse_screen_pos)) {
+      return;
+    }
+    ::ScreenToClient((HWND)window, &mouse_screen_pos);
+    io.MousePos = ImVec2((float)mouse_screen_pos.x, (float)mouse_screen_pos.y);
+    //Update OS mouse cursor with the cursor requested by imgui
+    ImGuiMouseCursor mouse_cursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : 
+                                                         ImGui::GetMouseCursor();
+    if (be->LastMouseCursor != mouse_cursor) {
+      be->LastMouseCursor = mouse_cursor;
+      if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) {
+        return;
+      }
+      ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
+      if (imgui_cursor != ImGuiMouseCursor_None || io.MouseDrawCursor) {
+        //Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
+        ::SetCursor(0);
+      }
+      else {
+        //Show OS mouse cursor
+        LPTSTR win32_cursor = IDC_ARROW;
+        switch (imgui_cursor) {
+        case ImGuiMouseCursor_Arrow:        win32_cursor = IDC_ARROW; break;
+        case ImGuiMouseCursor_TextInput:    win32_cursor = IDC_IBEAM; break;
+        case ImGuiMouseCursor_ResizeAll:    win32_cursor = IDC_SIZEALL; break;
+        case ImGuiMouseCursor_ResizeEW:     win32_cursor = IDC_SIZEWE; break;
+        case ImGuiMouseCursor_ResizeNS:     win32_cursor = IDC_SIZENS; break;
+        case ImGuiMouseCursor_ResizeNESW:   win32_cursor = IDC_SIZENESW; break;
+        case ImGuiMouseCursor_ResizeNWSE:   win32_cursor = IDC_SIZENWSE; break;
+        case ImGuiMouseCursor_Hand:         win32_cursor = IDC_HAND; break;
+        case ImGuiMouseCursor_NotAllowed:   win32_cursor = IDC_NO; break;
+        }
+        ::SetCursor(::LoadCursor(0, win32_cursor));
+      }
+    }
     delta;
   }
 
@@ -330,6 +398,8 @@ namespace ImGui {
 
   void
   shutDown() {
+    ImGui_ImplWin32_Data* be = ImGui_ImplWin32_GetBackendData();
+    IM_ASSERT(be != nullptr && "No platform backend to shutdown, or already shutdown?");
     ImGui_ImplOV_Data* bd = ImGui_ImplOV_GetBackendData();
     IM_ASSERT(bd != nullptr && "No renderer backend to shitdon, or already shutdown?");
     ImGuiIO& io = ImGui::GetIO();
@@ -337,7 +407,31 @@ namespace ImGui {
     ImGui::DestroyPlatformWindows();
     io.BackendRendererName = nullptr;
     io.BackendRendererUserData = nullptr;
+    io.BackendPlatformName = nullptr;
+    io.BackendPlatformUserData = nullptr;
     IM_DELETE(bd);
+    IM_DELETE(be);
     ImGui::DestroyContext();
+  }
+
+  void
+  inputCallback() {
+    ImGuiIO& io = ImGui::GetIO();
+    {
+      int32 button = 0;
+      button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kLEFT) ?
+               0 : button;
+      button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kRIGHT) ?
+               1 : button;
+      button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kMIDDLE) ?
+               2 : button;
+      button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kBUTTON3) ?
+               3 : button;
+      button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kBUTTON4) ?
+               4 : button;
+      if (button != 0) {
+        io.MouseDown[button] = true;
+      }
+    }
   }
 }
