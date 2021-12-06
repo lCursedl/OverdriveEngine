@@ -216,7 +216,8 @@ namespace ImGui {
         ::SetCursor(::LoadCursor(0, win32_cursor));
       }
     }
-    delta;
+    OV_UNREFERENCED_PARAMETER(delta);
+    inputCallback();
   }
 
   void
@@ -417,20 +418,38 @@ namespace ImGui {
   void
   inputCallback() {
     ImGuiIO& io = ImGui::GetIO();
+    //Mouse Pressed case
     {
-      int32 button = 0;
+      int32 button = -1;
       button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kLEFT) ?
-               0 : button;
+                                                            0 : button;
       button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kRIGHT) ?
-               1 : button;
+                                                            1 : button;
       button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kMIDDLE) ?
-               2 : button;
+                                                            2 : button;
       button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kBUTTON3) ?
-               3 : button;
+                                                            3 : button;
       button = ovEngineSDK::g_baseInput().isMouseKeyPressed(ovEngineSDK::KEYSM::kBUTTON4) ?
-               4 : button;
-      if (button != 0) {
+                                                            4 : button;
+      if (button > -1) {
         io.MouseDown[button] = true;
+      }
+    }
+    //Mouse released case
+    {
+      int32 button = -1;
+      button = ovEngineSDK::g_baseInput().isMouseKeyReleased(ovEngineSDK::KEYSM::kLEFT) ?
+                                                            0 : button;
+      button = ovEngineSDK::g_baseInput().isMouseKeyReleased(ovEngineSDK::KEYSM::kRIGHT) ?
+                                                            1 : button;
+      button = ovEngineSDK::g_baseInput().isMouseKeyReleased(ovEngineSDK::KEYSM::kMIDDLE) ?
+                                                            2 : button;
+      button = ovEngineSDK::g_baseInput().isMouseKeyReleased(ovEngineSDK::KEYSM::kBUTTON3) ?
+                                                            3 : button;
+      button = ovEngineSDK::g_baseInput().isMouseKeyReleased(ovEngineSDK::KEYSM::kBUTTON4) ?
+                                                            4 : button;
+      if (button > -1) {
+        io.MouseDown[button] = false;
       }
     }
   }

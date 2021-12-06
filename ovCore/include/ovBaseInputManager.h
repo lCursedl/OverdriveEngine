@@ -123,6 +123,14 @@ namespace ovEngineSDK {
     };
   }
 
+  namespace STATUS {
+    enum E {
+      kIDLE = 0,
+      kPRESSED,
+      kRELEASED
+    };
+  }
+
   class BaseInputManager : public Module<BaseInputManager>
   {
    public:
@@ -136,10 +144,27 @@ namespace ovEngineSDK {
     update() {}
 
     virtual bool
-    isKeyPressed(KEYS::E) {return false;}
+    isKeyPressed(KEYS::E key) {
+      OV_UNREFERENCED_PARAMETER(key);
+      return false;}
 
     virtual bool
-    isMouseKeyPressed(KEYSM::E) {return false;}
+    isKeyReleased(KEYS::E key) {
+      OV_UNREFERENCED_PARAMETER(key);
+      return false;
+    }
+
+    virtual bool
+    isMouseKeyPressed(KEYSM::E key) {
+      OV_UNREFERENCED_PARAMETER(key);
+      return false;
+    }
+
+    virtual bool
+    isMouseKeyReleased(KEYSM::E key) {
+      OV_UNREFERENCED_PARAMETER(key);
+      return false;
+    }
 
     virtual float
     getXAxis() { return 0.f; }
@@ -154,6 +179,16 @@ namespace ovEngineSDK {
     setObject(BaseInputManager* _api) {
       BaseInputManager::_instance() = _api;
     }
+
+   protected:
+    bool m_keyboardPress = false;
+    bool m_keyboardRelease = false;
+    bool m_mousePressed = false;
+    bool m_mouseReleased = false;
+
+
+    std::map<KEYS::E, STATUS::E> m_keyState;
+    std::map<KEYSM::E, STATUS::E> m_mouseState;
   };
 
   OV_CORE_EXPORT BaseInputManager&
