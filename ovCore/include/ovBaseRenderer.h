@@ -1,5 +1,6 @@
 #pragma once
 #include <ovModule.h>
+#include <ovTexture.h>
 #include <ovPrerequisitesCore.h>
 
 namespace ovEngineSDK {
@@ -22,6 +23,11 @@ namespace ovEngineSDK {
     BaseRenderer::_instance() = _api;
     }
 
+   protected:
+    virtual SPtr<Texture>
+    getOutputImage() { return nullptr;}
+
+    friend class GameApp;
   };
 
   OV_CORE_EXPORT BaseRenderer&

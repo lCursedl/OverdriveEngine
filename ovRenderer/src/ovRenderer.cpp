@@ -76,14 +76,14 @@ namespace ovEngineSDK {
 
     for (int32 i = 0; i < 3; ++i) {
       m_gBufferTextures.push_back(graphicAPI.createTexture(
-        800,
-        600,
+        m_viewportDim.x,
+        m_viewportDim.y,
         TEXTURE_BINDINGS::E::RENDER_TARGET | TEXTURE_BINDINGS::E::SHADER_RESOURCE,
         FORMATS::kRGBA16_FLOAT));
     }
 
-    m_depthStencilTexture = graphicAPI.createTexture(800,
-                                                      600,
+    m_depthStencilTexture = graphicAPI.createTexture(m_viewportDim.x,
+                                                      m_viewportDim.y,
                                                       TEXTURE_BINDINGS::E::DEPTH_STENCIL,
                                                       FORMATS::kD24_S8);
 
@@ -93,8 +93,8 @@ namespace ovEngineSDK {
                                                      Vector3(0.f, 0.f, -100.f),
                                                      Vector3(0.f, 1.f, 0.f)));
     mat.projection = graphicAPI.matrix4Policy(PerspectiveMatrix(70.f,
-                                                                800.f,
-                                                                600.f,
+                                                                m_viewportDim.x,
+                                                                m_viewportDim.y,
                                                                 0.01f,
                                                                 3000.f));
 
@@ -114,8 +114,8 @@ namespace ovEngineSDK {
     m_ssaoProgram->linkProgram();
 
     m_ssaoTextures.push_back(graphicAPI.createTexture(
-                             800,
-                             600,
+                             m_viewportDim.x,
+                             m_viewportDim.y,
                              TEXTURE_BINDINGS::E::RENDER_TARGET |
                              TEXTURE_BINDINGS::E::SHADER_RESOURCE |
                              TEXTURE_BINDINGS::E::UNORDERED_ACCESS,
@@ -139,8 +139,8 @@ namespace ovEngineSDK {
                                      L"resources/shaders/CS_BlurH"));
     m_blurHProgram->linkProgram();
     m_tempBlurTextures.push_back(graphicAPI.createTexture(
-                                 800,
-                                 600,
+                                 m_viewportDim.x,
+                                 m_viewportDim.y,
                                  TEXTURE_BINDINGS::E::RENDER_TARGET |
                                  TEXTURE_BINDINGS::E::SHADER_RESOURCE |
                                  TEXTURE_BINDINGS::E::UNORDERED_ACCESS,
@@ -163,6 +163,12 @@ namespace ovEngineSDK {
     m_lightBufferConstant = graphicAPI.createBuffer(nullptr,
                                                     sizeof(Lighting),
                                                     BUFFER_TYPE::kCONST_BUFFER);
+    m_outputTexture.push_back(graphicAPI.createTexture(
+                              m_viewportDim.x,
+                              m_viewportDim.y,
+                              TEXTURE_BINDINGS::E::RENDER_TARGET |
+                              TEXTURE_BINDINGS::E::SHADER_RESOURCE,
+                              FORMATS::kRGBA16_FLOAT));
     //Shadow map
     m_depthMapTexture = graphicAPI.createTexture(1024,
                                                  1024,
@@ -316,7 +322,7 @@ namespace ovEngineSDK {
                                m_linearSampler,
                                SHADER_TYPE::COMPUTE_SHADER);
 
-    graphicAPI.dispatch(Math::ceil(800 / 32), Math::ceil(600 / 32), 1);
+    graphicAPI.dispatch(Math::ceil(m_viewportDim.x / 32), Math::ceil(m_viewportDim.y / 32), 1);
 
     for (int32 i = 0; i < 2; ++i) {
       graphicAPI.setTextureShaderResource(i, nullptr, SHADER_TYPE::COMPUTE_SHADER);
@@ -352,7 +358,7 @@ namespace ovEngineSDK {
                                m_linearSampler,
                                SHADER_TYPE::COMPUTE_SHADER);
 
-    graphicAPI.dispatch(Math::ceil(800 / 32), Math::ceil(600 / 32), 1);
+    graphicAPI.dispatch(Math::ceil(m_viewportDim.x / 32), Math::ceil(m_viewportDim.y / 32), 1);
 
     graphicAPI.setTextureShaderResource(0, nullptr, SHADER_TYPE::COMPUTE_SHADER);
     graphicAPI.setTextureUnorderedAccess(0, nullptr);
@@ -374,7 +380,7 @@ namespace ovEngineSDK {
                                m_linearSampler,
                                SHADER_TYPE::COMPUTE_SHADER);
 
-    graphicAPI.dispatch(Math::ceil(800 / 32), Math::ceil(600 / 32), 1);
+    graphicAPI.dispatch(Math::ceil(m_viewportDim.x / 32), Math::ceil(m_viewportDim.y / 32), 1);
     
     graphicAPI.setTextureShaderResource(0, nullptr, SHADER_TYPE::COMPUTE_SHADER);
     graphicAPI.setTextureUnorderedAccess(0, nullptr);
@@ -392,8 +398,8 @@ namespace ovEngineSDK {
     //LIGHTING
 
     graphicAPI.setViewport(0.f, 0.f, m_viewportDim.x, m_viewportDim.y, 0.f, 1.f);
-    graphicAPI.setRenderTarget(1, m_backBufferTextures, nullptr);
-    graphicAPI.clearRenderTarget(m_backTexture, clearColor);
+    graphicAPI.setRenderTarget(1, m_outputTexture, nullptr);
+    graphicAPI.clearRenderTarget(m_outputTexture[0], clearColor);
 
     graphicAPI.setRasterizerState(m_screenQuadRS);
     graphicAPI.setDepthStencilState(m_screenQuadDS);
@@ -438,5 +444,12 @@ namespace ovEngineSDK {
     for (int32 i = 0; i < 5; ++i) {
       graphicAPI.setTexture(i, nullptr);
     }
+    graphicAPI.setRenderTarget(1, m_backBufferTextures, nullptr);
+    graphicAPI.clearRenderTarget(m_backBufferTextures[0], clearColor);
+  }
+
+  SPtr<Texture>
+  Renderer::getOutputImage() {
+    return m_outputTexture.empty() ? nullptr : m_outputTexture[0];
   }
 }

@@ -1,6 +1,7 @@
 #include "ovGameApp.h"
 #include "ovCamera.h"
 #include "ovBaseInputManager.h"
+#include "ovBaseRenderer.h"
 #if OV_PLATFORM == OV_PLATFORM_WIN32
 #include <Windows.h>
 #endif // OV_PLATFORM == OV_PLATFORM_WIN32
@@ -60,9 +61,6 @@ GameApp::onCreate() {
 
 void
 GameApp::onUpdate(float delta) {
-  ImGui::NewFrame();
-  ImGui::update(m_windowHandle, delta);
-  ImGui::ShowDemoWindow(&m_showDemo);
   //auto& graphicAPI = g_graphicsAPI();
   /*Vector<Matrix4> transforms;
   myModel->transformBones(delta, transforms);
@@ -74,6 +72,8 @@ GameApp::onUpdate(float delta) {
     }
   }
   graphicAPI.updateBuffer(m_bBuffer, &cbBone);*/
+  m_finalTexture = g_baseRenderer().getOutputImage();
+  
   SPtr<Camera> cam = SceneGraph::instance().getActiveCamera();
   if (cam) {
     if (g_baseInput().isMouseKeyPressed(KEYSM::kRIGHT)) {
@@ -103,11 +103,62 @@ GameApp::onUpdate(float delta) {
       cam->update(delta);
     }
   }
+  ImGui::NewFrame();
+  ImGui::update(m_windowHandle, delta);
+  //ImGui window bar
+  ImGui::BeginMainMenuBar(); {
+    if (ImGui::BeginMenu("File")) {
+      if (ImGui::MenuItem("New")) {}
+      if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+      if (ImGui::MenuItem("Save", "Ctrl+S")) {}
+      if (ImGui::MenuItem("Save As..")) {}
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Edit")) {
+      if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+      if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}
+      ImGui::Separator();
+      if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+      if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+      if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Window")) {
+      if (ImGui::MenuItem("Browser")){}
+      if (ImGui::MenuItem("Details")){}
+      if (ImGui::MenuItem("Viewport")){}
+      if (ImGui::MenuItem("Scene")) {}
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Help")) {
+      if (ImGui::MenuItem("About")) {}
+      ImGui::EndMenu();
+    }
+    ImGui::EndMainMenuBar();
+  }
+  //Imgui docking space for windows
+  ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+  //Windows
+  ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
+    ImGui::Text("Placeholder for scenegraph content.");
+    ImGui::End();
+  }
+  ImGui::Begin("Browser", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
+    ImGui::Text("Placeholder for content browser.");
+    ImGui::End();
+  }
+  ImGui::Begin("Details", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
+    ImGui::Text("Placeholder for object details (Transform, Components, etc)");
+    ImGui::End();
+  }
+  ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
+    ImGui::Image(&m_finalTexture, ImGui::GetWindowSize());
+    ImGui::End();
+  }
 }
 
 void
 GameApp::onRender() {
-  //ImGui::Render();
   ImGui::render(m_windowHandle);
 }
 

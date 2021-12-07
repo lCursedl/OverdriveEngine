@@ -108,7 +108,7 @@ namespace ovEngineSDK {
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hInstance = 0;
-    wc.hIcon = 0;
+    wc.hIcon = LoadIcon(0, IDI_APPLICATION);
     wc.hCursor = LoadCursor(0, IDC_ARROW);
     wc.hbrBackground = 0;
     wc.lpszMenuName = 0;
