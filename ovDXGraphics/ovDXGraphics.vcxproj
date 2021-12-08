@@ -188,7 +188,6 @@
     <ClCompile Include="src\ovDXSamplerState.cpp" />
     <ClCompile Include="src\ovDXTexture.cpp" />
     <ClCompile Include="src\ovDXVertexShader.cpp" />
-    <ClCompile Include="src\ovParticleSystemDX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovDXBlendState.h" />
@@ -204,8 +203,11 @@
     <ClInclude Include="include\ovDXTexture.h" />
     <ClInclude Include="include\ovDXVertexShader.h" />
     <ClInclude Include="include\ovParticleDX.h" />
-    <ClInclude Include="include\ovParticleSystemDX.h" />
+    <ClInclude Include="include\ovParticleSystemDX.cuh" />
     <ClInclude Include="include\ovPrerequisitesDX.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="src\ovParticleSystemDX.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
