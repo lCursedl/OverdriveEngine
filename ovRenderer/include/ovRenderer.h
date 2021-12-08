@@ -25,6 +25,9 @@ namespace ovEngineSDK {
     void init() override;
     void update() override;
     void render() override;
+   protected:
+    SPtr<Texture>
+    getOutputImage()                                                  override;
    private:
     
     Vector<WPtr<Model>> m_models;
@@ -49,6 +52,7 @@ namespace ovEngineSDK {
     Vector<SPtr<Texture>> m_tempBlurTextures;
     Vector<SPtr<Texture>> m_lightTextures;
     Vector<SPtr<Texture>> m_shadowTextures;
+    Vector<SPtr<Texture>> m_outputTexture;
     Vector<SPtr<Texture>> m_backBufferTextures;
 
     SPtr<Texture> m_depthStencilTexture;

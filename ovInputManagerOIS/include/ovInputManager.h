@@ -10,23 +10,9 @@
 
 
 namespace ovEngineSDK {
-  
-  class EventHandler : public OIS::KeyListener, public OIS::MouseListener
-  {
-   public:
-    EventHandler() = default;
-    ~EventHandler() = default;
-    
-    bool keyPressed(const OIS::KeyEvent& arg)                         override;
-    bool keyReleased(const OIS::KeyEvent& arg)                        override;
-    bool mouseMoved(const OIS::MouseEvent& arg)                       override;
-    bool mousePressed(const OIS::MouseEvent& arg,
-                      OIS::MouseButtonID id)                          override;
-    bool mouseReleased(const OIS::MouseEvent& arg,
-                       OIS::MouseButtonID id)                         override;
-  };
-
-  class InputManager final : public BaseInputManager
+  class InputManager final : public BaseInputManager,
+                             public OIS::KeyListener,
+                             public OIS::MouseListener
   {
    public:
     InputManager() = default;
@@ -40,7 +26,13 @@ namespace ovEngineSDK {
     bool
     isKeyPressed(KEYS::E key)                                         override;
     bool
-    isMouseKeyPressed(KEYSM::E key)                                   override;   
+    isKeyReleased(KEYS::E key)                                        override;
+
+    bool
+    isMouseKeyPressed(KEYSM::E key)                                   override;
+
+    bool
+    isMouseKeyReleased(KEYSM::E key)                                  override;
 
     void
     getMouseAxis(float& X, float& Y)                                  override;
@@ -59,10 +51,24 @@ namespace ovEngineSDK {
     OIS::Keyboard* m_keyBoard = nullptr;
     OIS::Mouse* m_mouse = nullptr;
 
-    EventHandler m_handler;
+    std::map<OIS::KeyCode, KEYS::E> m_keys;
+    std::map<OIS::MouseButtonID, KEYSM::E> m_mouseKeys;
 
-    std::map<KEYS::E, OIS::KeyCode> m_keys;
-    std::map<KEYSM::E, OIS::MouseButtonID> m_mouseKeys;
+    bool
+    keyPressed(const OIS::KeyEvent& arg)                              override;
+    bool
+    keyReleased(const OIS::KeyEvent& arg)                             override;
+    bool
+    mouseMoved(const OIS::MouseEvent& arg)                            override;
+    bool
+    mousePressed(const OIS::MouseEvent& arg,
+                      OIS::MouseButtonID id)                          override;
+    bool
+    mouseReleased(const OIS::MouseEvent& arg,
+                        OIS::MouseButtonID id)                        override;
+
+    void
+    checkButtonStates();
   };
 
   extern "C" OV_PLUGIN_EXPORT BaseInputManager*
