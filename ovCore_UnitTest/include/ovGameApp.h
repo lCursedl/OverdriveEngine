@@ -30,6 +30,7 @@ class GameApp : public BaseApp
   Color m_color;
   SPtr<Texture> m_pBack;
   SPtr<Texture> m_finalTexture;
+  SPtr<Texture> m_histogramTexture;
   Vector<SPtr<Texture>> m_vTextures;
   bool m_showDemo = true;
 

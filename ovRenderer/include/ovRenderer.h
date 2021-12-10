@@ -28,6 +28,9 @@ namespace ovEngineSDK {
    protected:
     SPtr<Texture>
     getOutputImage()                                                  override;
+
+    SPtr<Texture>
+    getOutputHistogram()                                              override;
    private:
     
     Vector<WPtr<Model>> m_models;
@@ -46,6 +49,7 @@ namespace ovEngineSDK {
     SPtr<ShaderProgram> m_blurVProgram;
     SPtr<ShaderProgram> m_lightProgram;
     SPtr<ShaderProgram> m_shadowProgram;
+    SPtr<ShaderProgram> m_histogramProgram;
 
     Vector<SPtr<Texture>> m_gBufferTextures;
     Vector<SPtr<Texture>> m_ssaoTextures;
@@ -54,6 +58,7 @@ namespace ovEngineSDK {
     Vector<SPtr<Texture>> m_shadowTextures;
     Vector<SPtr<Texture>> m_outputTexture;
     Vector<SPtr<Texture>> m_backBufferTextures;
+    Vector<SPtr<Texture>> m_histogramTextures;
 
     SPtr<Texture> m_depthStencilTexture;
     SPtr<Texture> m_depthMapTexture;
@@ -65,6 +70,9 @@ namespace ovEngineSDK {
     SPtr<Buffer> m_lightBufferConstant;
     SPtr<Buffer> m_shadowBufferConstant;
     SPtr<Buffer> m_viewInverseBufferConstant;
+    SPtr<Buffer> m_histogramR;
+    SPtr<Buffer> m_histogramG;
+    SPtr<Buffer> m_histogramB;
     
     SPtr<InputLayout> m_gBufferLayout;
 

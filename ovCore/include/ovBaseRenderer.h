@@ -27,6 +27,9 @@ namespace ovEngineSDK {
     virtual SPtr<Texture>
     getOutputImage() { return nullptr;}
 
+    virtual SPtr<Texture>
+    getOutputHistogram() { return nullptr; }
+
     friend class GameApp;
   };
 

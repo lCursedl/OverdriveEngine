@@ -73,6 +73,7 @@ GameApp::onUpdate(float delta) {
   }
   graphicAPI.updateBuffer(m_bBuffer, &cbBone);*/
   m_finalTexture = g_baseRenderer().getOutputImage();
+  m_histogramTexture = g_baseRenderer().getOutputHistogram();
   
   SPtr<Camera> cam = SceneGraph::instance().getActiveCamera();
   if (cam) {
@@ -153,6 +154,10 @@ GameApp::onUpdate(float delta) {
   }
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
     ImGui::Image(&m_finalTexture, ImGui::GetWindowSize());
+    ImGui::End();
+  }
+  ImGui::Begin("Histogram", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
+    ImGui::Image(&m_histogramTexture, ImGui::GetWindowSize(), ImVec2(0, 0), ImVec2(1, -1));
     ImGui::End();
   }
 }

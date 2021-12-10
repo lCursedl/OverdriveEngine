@@ -211,6 +211,38 @@ namespace ovEngineSDK {
 
     m_shadowTextures.push_back(m_depthMapTexture);
 
+    //Histogram
+    Vector<int> tempHistDataR;
+    Vector<int> tempHistDataG;
+    Vector<int> tempHistDataB;
+    tempHistDataR.resize(256, 0);
+    tempHistDataG.resize(256, 0);
+    tempHistDataB.resize(256, 0);
+    m_histogramTextures.push_back(graphicAPI.createTexture(m_viewportDim.x,
+                                                           m_viewportDim.y,
+                                                           TEXTURE_BINDINGS::E::RENDER_TARGET |
+                                                           TEXTURE_BINDINGS::E::SHADER_RESOURCE |
+                                                           TEXTURE_BINDINGS::E::UNORDERED_ACCESS,
+                                                           FORMATS::kRGBA16_FLOAT));
+    m_histogramProgram = graphicAPI.createShaderProgram();
+    m_histogramProgram->setComputeShader(graphicAPI.createComputeShader(
+                                         L"resources/shaders/CS_Histogram"));
+    m_histogramProgram->linkProgram();
+    m_histogramR = graphicAPI.createBuffer(tempHistDataR.data(),
+                                           sizeof(int32) * 256,
+                                           BUFFER_TYPE::kUNORDERED_BUFER,
+                                           256,
+                                           FORMATS::kR32_INT);
+    m_histogramG = graphicAPI.createBuffer(tempHistDataG.data(),
+                                           sizeof(int32) * 256,
+                                           BUFFER_TYPE::kUNORDERED_BUFER,
+                                           256,
+                                           FORMATS::kR32_INT);
+    m_histogramB = graphicAPI.createBuffer(tempHistDataB.data(),
+                                           sizeof(int32) * 256,
+                                           BUFFER_TYPE::kUNORDERED_BUFER,
+                                           256,
+                                           FORMATS::kR32_INT);
     //Screen Aligned Quad
     m_screenQuadRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
                                                       CULL_MODE::kNONE,
@@ -444,12 +476,56 @@ namespace ovEngineSDK {
     for (int32 i = 0; i < 5; ++i) {
       graphicAPI.setTexture(i, nullptr);
     }
+
+    //Backbuffer
+
     graphicAPI.setRenderTarget(1, m_backBufferTextures, nullptr);
     graphicAPI.clearRenderTarget(m_backBufferTextures[0], clearColor);
+
+    //Histogram
+
+    graphicAPI.setTextureUnorderedAccess(0, m_histogramTextures[0]);
+    graphicAPI.clearRenderTarget(m_histogramTextures[0], clearColor);
+
+    Vector<int32> tempHistDataR;
+    Vector<int32> tempHistDataG;
+    Vector<int32> tempHistDataB;
+    tempHistDataR.resize(256, 0);
+    tempHistDataG.resize(256, 0);
+    tempHistDataB.resize(256, 0);
+    graphicAPI.updateBuffer(m_histogramR, tempHistDataR.data());
+    graphicAPI.updateBuffer(m_histogramG, tempHistDataG.data());
+    graphicAPI.updateBuffer(m_histogramB, tempHistDataB.data());
+
+    graphicAPI.setShaders(m_histogramProgram);
+    graphicAPI.setTextureShaderResource(0,
+                                        m_outputTexture[0],
+                                        SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setBufferUnorderedAccess(1, m_histogramR);
+    graphicAPI.setBufferUnorderedAccess(2, m_histogramG);
+    graphicAPI.setBufferUnorderedAccess(3, m_histogramB);
+
+    graphicAPI.dispatch(Math::ceil(m_viewportDim.x / 32), Math::ceil(m_viewportDim.y / 32), 1);
+
+    graphicAPI.setTextureUnorderedAccess(0, nullptr);
+
+    graphicAPI.setTextureShaderResource(0,
+                                        nullptr,
+                                        SHADER_TYPE::COMPUTE_SHADER);
+    graphicAPI.setBufferUnorderedAccess(1, nullptr);
+    graphicAPI.setBufferUnorderedAccess(2, nullptr);
+    graphicAPI.setBufferUnorderedAccess(3, nullptr);
+
+    
   }
 
   SPtr<Texture>
   Renderer::getOutputImage() {
     return m_outputTexture.empty() ? nullptr : m_outputTexture[0];
+  }
+
+  SPtr<Texture>
+  Renderer::getOutputHistogram() {
+    return m_histogramTextures.empty() ? nullptr : m_histogramTextures[0];
   }
 }
