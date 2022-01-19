@@ -67,6 +67,7 @@ namespace ovEngineSDK {
     Plugin m_graphicPlugin;
     Plugin m_rendererPlugin;
     Plugin m_inputPlugin;
+    Plugin m_omniPlugin;
     bool m_runApp = false;
     sf::Clock m_appClock;
     float m_deltaTime;

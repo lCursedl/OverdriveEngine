@@ -107,6 +107,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ovUtilities_d.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary />
+      <LinkStatus>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</LinkStatus>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">
@@ -128,6 +129,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ovUtilities.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary />
+      <LinkStatus>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</LinkStatus>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|x64'">
@@ -145,6 +147,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
       <ImportLibrary />
       <AdditionalDependencies>ovUtilities_d.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkStatus>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</LinkStatus>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|x64'">
@@ -166,6 +169,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ovUtilities.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary />
+      <LinkStatus>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</LinkStatus>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

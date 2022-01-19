@@ -173,6 +173,7 @@
     <ClCompile Include="src\ovActor.cpp" />
     <ClCompile Include="src\ovBaseApp.cpp" />
     <ClCompile Include="src\ovBaseInputManager.cpp" />
+    <ClCompile Include="src\ovBaseOmniverse.cpp" />
     <ClCompile Include="src\ovBaseRenderer.cpp" />
     <ClCompile Include="src\ovCamera.cpp" />
     <ClCompile Include="src\ovGraphicsAPI.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="include\ovActor.h" />
     <ClInclude Include="include\ovBaseApp.h" />
     <ClInclude Include="include\ovBaseInputManager.h" />
+    <ClInclude Include="include\ovBaseOmniverse.h" />
     <ClInclude Include="include\ovBaseRenderer.h" />
     <ClInclude Include="include\ovBlendState.h" />
     <ClInclude Include="include\ovBuffer.h" />

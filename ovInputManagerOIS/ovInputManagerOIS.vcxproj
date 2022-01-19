@@ -106,7 +106,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)OIS/lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ovUtilities_d.lib;ovCore_d.lib;OIS_d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary />
+      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">
@@ -127,7 +127,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)OIS/lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ovUtilities.lib;ovCore.lib;OIS.lib;sfml-window.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary />
+      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|x64'">
@@ -144,7 +144,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)OIS/lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ovUtilities_d.lib;ovCore_d.lib;OIS_d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary />
+      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|x64'">
@@ -165,7 +165,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)OIS/lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ovUtilities.lib;ovCore.lib;OIS.lib;sfml-window.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary />
+      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

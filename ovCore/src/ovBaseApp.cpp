@@ -1,6 +1,7 @@
 #include "ovBaseApp.h"
 #include "ovBaseRenderer.h"
 #include "ovBaseInputManager.h"
+#include "ovBaseOmniverse.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
@@ -16,7 +17,7 @@ namespace ovEngineSDK {
     onCreate();
     BaseRenderer::instance().init();
     BaseInputManager::instance().init(m_windowHandle);
-
+    BaseOmniverse::instance().init();
     MSG msg = {};
 
     while (WM_QUIT != msg.message) {
@@ -88,6 +89,13 @@ namespace ovEngineSDK {
       BaseInputManager::instance().setObject(inputBase);
       //g_baseInput().setObject(inputBase);
     }
+    if (m_omniPlugin.loadPlugin("ovOmniverse_d.dll")) {
+      auto createOmniverse = reinterpret_cast<funcCreateBaseOmniverse>(
+                             m_omniPlugin.getProcedureByName("createOmniverse"));
+      BaseOmniverse::startUp();
+      BaseOmniverse* omniBase = createOmniverse();
+      BaseOmniverse::instance().setObject(omniBase);
+    }
   }
 
   void
@@ -97,6 +105,7 @@ namespace ovEngineSDK {
     SceneGraph::shutDown();
     BaseRenderer::shutDown();
     BaseInputManager::shutDown();
+    BaseOmniverse::shutDown();
   }
 
   void BaseApp::createWindow() {
