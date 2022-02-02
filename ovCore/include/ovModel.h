@@ -31,6 +31,11 @@ namespace ovEngineSDK {
     void render() override;
     void load(String const& path);
     void transformBones(float delta, Vector<Matrix4>& Transforms);
+    void getModelInfo(Vector<Vector3>& vertices,
+                      Vector<Vector2I>& indices,
+                      Vector<Vector3>& normals,
+                      Vector<Vector2>& uvs);
+    int32 getMeshCount();
    private:
     Vector<Mesh*> m_meshes;
     Vector<MeshTexture> m_modelTextures;
@@ -55,5 +60,7 @@ namespace ovEngineSDK {
     void calcInterpolatedPos(aiVector3D& Out, float animTime, const aiNodeAnim* nodeAnimation);
     void calcInterpolatedRot(aiQuaternion& Out, float animTime, const aiNodeAnim* nodeAnimation);
     void calcInterpolatedScale(aiVector3D& Out, float animTime, const aiNodeAnim* nodeAnimation);
+
+    friend class OmniverseOV;
   };
 }

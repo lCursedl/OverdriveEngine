@@ -102,6 +102,19 @@ namespace ovEngineSDK {
   }
 
   void
+  Model::getModelInfo(Vector<Vector3>& vertices,
+                      Vector<Vector2I>& indices,
+                      Vector<Vector3>& normals,
+                      Vector<Vector2>& uvs) {
+    
+  }
+
+  int32
+  Model::getMeshCount() {
+    return m_meshes.empty() ? 0 : m_meshes.size();
+  }
+
+  void
   Model::processNode(aiNode* node, const aiScene* scene) {
     //Process each mesh located at the current node
     for (uint32 i = 0; i < node->mNumMeshes; ++i) {

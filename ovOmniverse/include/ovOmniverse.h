@@ -28,7 +28,7 @@
 #include <pxr/usd/usd/modelAPI.h>
 
 namespace ovEngineSDK {
-  
+
   PXR_NAMESPACE_USING_DIRECTIVE
 
   class OmniverseOV final : public BaseOmniverse

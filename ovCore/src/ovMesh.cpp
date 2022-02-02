@@ -101,6 +101,24 @@ namespace ovEngineSDK {
     }
   }
 
+  void
+  Mesh::getMeshInfo(Vector<Vector3>& vertices,
+                    Vector<uint32>& indices,
+                    Vector<Vector3>& normals,
+                    Vector<Vector2>& uvs) {
+    int32 numElements = m_vertices->size();
+    for (int32 index = 0; index < numElements; ++index) {
+      vertices.push_back(m_vertices->at(index).Position);
+      normals.push_back(m_vertices->at(index).Normal);
+      uvs.push_back(m_vertices->at(index).TexCoords);
+    }
+
+    int32 numIndices = m_indices->size();
+    for (int32 index = 0; index < numIndices; ++index) {
+      indices.push_back(m_indices->at(index));
+    }
+  }
+
   void VertexBoneData::addBoneData(uint32 boneID, float weight) {
     for (uint32 i = 0; i < NUM_BONES_PERVERTEX; ++i) {
       if (0.f == Weights[i]) {

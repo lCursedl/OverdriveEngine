@@ -64,6 +64,10 @@ namespace ovEngineSDK {
     ~Mesh();
     void setUpMesh();
     void draw(SPtr<SamplerState> sstate);
+    void getMeshInfo(Vector<Vector3>& vertices,
+                     Vector<uint32>& indices,
+                     Vector<Vector3>& normals,
+                     Vector<Vector2>& uvs);
    private:
     Vector<MeshVertex>*  m_vertices;
     Vector<uint32>*      m_indices;
