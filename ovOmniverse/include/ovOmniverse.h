@@ -46,6 +46,9 @@ namespace ovEngineSDK {
     void
     createUSD()  override;
 
+    bool
+    loadUSD(const String& fileName)                                    override;
+
     String m_existingExample;
     String m_destinationPath = "omniverse://localhost/Users/Overdrive";
 

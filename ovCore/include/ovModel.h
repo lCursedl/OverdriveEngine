@@ -27,15 +27,32 @@ namespace ovEngineSDK {
     Model() = default;
     ~Model();
 
-    void update(float delta) override;
-    void render() override;
-    void load(String const& path);
-    void transformBones(float delta, Vector<Matrix4>& Transforms);
-    void getModelInfo(Vector<Vector3>& vertices,
-                      Vector<Vector2I>& indices,
-                      Vector<Vector3>& normals,
-                      Vector<Vector2>& uvs);
-    int32 getMeshCount();
+    void
+    update(float delta)                                               override;
+
+    void
+    render()                                                          override;
+
+    void
+    load(String const& path, bool notexture = false);
+    void
+    transformBones(float delta, Vector<Matrix4>& Transforms);
+
+    void
+    getModelInfo(Vector<Vector3>& vertices,
+                 Vector<Vector2I>& indices,
+                 Vector<Vector3>& normals,
+                 Vector<Vector2>& uvs);
+
+    int32
+    getMeshCount();
+
+    void
+    addMesh(const Vector<MeshVertex> vertices,
+            const Vector<uint32> indices,
+            const Vector<MeshTexture> textures);
+
+
    private:
     Vector<Mesh*> m_meshes;
     Vector<MeshTexture> m_modelTextures;
@@ -45,10 +62,11 @@ namespace ovEngineSDK {
     aiScene* m_modelScene = nullptr;
     Matrix4 m_globalTransform;
 
-    void processNode(aiNode* node, const aiScene* scene);
-    Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
+    void processNode(aiNode* node, const aiScene* scene, bool texture);
+    Mesh* processMesh(aiMesh* mesh, const aiScene* scene, bool texture);
     Vector<MeshTexture> loadMaterialTextures(aiMaterial* material,
-                                             aiTextureType type);
+                                             aiTextureType type,
+                                             bool texture);
     const aiNodeAnim* findAnimationNode(const aiAnimation* anim, const String node);
     void readNodeHierarchy(float animTime,
                            const aiNode* node,

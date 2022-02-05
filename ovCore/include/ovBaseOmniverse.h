@@ -23,6 +23,9 @@ namespace ovEngineSDK {
     virtual void
     createUSD() {}
 
+    virtual bool
+    loadUSD(const String& fileName) { return false; }
+
   }; 
   
   OV_CORE_EXPORT BaseOmniverse&

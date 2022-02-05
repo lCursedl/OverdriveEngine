@@ -105,7 +105,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(DEVLIBS)Omniverse/lib/nv_usd/debug;$(DEVLIBS)Omniverse/lib/omni_client_library/debug;$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ar.lib;arch.lib;gf.lib;js.lib;kind.lib;pcp.lib;plug.lib;sdf.lib;tf.lib;trace.lib;usd.lib;usdGeom.lib;vt.lib;work.lib;usdShade.lib;usdLux.lib;omniclient.lib;python37.lib;boost_python37-vc141-mt-gd-x64-1_68.lib;shlwapi.lib;ovCore_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ar.lib;arch.lib;gf.lib;js.lib;kind.lib;pcp.lib;plug.lib;sdf.lib;tf.lib;trace.lib;usd.lib;usdGeom.lib;vt.lib;work.lib;usdShade.lib;usdLux.lib;omniclient.lib;python37.lib;boost_python37-vc141-mt-gd-x64-1_68.lib;shlwapi.lib;ovCore_d.lib;%(AdditionalDependencies);ovUtilities_d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
@@ -127,7 +127,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(DEVLIBS)Omniverse/lib/nv_usd/release;$(DEVLIBS)Omniverse/lib/omni_client_library/release;$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ar.lib;arch.lib;gf.lib;js.lib;kind.lib;pcp.lib;plug.lib;sdf.lib;tf.lib;trace.lib;usd.lib;usdGeom.lib;vt.lib;work.lib;usdShade.lib;usdLux.lib;omniclient.lib;python37.lib;boost_python37-vc141-mt-x64-1_68.lib;shlwapi.lib;ovCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ar.lib;arch.lib;gf.lib;js.lib;kind.lib;pcp.lib;plug.lib;sdf.lib;tf.lib;trace.lib;usd.lib;usdGeom.lib;vt.lib;work.lib;usdShade.lib;usdLux.lib;omniclient.lib;python37.lib;boost_python37-vc141-mt-x64-1_68.lib;shlwapi.lib;ovCore.lib;%(AdditionalDependencies);ovUtilities.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
@@ -145,7 +145,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(DEVLIBS)Omniverse/lib/nv_usd/debug;$(DEVLIBS)Omniverse/lib/omni_client_library/debug;$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ar.lib;arch.lib;gf.lib;js.lib;kind.lib;pcp.lib;plug.lib;sdf.lib;tf.lib;trace.lib;usd.lib;usdGeom.lib;vt.lib;work.lib;usdShade.lib;usdLux.lib;omniclient.lib;python37.lib;boost_python37-vc141-mt-gd-x64-1_68.lib;shlwapi.lib;ovCore_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ar.lib;arch.lib;gf.lib;js.lib;kind.lib;pcp.lib;plug.lib;sdf.lib;tf.lib;trace.lib;usd.lib;usdGeom.lib;vt.lib;work.lib;usdShade.lib;usdLux.lib;omniclient.lib;python37.lib;boost_python37-vc141-mt-gd-x64-1_68.lib;shlwapi.lib;ovCore_d.lib;%(AdditionalDependencies);ovUtilities_d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>
@@ -167,7 +167,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(DEVLIBS)Omniverse/lib/nv_usd/release;$(DEVLIBS)Omniverse/lib/omni_client_library/release;$(SolutionDir)lib/$(PlatformTarget)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ar.lib;arch.lib;gf.lib;js.lib;kind.lib;pcp.lib;plug.lib;sdf.lib;tf.lib;trace.lib;usd.lib;usdGeom.lib;vt.lib;work.lib;usdShade.lib;usdLux.lib;omniclient.lib;python37.lib;boost_python37-vc141-mt-x64-1_68.lib;shlwapi.lib;ovCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ar.lib;arch.lib;gf.lib;js.lib;kind.lib;pcp.lib;plug.lib;sdf.lib;tf.lib;trace.lib;usd.lib;usdGeom.lib;vt.lib;work.lib;usdShade.lib;usdLux.lib;omniclient.lib;python37.lib;boost_python37-vc141-mt-x64-1_68.lib;shlwapi.lib;ovCore.lib;%(AdditionalDependencies);ovUtilities.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>

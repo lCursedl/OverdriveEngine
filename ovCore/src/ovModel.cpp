@@ -50,7 +50,7 @@ namespace ovEngineSDK {
   }
 
   void
-  Model::load(String const& path) {
+  Model::load(String const& path, bool notexture) {
     //Read file via assimp
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
@@ -67,7 +67,7 @@ namespace ovEngineSDK {
     //Retrieve the directory path of the file
     m_directory = path.substr(0, path.find_last_of('/'));
     //Process assimp's root node recursively
-    processNode(scene->mRootNode, scene);
+    processNode(scene->mRootNode, scene, notexture);
     //Create texture sampler for model's textures
     m_textureSampler = g_graphicsAPI().createSamplerState(FILTER_LEVEL::FILTER_LINEAR,
                                                           FILTER_LEVEL::FILTER_LINEAR,
@@ -115,19 +115,30 @@ namespace ovEngineSDK {
   }
 
   void
-  Model::processNode(aiNode* node, const aiScene* scene) {
+  Model::addMesh(const Vector<MeshVertex> vertices,
+                 const Vector<uint32> indices,
+                 const Vector<MeshTexture> textures) {
+    Vector<MeshVertex>* mVertices= new Vector<MeshVertex>(vertices);
+    Vector<uint32>* mIndices = new Vector<uint32>(indices);
+
+    m_meshes.push_back(new Mesh(mVertices, mIndices, textures, nullptr));
+
+  }
+
+  void
+  Model::processNode(aiNode* node, const aiScene* scene, bool texture) {
     //Process each mesh located at the current node
     for (uint32 i = 0; i < node->mNumMeshes; ++i) {
       aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-      m_meshes.push_back(processMesh(mesh, scene));
+      m_meshes.push_back(processMesh(mesh, scene, texture));
     }
     for (uint32 i = 0; i < node->mNumChildren; ++i) {
-      processNode(node->mChildren[i], scene);
+      processNode(node->mChildren[i], scene, texture);
     }
   }
 
   Mesh*
-  Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+  Model::processMesh(aiMesh* mesh, const aiScene* scene, bool texture) {
     //Data to fill
     Vector<MeshVertex>* vertices = new Vector<MeshVertex>();
     Vector<uint32>* indices = new Vector<uint32>();
@@ -173,10 +184,10 @@ namespace ovEngineSDK {
     }
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    Vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
-    Vector<MeshTexture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS);
-    Vector<MeshTexture> metallicMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
-    Vector<MeshTexture> roughMaps = loadMaterialTextures(material, aiTextureType_SHININESS);
+    Vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, texture);
+    Vector<MeshTexture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, texture);
+    Vector<MeshTexture> metallicMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, texture);
+    Vector<MeshTexture> roughMaps = loadMaterialTextures(material, aiTextureType_SHININESS, texture);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
     textures.insert(textures.end(), metallicMaps.begin(), metallicMaps.end());
@@ -185,30 +196,41 @@ namespace ovEngineSDK {
   }
 
   Vector<MeshTexture>
-  Model::loadMaterialTextures(aiMaterial* material, aiTextureType type) {
+  Model::loadMaterialTextures(aiMaterial* material, aiTextureType type, bool texture) {
     Vector<MeshTexture> textures;
 
-    for (uint32 i = 0; i < material->GetTextureCount(type); ++i) {
-      aiString aiStr;
-      material->GetTexture(type, i, &aiStr);
-      String str = String(aiStr.C_Str());
-      str = m_directory + getTexturePath(str);
-      bool skip = false;
-      for (auto& textureModel : m_modelTextures) {
-        if (strcmp(textureModel.Path.data(), str.data()) == 0) {
-          textures.push_back(textureModel);
-          skip = true;
-          break;
+    if (!texture) {
+      for (uint32 i = 0; i < material->GetTextureCount(type); ++i) {
+        aiString aiStr;
+        material->GetTexture(type, i, &aiStr);
+        String str = String(aiStr.C_Str());
+        str = m_directory + getTexturePath(str);
+        bool skip = false;
+        for (auto& textureModel : m_modelTextures) {
+          if (strcmp(textureModel.Path.data(), str.data()) == 0) {
+            textures.push_back(textureModel);
+            skip = true;
+            break;
+          }
+        }
+        if (!skip) {
+          MeshTexture mTexture;
+          mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(str);
+          mTexture.Path = str;
+          textures.push_back(mTexture);
+          m_modelTextures.push_back(mTexture);
         }
       }
-      if (!skip) {
-        MeshTexture mTexture;
-        mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(str);
-        mTexture.Path = str;
-        textures.push_back(mTexture);
-        m_modelTextures.push_back(mTexture);
-      }
     }
+    else {
+      MeshTexture mTexture;
+      mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(
+                              "resources/textures/missingtexture.png");
+      mTexture.Path = "missingtexture.png";
+      textures.push_back(mTexture);
+      m_modelTextures.push_back(mTexture);
+    }
+    
     return textures;
   }
   const aiNodeAnim*

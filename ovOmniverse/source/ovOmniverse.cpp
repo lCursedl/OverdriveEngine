@@ -1,6 +1,7 @@
 #include "ovOmniverse.h"
 #include <ovSceneGraph.h>
 #include <ovModel.h>
+#include <ovGraphicsAPI.h>
 
 namespace ovEngineSDK {
   
@@ -55,7 +56,8 @@ namespace ovEngineSDK {
     omniClientRegisterConnectionStatusCallback(nullptr,
                                                OmniClientConnectionStatusCallbackImpl);
     omniUsdLiveSetDefaultEnabled(false);
-    createUSD();
+    //createUSD();
+    loadUSD("resources/models/ovEngine.usd");
     return true;
   }
 
@@ -83,74 +85,154 @@ namespace ovEngineSDK {
           OutputDebugStringA("Couldn't create UsdGeoMesh\n");
           return;
         }
-        int32 count = model->getMeshCount();
-        //Model has single mesh
-        if (count > 0 && count < 2) {
-          
-        }
-        //Model has multiple meshes
-        else if (count > 1) {
-          for (auto& inmesh : model->m_meshes) {
-            String meshName("_mesh" + std::to_string(meshIndex));
-            ++meshIndex;
-            SdfPath meshPath = modelPath.AppendChild(TfToken(meshName));
-            UsdGeomMesh subMesh = UsdGeomMesh::Define(gStage, meshPath);
-            if (!subMesh) {
-              OutputDebugStringA("Couldn't create a sub UsdGeoMesh.\n");
-            }
-            subMesh.CreateOrientationAttr(VtValue(UsdGeomTokens->rightHanded));
-            Vector<Vector3> tempVertices;
-            Vector<uint32> tempIndices;
-            Vector<Vector3> tempNormals;
-            Vector<Vector2> tempUVs;
-            inmesh->getMeshInfo(tempVertices, tempIndices, tempNormals, tempUVs);
+        for (auto& inmesh : model->m_meshes) {
+          String meshName("_mesh" + std::to_string(meshIndex));
+          ++meshIndex;
+          SdfPath meshPath = modelPath.AppendChild(TfToken(meshName));
+          UsdGeomMesh subMesh = UsdGeomMesh::Define(gStage, meshPath);
+          if (!subMesh) {
+            OutputDebugStringA("Couldn't create a sub UsdGeoMesh.\n");
+          }
+          subMesh.CreateOrientationAttr(VtValue(UsdGeomTokens->rightHanded));
+          Vector<Vector3> tempVertices;
+          Vector<uint32> tempIndices;
+          Vector<Vector3> tempNormals;
+          Vector<Vector2> tempUVs;
+          inmesh->getMeshInfo(tempVertices, tempIndices, tempNormals, tempUVs);
 
-            VtArray<GfVec3f> points;
-            points.resize(tempVertices.size());
-            int32 numVertices = tempVertices.size();
-            for (int32 i = 0; i < numVertices; ++i) {
-              points[i] = GfVec3f(tempVertices[i].x, tempVertices[i].y, tempVertices[i].z);
-            }
-            subMesh.CreatePointsAttr(VtValue(points));
+          VtArray<GfVec3f> points;
+          points.resize(tempVertices.size());
+          int32 numVertices = tempVertices.size();
+          for (int32 i = 0; i < numVertices; ++i) {
+            points[i] = GfVec3f(tempVertices[i].x, tempVertices[i].y, tempVertices[i].z);
+          }
+          subMesh.CreatePointsAttr(VtValue(points));
 
-            int32 numIndices = tempIndices.size();
-            VtArray<int32> vecIndices;
-            vecIndices.resize(numIndices);
-            for (int32 i = 0; i < numIndices; ++i) {
-              vecIndices[i] = tempIndices[i];
-            }
-            subMesh.CreateFaceVertexIndicesAttr(VtValue(vecIndices));
+          int32 numIndices = tempIndices.size();
+          VtArray<int32> vecIndices;
+          vecIndices.resize(numIndices);
+          for (int32 i = 0; i < numIndices; ++i) {
+            vecIndices[i] = tempIndices[i];
+          }
+          subMesh.CreateFaceVertexIndicesAttr(VtValue(vecIndices));
 
-            VtArray<GfVec3f> meshNormals;
-            meshNormals.resize(numVertices);
-            for (int32 i = 0; i < numVertices; ++i) {
-              meshNormals[i] = GfVec3f(tempNormals[i].x, tempNormals[i].y, tempNormals[i].z);
-            }
-            subMesh.CreateNormalsAttr(VtValue(meshNormals));
+          VtArray<GfVec3f> meshNormals;
+          meshNormals.resize(numVertices);
+          for (int32 i = 0; i < numVertices; ++i) {
+            meshNormals[i] = GfVec3f(tempNormals[i].x, tempNormals[i].y, tempNormals[i].z);
+          }
+          subMesh.CreateNormalsAttr(VtValue(meshNormals));
 
-            VtArray<int32> faceVertexCounts;
-            faceVertexCounts.resize(numIndices / 3);
-            std::fill(faceVertexCounts.begin(), faceVertexCounts.end(), 3);
-            subMesh.CreateFaceVertexCountsAttr(VtValue(faceVertexCounts));
+          VtArray<int32> faceVertexCounts;
+          faceVertexCounts.resize(numIndices / 3);
+          std::fill(faceVertexCounts.begin(), faceVertexCounts.end(), 3);
+          subMesh.CreateFaceVertexCountsAttr(VtValue(faceVertexCounts));
 
-            UsdGeomPrimvar attr2 = subMesh.CreatePrimvar(_tokens->st, SdfValueTypeNames->TexCoord2fArray);
-            {
-              int32 uv_count = tempUVs.size();
-              VtVec2fArray valueArray;
-              valueArray.resize(uv_count);
-              for (int32 i = 0; i < uv_count; ++i) {
-                valueArray[i].Set(tempUVs[i].x, tempUVs[i].y);
-              }
-              bool status = attr2.Set(valueArray);
+          UsdGeomPrimvar attr2 = subMesh.CreatePrimvar(_tokens->st, SdfValueTypeNames->TexCoord2fArray);
+          {
+            int32 uv_count = tempUVs.size();
+            VtVec2fArray valueArray;
+            valueArray.resize(uv_count);
+            for (int32 i = 0; i < uv_count; ++i) {
+              valueArray[i].Set(tempUVs[i].x, tempUVs[i].y);
             }
-            attr2.SetInterpolation(UsdGeomTokens->vertex);
-          }        
+            bool status = attr2.Set(valueArray);
+          }
+          attr2.SetInterpolation(UsdGeomTokens->vertex);
         }
       }
       gStage->Save();
       omniUsdLiveProcess();
       shutdownOmniverse();
     }
+  }
+
+  bool
+  OmniverseOV::loadUSD(const String& fileName) {
+    gStage = UsdStage::Open(fileName);
+    if (!gStage) {
+      failNotify("Failure to open stage in Omniverse: ", fileName.c_str());
+      return false;
+    }
+
+    {
+      std::unique_lock<std::mutex> lk(gLogMutex);
+      std::cout << "Stage is not Y-up so live xform edits will be incorrect. Stage is"
+                << UsdGeomGetStageUpAxis(gStage) << "-up\n.";
+    }
+
+    auto range = gStage->Traverse();
+    for (const auto& node : range) {
+      if (node.IsA<UsdGeomMesh>()) {
+        UsdPrim parent = node.GetParent();
+        if ("Root" != parent.GetName()) {
+          std::unique_lock<std::mutex> lk(gLogMutex);
+          std::cout << "Found UsdGeoMesh" << node.GetName() << ".\n";
+
+          UsdGeomMesh geoMesh(node);
+          VtArray<GfVec3f> points;
+          VtArray<GfVec3f> normals;
+          VtVec2fArray uvs;
+          VtArray<int32> indices;
+
+          UsdAttribute meshPointAttrib = geoMesh.GetPointsAttr();
+          meshPointAttrib.Get(&points);
+
+          UsdAttribute meshIndexAttrib = geoMesh.GetFaceVertexIndicesAttr();
+          meshIndexAttrib.Get(&indices);
+
+          UsdAttribute meshNormalAttrib = geoMesh.GetNormalsAttr();
+          meshNormalAttrib.Get(&normals);
+
+          UsdAttribute meshUVAttrib = geoMesh.GetPrimvar(_tokens->st);
+          meshUVAttrib.Get(&uvs);
+          uint32 numPoints = points.size();
+          uint32 numIndices = indices.size();
+          
+          Vector<MeshVertex> meshVertices;
+          Vector<uint32> meshIndices;
+
+          for (int32 i = 0; i < numPoints; ++i) {
+            MeshVertex v;
+            v.Position = Vector3(points[i].data()[0], points[i].data()[1], points[i].data()[2]);
+            v.Normal = Vector3(normals[i].data()[0], normals[i].data()[1], normals[i].data()[2]);
+            v.Tangent = Vector3(1.0f, 1.0f, 1.0f);
+            v.Bitangent = Vector3(1.0f, 1.0f, 1.0f);
+            v.TexCoords = Vector2(uvs[i].data()[0], uvs[i].data()[1]);
+            meshVertices.push_back(v);
+          }
+
+          for (int32 i = 0; i < numIndices; ++i) {
+            meshIndices.push_back(indices[i]);
+          }
+
+          Vector<MeshTexture> emptytextures;
+
+          MeshTexture mTexture;
+          mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(
+                                 "resources/textures/missingtexture.png");
+
+          emptytextures.push_back(mTexture);
+          emptytextures.push_back(mTexture);
+          emptytextures.push_back(mTexture);
+          emptytextures.push_back(mTexture);
+
+          SPtr<Model> model = make_shared<Model>();
+          model->addMesh(meshVertices, meshIndices, emptytextures);
+
+          SPtr<Actor>myActor = make_shared<Actor>();
+          myActor->addComponent(model);
+
+          SPtr<SceneNode>myNode = make_shared<SceneNode>();
+          myNode->setActor(myActor);
+
+          
+
+          SceneGraph::instance().addNode(myNode);
+        }
+      }
+    }
+    return false;
   }
 
   static void
