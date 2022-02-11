@@ -142,7 +142,7 @@
     <Link>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget);$(DEVLIBS)Assimp/lib/$(PlatformTarget);D:\Dev\imgui/lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget);$(DEVLIBS)SFML/lib/$(PlatformTarget);$(DEVLIBS)Assimp/lib/$(PlatformTarget);$(DEVLIBS)imgui/lib/$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-window-d.lib;ovUtilities_d.lib;assimp-vc142-mtd.lib;sfml-system-d.lib;imgui_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
     </Link>

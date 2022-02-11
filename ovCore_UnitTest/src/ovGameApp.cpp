@@ -18,32 +18,14 @@ GameApp::onCreate() {
 
   ImGui::init(m_windowHandle);
 
-  /*SPtr<Model>model = make_shared<Model>();
-  model->load("resources/models/BattleDroid.fbx", true);
-
-  SPtr<Model>model2 = make_shared<Model>();
-  model2->load("resources/models/Box_v2.fbx", true);
-
-  SPtr<Model>model3 = make_shared<Model>();
-  model3->load("resources/models/Mavis.fbx", true);
+  SPtr<Model>model = make_shared<Model>();
+  model->load("resources/models/Vela/Vela2.fbx");
 
   SPtr<Actor>myActor = make_shared<Actor>();
   myActor->addComponent(model);
 
-  SPtr<Actor>myActor2 = make_shared<Actor>();
-  myActor2->addComponent(model2);
-
-  SPtr<Actor>myActor3 = make_shared<Actor>();
-  myActor3->addComponent(model3);
-
   SPtr<SceneNode>myNode = make_shared<SceneNode>();
   myNode->setActor(myActor);
-
-  SPtr<SceneNode>myNode2 = make_shared<SceneNode>();
-  myNode2->setActor(myActor2);
-
-  SPtr<SceneNode>myNode3 = make_shared<SceneNode>();
-  myNode3->setActor(myActor3);*/
 
   SPtr<Camera>cam = make_shared<Camera>();
   cam->init(Vector3(0.f, 0.f, -250.f),
@@ -72,9 +54,7 @@ GameApp::onCreate() {
 
   auto& scene = SceneGraph::instance();
 
-  /*scene.addNode(myNode);
-  scene.addNode(myNode2);
-  scene.addNode(myNode3);*/
+  scene.addNode(myNode);
   scene.addNode(camNode);
   scene.addNode(planeNode);
 

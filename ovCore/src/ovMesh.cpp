@@ -3,9 +3,9 @@
 
 namespace ovEngineSDK {
 
-  Mesh::Mesh(Vector<MeshVertex>* vertex,
-             Vector<uint32>* index,
-             Vector<MeshTexture> texture,
+  Mesh::Mesh(const Vector<MeshVertex> vertex,
+             const Vector<uint32> index,
+             const Vector<MeshTexture> texture,
              aiMesh* mesh) {
     m_vertices = vertex;
     m_indices = index;
@@ -52,33 +52,29 @@ namespace ovEngineSDK {
   }
 
   Mesh::~Mesh() {
-    if (m_vertices) {
-      if (!m_vertices->empty()) {
-        m_vertices->clear();
-        delete m_vertices;
-      }
+    if (!m_vertices.empty()) {
+      m_vertices.clear();
     }
-    if (m_indices) {
-      if (!m_indices->empty()) {
-        m_indices->clear();
-        delete m_indices;
-      }
+    if (!m_indices.empty()) {
+      m_indices.clear();
     }
     if (!m_textures.empty()) {
       m_textures.clear();
     }
   }
+
   void Mesh::setUpMesh() {
     auto graphicAPI = &g_graphicsAPI();
-    m_vertexBuffer = graphicAPI->createBuffer(m_vertices->data(),
+    m_vertexBuffer = graphicAPI->createBuffer(m_vertices.data(),
                                               static_cast<int32>(sizeof(MeshVertex) * 
-                                              m_vertices->size()),
+                                              m_vertices.size()),
                                               BUFFER_TYPE::kVERTEX_BUFFER);
-    m_indexBuffer = graphicAPI->createBuffer(m_indices->data(),
+    m_indexBuffer = graphicAPI->createBuffer(m_indices.data(),
                                              static_cast<int32>(sizeof(uint32) * 
-                                             m_indices->size()),
+                                             m_indices.size()),
                                              BUFFER_TYPE::kINDEX_BUFFER);
   }
+
   void Mesh::draw(SPtr<SamplerState> sstate) {
     auto graphicAPI = &g_graphicsAPI();
 
@@ -94,7 +90,7 @@ namespace ovEngineSDK {
       graphicAPI->setTexture(i, m_textures[i].TextureMesh);
     }
     
-    graphicAPI->drawIndexed(static_cast<int32>(m_indices->size()), 0, 0);
+    graphicAPI->drawIndexed(static_cast<int32>(m_indices.size()), 0, 0);
 
     for (uint32 i = 0; i < numTextures; ++i) {
       graphicAPI->setTexture(i, nullptr);
@@ -106,16 +102,14 @@ namespace ovEngineSDK {
                     Vector<uint32>& indices,
                     Vector<Vector3>& normals,
                     Vector<Vector2>& uvs) {
-    int32 numElements = m_vertices->size();
-    for (int32 index = 0; index < numElements; ++index) {
-      vertices.push_back(m_vertices->at(index).Position);
-      normals.push_back(m_vertices->at(index).Normal);
-      uvs.push_back(m_vertices->at(index).TexCoords);
+    for (auto& vertex : m_vertices) {
+      vertices.push_back(vertex.Position);
+      normals.push_back(vertex.Normal);
+      uvs.push_back(vertex.TexCoords);
     }
 
-    int32 numIndices = m_indices->size();
-    for (int32 index = 0; index < numIndices; ++index) {
-      indices.push_back(m_indices->at(index));
+    for (auto& index : m_indices) {
+      indices.push_back(index);
     }
   }
 

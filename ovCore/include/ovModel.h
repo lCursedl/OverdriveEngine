@@ -52,9 +52,12 @@ namespace ovEngineSDK {
             const Vector<uint32> indices,
             const Vector<MeshTexture> textures);
 
+    static SPtr<Model> createBox();
+    static SPtr<Model> createSphere();
+    static SPtr<Model> createCylinder();
 
    private:
-    Vector<Mesh*> m_meshes;
+    Vector<SPtr<Mesh>> m_meshes;
     Vector<MeshTexture> m_modelTextures;
     String m_directory;
     SPtr<SamplerState> m_textureSampler;
@@ -63,7 +66,7 @@ namespace ovEngineSDK {
     Matrix4 m_globalTransform;
 
     void processNode(aiNode* node, const aiScene* scene, bool texture);
-    Mesh* processMesh(aiMesh* mesh, const aiScene* scene, bool texture);
+    SPtr<Mesh> processMesh(aiMesh* mesh, const aiScene* scene, bool texture);
     Vector<MeshTexture> loadMaterialTextures(aiMaterial* material,
                                              aiTextureType type,
                                              bool texture);

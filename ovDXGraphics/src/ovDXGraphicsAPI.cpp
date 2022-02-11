@@ -312,6 +312,7 @@ namespace ovEngineSDK {
         stbi_image_free(data);
         return nullptr;
       }
+      stbi_image_free(data);
       return texture;
     }
     return nullptr;

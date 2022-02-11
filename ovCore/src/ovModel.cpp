@@ -30,9 +30,6 @@ namespace ovEngineSDK {
   }
 
   Model::~Model() {
-    for (auto& mesh : m_meshes) {
-      delete mesh;
-    }
     m_meshes.clear();
     m_modelTextures.clear();
     delete m_modelScene;
@@ -89,7 +86,7 @@ namespace ovEngineSDK {
     timeInTicks, static_cast<float>(m_modelScene->mAnimations[0]->mDuration));
 
     for (auto& tempMesh : m_meshes) {
-      readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, tempMesh);
+      //readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, tempMesh);
     }
     Transforms.resize(totalBones);
 
@@ -111,18 +108,26 @@ namespace ovEngineSDK {
 
   int32
   Model::getMeshCount() {
-    return m_meshes.empty() ? 0 : m_meshes.size();
+    return m_meshes.empty() ? 0 : static_cast<int32>(m_meshes.size());
   }
 
   void
   Model::addMesh(const Vector<MeshVertex> vertices,
                  const Vector<uint32> indices,
                  const Vector<MeshTexture> textures) {
-    Vector<MeshVertex>* mVertices= new Vector<MeshVertex>(vertices);
-    Vector<uint32>* mIndices = new Vector<uint32>(indices);
+    m_meshes.push_back(make_shared<Mesh>(vertices, indices, textures, nullptr));
+  }
 
-    m_meshes.push_back(new Mesh(mVertices, mIndices, textures, nullptr));
+  SPtr<Model> Model::createBox() {
+    return SPtr<Model>();
+  }
 
+  SPtr<Model> Model::createSphere() {
+    return SPtr<Model>();
+  }
+
+  SPtr<Model> Model::createCylinder() {
+    return SPtr<Model>();
   }
 
   void
@@ -137,11 +142,11 @@ namespace ovEngineSDK {
     }
   }
 
-  Mesh*
+  SPtr<Mesh>
   Model::processMesh(aiMesh* mesh, const aiScene* scene, bool texture) {
     //Data to fill
-    Vector<MeshVertex>* vertices = new Vector<MeshVertex>();
-    Vector<uint32>* indices = new Vector<uint32>();
+    Vector<MeshVertex> vertices;
+    Vector<uint32> indices;
     Vector<MeshTexture> textures;
 
     //Walk through each of the mesh's vertices
@@ -172,14 +177,14 @@ namespace ovEngineSDK {
       v.Bitangent.x = mesh->mBitangents[i].x;
       v.Bitangent.y = mesh->mBitangents[i].y;
       v.Bitangent.z = mesh->mBitangents[i].z;
-      vertices->push_back(v);
+      vertices.push_back(v);
     }
     //Go through each of the mesh's faces and retrieve the corresponding indices
     for (uint32 i = 0; i < mesh->mNumFaces; ++i) {
       aiFace face= mesh->mFaces[i];
       //Retrieve all indices of the face and store them in the indices vector
       for (uint32 j = 0; j < face.mNumIndices; ++j) {
-        indices->push_back(face.mIndices[j]);
+        indices.push_back(face.mIndices[j]);
       }
     }
 
@@ -192,7 +197,7 @@ namespace ovEngineSDK {
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
     textures.insert(textures.end(), metallicMaps.begin(), metallicMaps.end());
     textures.insert(textures.end(), roughMaps.begin(), roughMaps.end());
-    return new Mesh(vertices, indices, textures, mesh);
+    return make_shared<Mesh>(vertices, indices, textures, mesh);
   }
 
   Vector<MeshTexture>

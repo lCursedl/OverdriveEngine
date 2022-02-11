@@ -78,9 +78,8 @@ namespace ovEngineSDK {
   void
   SceneGraph::update(float delta) {
     if (m_pRoot) {
-      SIZE_T numChilds = m_pRoot->m_pChilds.size();
-      for (uint32 i = 0; i < numChilds; ++i) {
-        m_pRoot->m_pChilds[i]->update(delta);
+      for (auto& child : m_pRoot->m_pChilds) {
+        child->update(delta);
       }
     }
   }
@@ -88,9 +87,8 @@ namespace ovEngineSDK {
   void
   SceneGraph::render() {
     if (m_pRoot) {
-      SIZE_T numChilds = m_pRoot->m_pChilds.size();
-      for (uint32 i = 0; i < numChilds; ++i) {
-        m_pRoot->m_pChilds[i]->render();
+      for (auto& child : m_pRoot->m_pChilds) {
+        child->render();
       }
     }
   }

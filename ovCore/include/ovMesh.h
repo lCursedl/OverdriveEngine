@@ -57,9 +57,9 @@ namespace ovEngineSDK {
   class OV_CORE_EXPORT Mesh
   {
    public:
-    Mesh(Vector<MeshVertex>* vertex,
-         Vector<uint32>* index,
-         Vector<MeshTexture> texture,
+    Mesh(const Vector<MeshVertex> vertex,
+         const Vector<uint32> index,
+         const Vector<MeshTexture> texture,
          aiMesh* mesh);
     ~Mesh();
     void setUpMesh();
@@ -68,9 +68,10 @@ namespace ovEngineSDK {
                      Vector<uint32>& indices,
                      Vector<Vector3>& normals,
                      Vector<Vector2>& uvs);
+
    private:
-    Vector<MeshVertex>*  m_vertices;
-    Vector<uint32>*      m_indices;
+    Vector<MeshVertex>  m_vertices;
+    Vector<uint32>      m_indices;
     Vector<MeshTexture> m_textures;
     Vector<BoneInfo> m_boneInfo;
     Vector<VertexBoneData> m_bonesPerVertex;
