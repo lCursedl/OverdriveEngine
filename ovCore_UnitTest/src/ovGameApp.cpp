@@ -27,6 +27,12 @@ GameApp::onCreate() {
   SPtr<SceneNode>myNode = make_shared<SceneNode>();
   myNode->setActor(myActor);
 
+  SPtr<Model>box = Model::createSphere(50.f, 12, 12);
+  SPtr<Actor>boxActor = make_shared<Actor>();
+  boxActor->addComponent(box);
+  SPtr<SceneNode>boxNode = make_shared<SceneNode>();
+  boxNode->setActor(boxActor);
+
   SPtr<Camera>cam = make_shared<Camera>();
   cam->init(Vector3(0.f, 0.f, -250.f),
             Vector3(0.f, 0.f, -1.f),
@@ -55,6 +61,7 @@ GameApp::onCreate() {
   auto& scene = SceneGraph::instance();
 
   scene.addNode(myNode);
+  scene.addNode(boxNode);
   scene.addNode(camNode);
   scene.addNode(planeNode);
 

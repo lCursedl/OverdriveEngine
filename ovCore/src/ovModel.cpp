@@ -4,6 +4,9 @@
 
 namespace ovEngineSDK {
   
+  #define MIN_SPHERE_SECTOR 3
+  #define MIN_SPHERE_STACK 2
+
   String getTexturePath(String file) {
     size_t realPos = 0;
     size_t posInvSlash = file.rfind('\\');
@@ -119,12 +122,203 @@ namespace ovEngineSDK {
   }
 
   SPtr<Model> Model::createBox() {
-    return SPtr<Model>();
+    SPtr<Model> Box = make_shared<Model>();
+    Vector<MeshVertex> boxVertices;
+    Vector<uint32> boxIndices;
+    Vector<MeshTexture> boxTextures;
+    MeshVertex v;
+
+    v.Normal = Vector3(1.f, 1.f, 1.f);
+    v.Tangent = Vector3(1.f, 1.f, 1.f);
+    v.Bitangent = Vector3(1.f, 1.f, 1.f);
+
+    v.Position = Vector3(-1.f, 1.f, -1.f); v.TexCoords = Vector2(0.f, 0.f);    
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, 1.f, -1.f); v.TexCoords = Vector2(1.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, 1.f, 1.f); v.TexCoords = Vector2(1.f, 1.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(-1.f, 1.f, 1.f); v.TexCoords = Vector2(0.f, 1.f);
+    boxVertices.push_back(v);
+
+    v.Position = Vector3(-1.f, -1.f, -1.f); v.TexCoords = Vector2(0.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, -1.f, -1.f); v.TexCoords = Vector2(1.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, -1.f, 1.f); v.TexCoords = Vector2(1.f, 1.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(-1.f, -1.f, 1.f); v.TexCoords = Vector2(0.f, 1.f);
+    boxVertices.push_back(v);
+
+    v.Position = Vector3(-1.f, -1.f, 1.f); v.TexCoords = Vector2(0.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(-1.f, -1.f, -1.f); v.TexCoords = Vector2(1.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(-1.f, 1.f, -1.f); v.TexCoords = Vector2(1.f, 1.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(-1.f, 1.f, 1.f); v.TexCoords = Vector2(0.f, 1.f);
+    boxVertices.push_back(v);
+
+    v.Position = Vector3(1.f, -1.f, 1.f); v.TexCoords = Vector2(0.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, -1.f, -1.f); v.TexCoords = Vector2(1.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, 1.f, -1.f); v.TexCoords = Vector2(1.f, 1.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, 1.f, 1.f); v.TexCoords = Vector2(0.f, 1.f);
+    boxVertices.push_back(v);
+
+    v.Position = Vector3(-1.f, -1.f, -1.f); v.TexCoords = Vector2(0.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, -1.f, 1.f); v.TexCoords = Vector2(1.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, 1.f, -1.f); v.TexCoords = Vector2(1.f, 1.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(-1.f, 1.f, -1.f); v.TexCoords = Vector2(0.f, 1.f);
+    boxVertices.push_back(v);
+
+    v.Position = Vector3(-1.f, -1.f, 1.f); v.TexCoords = Vector2(0.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, -1.f, 1.f); v.TexCoords = Vector2(1.f, 0.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(1.f, 1.f, 1.f); v.TexCoords = Vector2(1.f, 1.f);
+    boxVertices.push_back(v);
+    v.Position = Vector3(-1.f, 1.f, 1.f); v.TexCoords = Vector2(0.f, 1.f);
+    boxVertices.push_back(v);
+
+    boxIndices.push_back(3); boxIndices.push_back(1); boxIndices.push_back(0);
+
+    boxIndices.push_back(2); boxIndices.push_back(1); boxIndices.push_back(3);
+
+    boxIndices.push_back(6); boxIndices.push_back(4); boxIndices.push_back(5);
+
+    boxIndices.push_back(7); boxIndices.push_back(4); boxIndices.push_back(6);
+
+    boxIndices.push_back(11); boxIndices.push_back(9); boxIndices.push_back(8);
+
+    boxIndices.push_back(10); boxIndices.push_back(9); boxIndices.push_back(11);
+
+    boxIndices.push_back(14); boxIndices.push_back(12); boxIndices.push_back(13);
+
+    boxIndices.push_back(15); boxIndices.push_back(12); boxIndices.push_back(14);
+
+    boxIndices.push_back(19); boxIndices.push_back(17); boxIndices.push_back(16);
+
+    boxIndices.push_back(18); boxIndices.push_back(17); boxIndices.push_back(19);
+
+    boxIndices.push_back(22); boxIndices.push_back(20); boxIndices.push_back(21);
+
+    boxIndices.push_back(23); boxIndices.push_back(20); boxIndices.push_back(22);
+
+    MeshTexture mTexture;
+    mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(
+      "resources/textures/missingtexture.png");
+
+    boxTextures.push_back(mTexture);
+    boxTextures.push_back(mTexture);
+    boxTextures.push_back(mTexture);
+    boxTextures.push_back(mTexture);
+
+    Box->m_textureSampler = g_graphicsAPI().createSamplerState(FILTER_LEVEL::FILTER_LINEAR,
+                                                      FILTER_LEVEL::FILTER_LINEAR,
+                                                      FILTER_LEVEL::FILTER_LINEAR,
+                                                      false,
+                                                      0,
+                                                      WRAPPING::WRAP,
+                                                      COMPARISON::NEVER);
+
+    Box->addMesh(boxVertices, boxIndices, boxTextures);
+    return Box;
   }
 
-  SPtr<Model> Model::createSphere() {
-    return SPtr<Model>();
+  SPtr<Model>
+  Model::createSphere(float radius, uint32 sectors, uint32 stacks) {
+    int32 sphereSectors = sectors < MIN_SPHERE_SECTOR ? MIN_SPHERE_SECTOR : sectors;
+    int32 spehereStacks = stacks < MIN_SPHERE_STACK ? MIN_SPHERE_STACK : stacks;
+    
+    float x, y, z, xy;
+    float nx, ny, nz, lengthInv = 1.0f / radius;
+    float s, t;
+
+    float sectorStep = 2 * Math::PI / sphereSectors;
+    float stackStep = Math::PI / spehereStacks;
+    float sectorAngle, stackAngle;
+
+    Vector<MeshVertex> sphereVertices;
+    Vector<uint32> sphereIndices;
+    Vector<MeshTexture> sphereTextures;
+    MeshVertex vertex;
+    vertex.Tangent = Vector3(1.0f, 1.0f, 1.0f);
+    vertex.Bitangent = Vector3(1.0f, 1.0f, 1.0f);
+
+    //Vertices
+    for (uint32 i = 0; i <= spehereStacks; ++i) {
+      stackAngle = Math::PI / 2 - i * stackStep;
+      xy = radius * Math::cos(stackAngle);
+      z = radius * Math::sin(stackAngle);
+
+      for (uint32 j = 0; j <= sphereSectors; ++j) {
+        sectorAngle = j * sectorStep;
+
+        //Vertex
+        x = xy * Math::cos(sectorAngle);
+        y = xy * Math::sin(sectorAngle);
+        vertex.Position = Vector3(x, y, z);
+        //Normal
+        nx = x * lengthInv;
+        ny = y * lengthInv;
+        nz = z * lengthInv;
+        vertex.Normal = Vector3(nx, ny, nz);
+        //Texcoords
+        s = static_cast<float>(j / sphereSectors);
+        t = static_cast<float>(i / spehereStacks);
+        vertex.TexCoords = Vector2(s, t);
+        sphereVertices.push_back(vertex);
+      }
+    }
+    //Indices
+    uint32 k1, k2;
+    for (uint32 i = 0; i < spehereStacks; ++i) {
+      k1 = i * (sphereSectors + 1);
+      k2 = k1 + sphereSectors + 1;
+
+      for (int32 j = 0; j < sphereSectors; ++j, ++k1, ++k2) {
+        if (i != 0) {
+          sphereIndices.push_back(k1);
+          sphereIndices.push_back(k2);
+          sphereIndices.push_back(k1 + 1);
+        }
+
+        if (i != (spehereStacks - 1)) {
+          sphereIndices.push_back(k1 + 1);
+          sphereIndices.push_back(k2);
+          sphereIndices.push_back(k2 + 1);
+        }
+      }
+
+    }
+    SPtr<Model> Sphere = make_shared<Model>();
+    MeshTexture mTexture;
+    mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(
+      "resources/textures/missingtexture.png");
+
+    sphereTextures.push_back(mTexture);
+    sphereTextures.push_back(mTexture);
+    sphereTextures.push_back(mTexture);
+    sphereTextures.push_back(mTexture);
+    Sphere->addMesh(sphereVertices, sphereIndices, sphereTextures);
+    Sphere->m_textureSampler = g_graphicsAPI().createSamplerState(
+                                FILTER_LEVEL::FILTER_LINEAR,
+                                FILTER_LEVEL::FILTER_LINEAR,
+                                FILTER_LEVEL::FILTER_LINEAR,
+                                false,
+                                0,
+                                WRAPPING::WRAP,
+                                COMPARISON::NEVER);
+    return Sphere;
   }
+
+  
 
   SPtr<Model> Model::createCylinder() {
     return SPtr<Model>();
