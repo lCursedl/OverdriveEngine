@@ -270,8 +270,8 @@ namespace ovEngineSDK {
         nz = z * lengthInv;
         vertex.Normal = Vector3(nx, ny, nz);
         //Texcoords
-        s = static_cast<float>(j / sphereSectors);
-        t = static_cast<float>(i / spehereStacks);
+        s = (float)j / sphereSectors;
+        t = (float)i / spehereStacks;
         vertex.TexCoords = Vector2(s, t);
         sphereVertices.push_back(vertex);
       }
