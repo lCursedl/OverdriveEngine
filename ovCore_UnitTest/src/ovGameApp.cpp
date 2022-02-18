@@ -27,7 +27,7 @@ GameApp::onCreate() {
   SPtr<SceneNode>myNode = make_shared<SceneNode>();
   myNode->setActor(myActor);
 
-  SPtr<Model>box = Model::createSphere(50.f, 12, 12);
+  SPtr<Model>box = Model::createCylinder(25.f, 25.f, 25.f);
   SPtr<Actor>boxActor = make_shared<Actor>();
   boxActor->addComponent(box);
   SPtr<SceneNode>boxNode = make_shared<SceneNode>();

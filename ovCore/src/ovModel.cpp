@@ -6,6 +6,8 @@ namespace ovEngineSDK {
   
   #define MIN_SPHERE_SECTOR 3
   #define MIN_SPHERE_STACK 2
+  #define MIN_CYLINDER_SECTOR 3
+  #define MIN_CYLINDER_STACK 1
 
   String getTexturePath(String file) {
     size_t realPos = 0;
@@ -318,10 +320,171 @@ namespace ovEngineSDK {
     return Sphere;
   }
 
-  
+  SPtr<Model>
+  Model::createCylinder(float bottomRadius,
+                        float topRadius,
+                        float height,
+                        uint32 sectors,
+                        uint32 stacks) {
+    uint32 cylinderSectors = sectors < MIN_CYLINDER_SECTOR ? MIN_CYLINDER_SECTOR : sectors;
+    uint32 cylinderStacks = stacks < MIN_CYLINDER_STACK ? MIN_CYLINDER_STACK : stacks;
 
-  SPtr<Model> Model::createCylinder() {
-    return SPtr<Model>();
+    //Generate unit circle vertices first
+    float sectorStep = 2.f * Math::PI / cylinderSectors;
+    float sectorAngle;
+
+    Vector<Vector3> unitCircleVertices;
+
+    for (uint32 i = 0; i <= cylinderSectors; ++i) {
+      sectorAngle = i * sectorStep;
+      unitCircleVertices.push_back(Vector3(Math::cos(sectorAngle),
+                                           Math::sin(sectorAngle),
+                                           0.f));
+    }
+
+    Vector<Vector3> cylinderNormals;
+
+    //Generate shared normal vector of the side of cylinder
+    float zAngle = Math::atan2(bottomRadius - topRadius, height).toDegrees();
+    float x0 = Math::cos(zAngle);
+    float y0 = 0.f;
+    float z0 = Math::sin(zAngle);
+
+    for (uint32 i = 0; i <= cylinderSectors; ++i) {
+      sectorAngle = i * sectorStep;
+      cylinderNormals.push_back(Vector3(Math::cos(sectorAngle) * x0 - Math::sin(sectorAngle) * y0,
+                                        Math::sin(sectorAngle) * x0 + Math::cos(sectorAngle) * y0,
+                                        z0));
+    }
+    //Put vertices of side cylinder to array by scaling unit circle
+    float z, radius;
+    Vector<MeshVertex> cylinderVertices;
+    MeshVertex v;
+    v.Tangent = Vector3(1.f, 1.f, 1.f);
+    v.Bitangent = Vector3(1.f, 1.f, 1.f);
+
+    for (uint32 i = 0; i <= cylinderStacks; ++i) {
+      z = -(height * .5f) + (float)i / cylinderStacks * height;
+      radius = bottomRadius + (float)i / cylinderStacks * (topRadius - bottomRadius);
+      float t = 1.f - (float)i / cylinderStacks;
+
+      for (uint32 j = 0; j <= cylinderSectors; ++j) {
+        v.Position = Vector3(unitCircleVertices[j].x * radius,
+                             unitCircleVertices[j].y * radius,
+                             z);
+        v.Normal = Vector3(cylinderNormals[j].x,
+                           cylinderNormals[j].y,
+                           cylinderNormals[j].z);
+        v.TexCoords = Vector2((float)j / cylinderSectors, t);
+        cylinderVertices.push_back(v);
+      }
+    }
+    //Remember where the base vertices start
+    
+    //Put vertices of base of cylinder
+    z = -height * .5f;
+    v.Position = Vector3(0.f, 0.f, z);
+    v.Normal = Vector3(0.f, 0.f, -1.f);
+    v.TexCoords = Vector2(.5f, .5f);
+    cylinderVertices.push_back(v);
+
+    for (uint32 i = 0; i < cylinderSectors; ++i) {
+      v.Position = Vector3(unitCircleVertices[i].x * bottomRadius,
+                           unitCircleVertices[i].y * bottomRadius,
+                           z);
+      v.Normal = Vector3(0.f, 0.f, -1.f);
+      v.TexCoords = Vector2(-unitCircleVertices[i].x * .5f + .5f,
+                            -unitCircleVertices[i].y * .5f + .5f);
+      cylinderVertices.push_back(v);
+    }
+    //Remember where the top vertices start
+    uint32 baseVertexIndex = (uint32)cylinderVertices.size() / 3;
+    uint32 topVertexIndex = baseVertexIndex + cylinderSectors + 1;
+
+    //Put vertices of top of cylinder
+    z = height * .5f;
+    v.Position = Vector3(0.f, 0.f, z);
+    v.Normal = Vector3(0.f, 0.f, 1.f);
+    v.TexCoords = Vector2(.5f, .5f);
+    cylinderVertices.push_back(v);
+
+    for (uint32 i = 0; i < cylinderSectors; ++i) {
+      v.Position = Vector3(unitCircleVertices[i].x * topRadius,
+                           unitCircleVertices[i].y * topRadius,
+                           z);
+      v.Normal = Vector3(0.f, 0.f, 1.f);
+      v.TexCoords = Vector2(unitCircleVertices[i].x * .5f + .5f,
+                            -unitCircleVertices[i].y * .5f + .5f);
+      cylinderVertices.push_back(v);
+    }
+
+    //Put indices for sides
+    Vector<uint32> cylinderIndices;
+    uint32 k1, k2;
+    for (uint32 i = 0; i < cylinderStacks; ++i) {
+      k1 = i * (cylinderSectors + 1);
+      k2 = k1 + cylinderSectors + 1;
+
+      for (uint32 j = 0; j < cylinderSectors; ++j, ++k1, ++k2) {
+        //2 triangles per sector
+        cylinderIndices.push_back(k1);
+        cylinderIndices.push_back(k1 + 1);
+        cylinderIndices.push_back(k2);
+
+        cylinderIndices.push_back(k2);
+        cylinderIndices.push_back(k1 + 1);
+        cylinderIndices.push_back(k2 + 1);
+      }
+    }
+
+    //Put indices for bottom
+    for (uint32 i = 0, k = baseVertexIndex + 1; i < cylinderSectors; ++i, ++k) {
+      if (i < (cylinderSectors - 1)) {
+        cylinderIndices.push_back(baseVertexIndex);
+        cylinderIndices.push_back(k + 1);
+        cylinderIndices.push_back(k);
+      }
+      else {
+        cylinderIndices.push_back(baseVertexIndex);
+        cylinderIndices.push_back(baseVertexIndex + 1);
+        cylinderIndices.push_back(k);
+      }
+    }
+
+    //Put indices for top
+    for (uint32 i = 0, k = topVertexIndex + 1; i < cylinderSectors; ++i, ++k) {
+      if (i < (cylinderSectors - 1)) {
+        cylinderIndices.push_back(topVertexIndex);
+        cylinderIndices.push_back(k);
+        cylinderIndices.push_back(k + 1);
+      }
+      else {
+        cylinderIndices.push_back(topVertexIndex);
+        cylinderIndices.push_back(k);
+        cylinderIndices.push_back(topVertexIndex + 1);
+      }
+    }
+
+    SPtr<Model> Cylinder = make_shared<Model>();
+    MeshTexture mTexture;
+    Vector<MeshTexture> cylinderTextures;
+    mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(
+      "resources/textures/missingtexture.png");
+
+    cylinderTextures.push_back(mTexture);
+    cylinderTextures.push_back(mTexture);
+    cylinderTextures.push_back(mTexture);
+    cylinderTextures.push_back(mTexture);
+    Cylinder->addMesh(cylinderVertices, cylinderIndices, cylinderTextures);
+    Cylinder->m_textureSampler = g_graphicsAPI().createSamplerState(
+                                  FILTER_LEVEL::FILTER_LINEAR,
+                                  FILTER_LEVEL::FILTER_LINEAR,
+                                  FILTER_LEVEL::FILTER_LINEAR,
+                                  false,
+                                  0,
+                                  WRAPPING::WRAP,
+                                  COMPARISON::NEVER);
+    return Cylinder;
   }
 
   void

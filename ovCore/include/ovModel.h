@@ -53,8 +53,14 @@ namespace ovEngineSDK {
             const Vector<MeshTexture> textures);
 
     static SPtr<Model> createBox();
-    static SPtr<Model> createSphere(float radius = 1.0f, uint32 sectors = 36, uint32 stacks = 18);
-    static SPtr<Model> createCylinder();
+    static SPtr<Model> createSphere(float radius = 1.f,
+                                    uint32 sectors = 36,
+                                    uint32 stacks = 18);
+    static SPtr<Model> createCylinder(float bottomRadius = 1.f,
+                                      float topRadius = 1.f,
+                                      float height = 1.f,
+                                      uint32 sectors = 36,
+                                      uint32 stacks = 1);
 
    private:
     Vector<SPtr<Mesh>> m_meshes;
