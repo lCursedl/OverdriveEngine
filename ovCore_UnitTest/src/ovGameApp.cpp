@@ -65,6 +65,7 @@ GameApp::onCreate() {
   scene.addNode(camNode);
   scene.addNode(planeNode);
 
+  m_vTextures = graphicAPI.createCompressedTexture("resources/textures/Compress.png");
 }
 
 void

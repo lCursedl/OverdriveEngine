@@ -150,6 +150,13 @@ namespace ovEngineSDK {
       return nullptr;
      }
 
+     virtual Vector<SPtr<Texture>>
+     createCompressedTexture(String) {
+       return Vector<SPtr<Texture>>();
+     }
+
+     
+
      /**
      * @fn       SPtr<Texture> createTextureFromMemory(int32 width, int32 height,
                  TEXTURE_BINDINGS binding, FORMATS format, uint8* data)
@@ -166,7 +173,8 @@ namespace ovEngineSDK {
                                int32,
                                TEXTURE_BINDINGS::E,
                                FORMATS::E,
-                               uint8*) {
+                               uint8*,
+                               uint32 elements = 4) {
        return nullptr;
      }
      /**

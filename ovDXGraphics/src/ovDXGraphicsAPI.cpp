@@ -31,7 +31,8 @@ namespace ovEngineSDK {
     uint32 width = rc.right - rc.left;
     uint32 height = rc.bottom - rc.top;
 
-    uint32 createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+    uint32 createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG | 
+    D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
 
     D3D_DRIVER_TYPE driverTypes[] = {
       D3D_DRIVER_TYPE_HARDWARE,
@@ -318,12 +319,68 @@ namespace ovEngineSDK {
     return nullptr;
   }
 
+  Vector<SPtr<Texture>>
+  DXGraphicsAPI::createCompressedTexture(String path) {
+    int32 width, height, components;
+    uint8* data = stbi_load(path.c_str(), &width, &height, &components, 3);
+    Vector<uint8> rData, gData, bData;
+    int32 value = width * height;
+    rData.resize(value);
+    gData.resize(value);
+    bData.resize(value);
+
+    for (uint32 i = 0; i < width * height; ++i) {
+      rData[i] = data[3 * i];
+      /*rData[(3 * i) + 1] = data[3 * i];
+      rData[(3 * i) + 2] = data[3 * i];*/
+
+      gData[i] = data[(3 * i) + 1];
+      /*gData[(3 * i) + 1] = data[(3 * i) + 1];
+      gData[(3 * i) + 2] = data[(3 * i) + 1];*/
+
+      bData[i] = data[(3 * i) + 2];
+      /*bData[(3 * i) + 1] = data[(3 * i) + 2];
+      bData[(3 * i) + 2] = data[(3 * i) + 2];*/
+    }
+
+    SPtr<Texture> rTexture =
+    createTextureFromMemory(width,
+                            height,
+                            TEXTURE_BINDINGS::E::SHADER_RESOURCE,
+                            FORMATS::kR8_UNORM,
+                            rData.data(),
+                            1);
+
+    SPtr<Texture> gTexture =
+    createTextureFromMemory(width,
+                            height,
+                            TEXTURE_BINDINGS::E::SHADER_RESOURCE,
+                            FORMATS::kR8_UNORM,
+                            gData.data(),
+                            1);
+    
+    SPtr<Texture> bTexture =
+    createTextureFromMemory(width,
+                            height,
+                            TEXTURE_BINDINGS::E::SHADER_RESOURCE,
+                            FORMATS::kR8_UNORM,
+                            bData.data(),
+                            1);
+
+    Vector<SPtr<Texture>> compressedTextures;
+    compressedTextures.push_back(rTexture);
+    compressedTextures.push_back(gTexture);
+    compressedTextures.push_back(bTexture);
+    return compressedTextures;
+  }
+
   SPtr<Texture>
   DXGraphicsAPI::createTextureFromMemory(int32 width,
                                          int32 height,
                                          TEXTURE_BINDINGS::E binding,
                                          FORMATS::E format,
-                                         uint8* data) {
+                                         uint8* data,
+                                         uint32 elements) {
     if (data) {
       SPtr<DXTexture>texture(new DXTexture);
       //Texture descriptor
@@ -354,7 +411,7 @@ namespace ovEngineSDK {
       D3D11_SUBRESOURCE_DATA subResource;
       ZeroMemory(&subResource, sizeof(subResource));
       subResource.pSysMem = data;
-      subResource.SysMemPitch = width * 4;
+      subResource.SysMemPitch = width * elements;
 
       //Create texture with descriptor and data
       if (FAILED(m_device->CreateTexture2D(&desc, &subResource, &texture->m_texture))) {
@@ -1182,7 +1239,7 @@ namespace ovEngineSDK {
       return;
     }
     if (!tex->m_texture || !tex->m_srv) {
-      OutputDebugStringA("Uninitialized texture received.\n");
+      //OutputDebugStringA("Uninitialized texture received.\n");
       return;
     }
     m_deviceContext->PSSetShaderResources(slot, 1, &tex->m_srv);
@@ -1300,8 +1357,8 @@ namespace ovEngineSDK {
       return;
     }
     if (!tex->m_texture || !tex->m_srv) {
-      OutputDebugStringA("Uninitialized texture received.\n");
-      //return;
+      //OutputDebugStringA("Uninitialized texture received.\n");
+      return;
     }
     switch (shader)
     {
@@ -1341,7 +1398,7 @@ namespace ovEngineSDK {
       return;
     }
     if (!tex->m_texture || !tex->m_uav) {
-      OutputDebugStringA("Uninitialized texture received.\n");
+      //OutputDebugStringA("Uninitialized texture received.\n");
       return;
     }
     m_deviceContext->CSSetUnorderedAccessViews(slot, 1, &tex->m_uav, 0);

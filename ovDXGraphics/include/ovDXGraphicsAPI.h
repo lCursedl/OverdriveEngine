@@ -31,12 +31,16 @@ namespace ovEngineSDK {
     SPtr<Texture>
     createTextureFromFile(String path)                                override;
 
+    Vector<SPtr<Texture>>
+    createCompressedTexture(String)                                   override;
+
     SPtr<Texture>
     createTextureFromMemory(int32 width,
                             int32 height,
                             TEXTURE_BINDINGS::E binding,
                             FORMATS::E format,
-                            uint8* data)                              override;
+                            uint8* data,
+                            uint32 elements = 4)                      override;
 
     SPtr<ShaderProgram>
     createShaderProgram()                                             override;
