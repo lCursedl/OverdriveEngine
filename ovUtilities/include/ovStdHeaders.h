@@ -53,6 +53,7 @@
 #include <functional>
 #include <limits>
 #include <iterator>
+#include <numeric>
 /*****************************************************************************/
 /*
 * C++ Stream

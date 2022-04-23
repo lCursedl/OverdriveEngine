@@ -3,23 +3,15 @@
 #include <ovMesh.h>
 #include <ovComponent.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <assimp/cimport.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
+//#include <assimp/cimport.h>
 
-//class aiAnimation;
-//class aiScene;
-//class aiNodeAnim;
-//class aiTextureType;
-//class aiMaterial;
-//class aiNode;
-//class aiMesh;
-//class aiVector3D;
-//class aiQuaternion;
+struct aiAnimation;
+struct aiScene;
 
-namespace ovEngineSDK {
-  
+namespace ovEngineSDK {  
 
   class OV_CORE_EXPORT Model : public Component
   {
@@ -33,7 +25,7 @@ namespace ovEngineSDK {
     void
     render()                                                          override;
 
-    void
+    static SPtr<Model>
     load(String const& path, bool notexture = false);
     void
     transformBones(float delta, Vector<Matrix4>& Transforms);
@@ -52,17 +44,23 @@ namespace ovEngineSDK {
             const Vector<uint32> indices,
             const Vector<MeshTexture> textures);
 
-    static SPtr<Model> createBox();
-    static SPtr<Model> createSphere(float radius = 1.f,
-                                    uint32 sectors = 36,
-                                    uint32 stacks = 18);
-    static SPtr<Model> createCylinder(float bottomRadius = 1.f,
-                                      float topRadius = 1.f,
-                                      float height = 1.f,
-                                      uint32 sectors = 36,
-                                      uint32 stacks = 1);
+    static SPtr<Model>
+    createBox();
+    static SPtr<Model>
+    createSphere(float radius = 1.f,
+                 uint32 sectors = 36,
+                 uint32 stacks = 18);
+    static SPtr<Model>
+    createCylinder(float bottomRadius = 1.f,
+                   float topRadius = 1.f,
+                   float height = 1.f,
+                   uint32 sectors = 36,
+                   uint32 stacks = 1);
 
-   private:
+    static SPtr<Model>
+    loadOVFile(String const& path, bool notexture = false);
+
+   public:
     Vector<SPtr<Mesh>> m_meshes;
     Vector<MeshTexture> m_modelTextures;
     String m_directory;
@@ -71,7 +69,7 @@ namespace ovEngineSDK {
     aiScene* m_modelScene = nullptr;
     Matrix4 m_globalTransform;
 
-    void processNode(aiNode* node, const aiScene* scene, bool texture);
+    /*void processNode(aiNode* node, const aiScene* scene, bool texture);
     SPtr<Mesh> processMesh(aiMesh* mesh, const aiScene* scene, bool texture);
     Vector<MeshTexture> loadMaterialTextures(aiMaterial* material,
                                              aiTextureType type,
@@ -86,7 +84,7 @@ namespace ovEngineSDK {
     uint32 findScaling(float animTime, const aiNodeAnim* nodeAnimation);
     void calcInterpolatedPos(aiVector3D& Out, float animTime, const aiNodeAnim* nodeAnimation);
     void calcInterpolatedRot(aiQuaternion& Out, float animTime, const aiNodeAnim* nodeAnimation);
-    void calcInterpolatedScale(aiVector3D& Out, float animTime, const aiNodeAnim* nodeAnimation);
+    void calcInterpolatedScale(aiVector3D& Out, float animTime, const aiNodeAnim* nodeAnimation);*/
 
     friend class OmniverseOV;
   };

@@ -2,12 +2,39 @@
 #include <ovGraphicsAPI.h>
 #include <ovQuaternion.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <assimp/cimport.h>
+#include <iosfwd>
+
 namespace ovEngineSDK {
   
   #define MIN_SPHERE_SECTOR 3
   #define MIN_SPHERE_STACK 2
   #define MIN_CYLINDER_SECTOR 3
   #define MIN_CYLINDER_STACK 1
+
+  void
+  processNode(SPtr<Model>& model,
+                   aiNode* node,
+                   const aiScene* scene,
+                   bool texture);
+
+  SPtr<Mesh>
+  processMesh(SPtr<Model>& model, aiMesh* mesh, const aiScene* scene, bool texture);
+
+  Vector<MeshTexture>
+  loadMaterialTextures(SPtr<Model>& model,
+                       aiMaterial* material,
+                       aiTextureType type,
+                       bool texture);
+  
+  bool
+  parseOVLine(std::ifstream& file,
+              String& line,
+              int32& lineNumber,
+              SPtr<Model>& refModel);
 
   String getTexturePath(String file) {
     size_t realPos = 0;
@@ -51,7 +78,7 @@ namespace ovEngineSDK {
     }
   }
 
-  void
+  SPtr<Model>
   Model::load(String const& path, bool notexture) {
     //Read file via assimp
     Assimp::Importer importer;
@@ -61,23 +88,25 @@ namespace ovEngineSDK {
                                              aiProcess_Triangulate);
     //Check for errors
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-      return;
+      return nullptr;
     }
-    m_modelScene = importer.GetOrphanedScene();
-    memcpy(&m_globalTransform, &m_modelScene->mRootNode->mTransformation, sizeof(Matrix4));
-    m_globalTransform = m_globalTransform.inverse();
+    SPtr<Model> m = make_shared<Model>();
+    m->m_modelScene = importer.GetOrphanedScene();
+    memcpy(&m->m_globalTransform, &m->m_modelScene->mRootNode->mTransformation, sizeof(Matrix4));
+    m->m_globalTransform = m->m_globalTransform.inverse();
     //Retrieve the directory path of the file
-    m_directory = path.substr(0, path.find_last_of('/'));
+    m->m_directory = path.substr(0, path.find_last_of('/'));
     //Process assimp's root node recursively
-    processNode(scene->mRootNode, scene, notexture);
+    processNode(m, scene->mRootNode, scene, notexture);
     //Create texture sampler for model's textures
-    m_textureSampler = g_graphicsAPI().createSamplerState(FILTER_LEVEL::FILTER_LINEAR,
+    m->m_textureSampler = g_graphicsAPI().createSamplerState(FILTER_LEVEL::FILTER_LINEAR,
                                                           FILTER_LEVEL::FILTER_LINEAR,
                                                           FILTER_LEVEL::FILTER_LINEAR,
                                                           false,
                                                           0,
                                                           WRAPPING::WRAP,
                                                           COMPARISON::NEVER);
+    return m;
   }
 
   void Model::transformBones(float delta, Vector<Matrix4>& Transforms) {
@@ -487,20 +516,142 @@ namespace ovEngineSDK {
     return Cylinder;
   }
 
+  SPtr<Model>
+  Model::loadOVFile(String const& path, bool notexture) {
+    std::ifstream infile;
+    String lineBuffer;
+    bool readFileOK = true;
+    int32 lineNumber = 0;
+
+    infile.open(path);
+    if ((infile.rdstate() & std::ifstream::failbit) != 0) {
+      //Error message opening file
+      return nullptr;
+    }
+
+    SPtr<Model> tempModel = make_shared<Model>();
+    tempModel->m_textureSampler = g_graphicsAPI().createSamplerState(
+                                  FILTER_LEVEL::FILTER_LINEAR,
+                                  FILTER_LEVEL::FILTER_LINEAR,
+                                  FILTER_LEVEL::FILTER_LINEAR,
+                                  false,
+                                  0,
+                                  WRAPPING::WRAP,
+                                  COMPARISON::NEVER);
+    while (!infile.eof()) {
+      std::getline(infile, lineBuffer);
+      ++lineNumber;
+
+      if (!parseOVLine(infile, lineBuffer, lineNumber, tempModel)) {
+        readFileOK = false;
+        break;
+      }
+
+    }
+    infile.close();
+    return readFileOK == true ? tempModel : nullptr;
+  }
+
+  bool
+  parseOVLine(std::ifstream& file,
+              String& line,
+              int32& lineNumber,
+              SPtr<Model>& refModel) {
+    bool parsed, unrecognizedLine = false;
+    char* nextToken = nullptr;
+    char* token = nullptr;
+    char* token2 = nullptr;
+    char* nextToken2 = nullptr;
+    const char* delimiterToken = " \t";
+    const char* delimiterData = ",";
+    int32 currenToken = 0;
+
+    Vector<String> tokens;
+    String originalLine = line;
+    MeshVertex V;
+    V.Tangent = Vector3(1.f, 1.f, 1.f);
+    V.Bitangent = Vector3(1.f, 1.f, 1.f);
+    MeshTexture mTexture;
+    Vector<MeshVertex> meshVertices;
+    Vector<uint32> meshIndices;
+    Vector<MeshTexture> meshTextures;
+
+    token = strtok_s((char*)line.c_str(), delimiterToken, &nextToken);
+    parsed = token == NULL ? true : false;
+
+    while (token != NULL) {
+      if (currenToken == 0) {
+        //Shape
+        if (0 == strcmp(token, "Shape:")) {
+          meshVertices.clear();
+          meshIndices.clear();
+          for (uint32 i = 0; i < 3; ++i) {
+            std::getline(file, line);
+            ++lineNumber;
+          }
+          token = strtok_s((char*)line.c_str(), " ", &nextToken);
+          int32 numFaces = std::stoi(nextToken) * 3;
+          for (uint32 i = 0; i < 3; ++i) {
+            std::getline(file, line);
+            ++lineNumber;
+          }
+          meshIndices.resize(numFaces);
+          for (int32 i = 0; i < numFaces; ++i) {
+            std::getline(file, line);
+            //Vertices
+            token = strtok_s((char*)line.c_str(), delimiterToken, &nextToken);
+            token2 = strtok_s(token, ",", &nextToken2);
+            V.Position.x = std::stof(token2);
+            token2 = strtok_s(nextToken2, ",", &token);
+            V.Position.y = std::stof(token2);
+            V.Position.z = std::stof(token);
+            //Normals
+            token = strtok_s(nextToken, delimiterToken, &nextToken2);
+            token2 = strtok_s(token, ",", &nextToken);
+            V.Normal.x = std::stof(token2);
+            token2 = strtok_s(nextToken, ",", &token);
+            V.Normal.y = std::stof(token2);
+            V.Normal.z = std::stof(token);
+            //UVs
+            token = strtok_s(nextToken2, ",", &nextToken);
+            V.TexCoords.x = std::stof(token);
+            V.TexCoords.y = std::stof(nextToken);
+            meshVertices.push_back(V);
+          }
+          mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(
+                                "resources/textures/missingtexture.png");
+          meshTextures.push_back(mTexture);
+          meshTextures.push_back(mTexture);
+          meshTextures.push_back(mTexture);
+          meshTextures.push_back(mTexture);
+          std::iota(meshIndices.begin(), meshIndices.end(), 0);
+          refModel->addMesh(meshVertices, meshIndices, meshTextures);
+        }
+        else {
+          return true;
+        }
+      }
+    }
+    return parsed;
+  }
+
   void
-  Model::processNode(aiNode* node, const aiScene* scene, bool texture) {
+  processNode(SPtr<Model>& model,
+              aiNode* node,
+              const aiScene* scene,
+              bool texture) {
     //Process each mesh located at the current node
     for (uint32 i = 0; i < node->mNumMeshes; ++i) {
       aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-      m_meshes.push_back(processMesh(mesh, scene, texture));
+      model->m_meshes.push_back(processMesh(model, mesh, scene, texture));
     }
     for (uint32 i = 0; i < node->mNumChildren; ++i) {
-      processNode(node->mChildren[i], scene, texture);
+      processNode(model, node->mChildren[i], scene, texture);
     }
   }
 
   SPtr<Mesh>
-  Model::processMesh(aiMesh* mesh, const aiScene* scene, bool texture) {
+  processMesh(SPtr<Model>& model, aiMesh* mesh, const aiScene* scene, bool texture) {
     //Data to fill
     Vector<MeshVertex> vertices;
     Vector<uint32> indices;
@@ -546,10 +697,23 @@ namespace ovEngineSDK {
     }
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    Vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, texture);
-    Vector<MeshTexture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, texture);
-    Vector<MeshTexture> metallicMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, texture);
-    Vector<MeshTexture> roughMaps = loadMaterialTextures(material, aiTextureType_SHININESS, texture);
+    Vector<MeshTexture> diffuseMaps = loadMaterialTextures(model,
+                                                           material,
+                                                           aiTextureType_DIFFUSE,
+                                                           texture);
+    Vector<MeshTexture> normalMaps = loadMaterialTextures(model,
+                                                          material,
+                                                          aiTextureType_NORMALS,
+                                                          texture);
+    Vector<MeshTexture> metallicMaps = loadMaterialTextures(model,
+                                                            material,
+                                                            aiTextureType_SPECULAR,
+                                                            texture);
+    Vector<MeshTexture> roughMaps = loadMaterialTextures(model,
+                                                         material,
+                                                         aiTextureType_SHININESS,
+                                                         texture);
+
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
     textures.insert(textures.end(), metallicMaps.begin(), metallicMaps.end());
@@ -558,7 +722,10 @@ namespace ovEngineSDK {
   }
 
   Vector<MeshTexture>
-  Model::loadMaterialTextures(aiMaterial* material, aiTextureType type, bool texture) {
+  loadMaterialTextures(SPtr<Model>& model,
+                       aiMaterial* material,
+                       aiTextureType type,
+                       bool texture) {
     Vector<MeshTexture> textures;
 
     if (!texture) {
@@ -566,9 +733,9 @@ namespace ovEngineSDK {
         aiString aiStr;
         material->GetTexture(type, i, &aiStr);
         String str = String(aiStr.C_Str());
-        str = m_directory + getTexturePath(str);
+        str = model->m_directory + getTexturePath(str);
         bool skip = false;
-        for (auto& textureModel : m_modelTextures) {
+        for (auto& textureModel : model->m_modelTextures) {
           if (strcmp(textureModel.Path.data(), str.data()) == 0) {
             textures.push_back(textureModel);
             skip = true;
@@ -580,7 +747,7 @@ namespace ovEngineSDK {
           mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(str);
           mTexture.Path = str;
           textures.push_back(mTexture);
-          m_modelTextures.push_back(mTexture);
+          model->m_modelTextures.push_back(mTexture);
         }
       }
     }
@@ -590,13 +757,13 @@ namespace ovEngineSDK {
                               "resources/textures/missingtexture.png");
       mTexture.Path = "missingtexture.png";
       textures.push_back(mTexture);
-      m_modelTextures.push_back(mTexture);
+      model->m_modelTextures.push_back(mTexture);
     }
     
     return textures;
   }
   const aiNodeAnim*
-  Model::findAnimationNode(const aiAnimation* anim, const String node) {
+  findAnimationNode(const aiAnimation* anim, const String node) {
     for (uint32 i = 0; i < anim->mNumChannels; ++i) {
       const aiNodeAnim* T = anim->mChannels[i];
       if (String(T->mNodeName.data) == node) {
@@ -606,58 +773,59 @@ namespace ovEngineSDK {
     return nullptr;
   }
   void
-  Model::readNodeHierarchy(float animTime,
-                           const aiNode* node,
-                           const Matrix4 tParent,
-                           Mesh* modelMesh) {
-    String nodeName(node->mName.data);
-    
-    Matrix4 Transform;
-    memcpy(&Transform, &node->mTransformation, sizeof(Matrix4));
-    Transform = Transform.transpose();
-    const aiNodeAnim* animNode = findAnimationNode(m_modelScene->mAnimations[0], nodeName);
-    if (animNode) {
-      //Interpolate scaling and generate scaling transformation matrix
-      aiVector3D aiscaling;
-      calcInterpolatedScale(aiscaling, animTime, animNode);
-      Matrix4 scaleMat = Matrix4::IDENTITY;
-      //Translate the values from aiVector3D to Vector3
-      Vector3 scaling(aiscaling.x, aiscaling.y, aiscaling.z);
-      scaleMat = Matrix4::scale(scaleMat, scaling);
+  readNodeHierarchy(float animTime,
+                    const aiNode* node,
+                    const Matrix4 tParent,
+                    Mesh* modelMesh) {
+    //String nodeName(node->mName.data);
+    //
+    //Matrix4 Transform;
+    //memcpy(&Transform, &node->mTransformation, sizeof(Matrix4));
+    //Transform = Transform.transpose();
+    //const aiNodeAnim* animNode = findAnimationNode(m_modelScene->mAnimations[0], nodeName);
+    //if (animNode) {
+    //  //Interpolate scaling and generate scaling transformation matrix
+    //  aiVector3D aiscaling;
+    //  calcInterpolatedScale(aiscaling, animTime, animNode);
+    //  Matrix4 scaleMat = Matrix4::IDENTITY;
+    //  //Translate the values from aiVector3D to Vector3
+    //  Vector3 scaling(aiscaling.x, aiscaling.y, aiscaling.z);
+    //  scaleMat = Matrix4::scale(scaleMat, scaling);
 
-      //Interpolate rotation and generate rotation transform matrix
-      aiQuaternion aiquat;
-      calcInterpolatedRot(aiquat, animTime, animNode);
-      aiquat.Conjugate();
-      Quaternion rotation(static_cast<float>(aiquat.x), static_cast<float>(aiquat.y),
-                          static_cast<float>(aiquat.z), static_cast<float>(aiquat.w));
-      Matrix4 rotMat = Matrix4::fromQuat(rotation);
+    //  //Interpolate rotation and generate rotation transform matrix
+    //  aiQuaternion aiquat;
+    //  calcInterpolatedRot(aiquat, animTime, animNode);
+    //  aiquat.Conjugate();
+    //  Quaternion rotation(static_cast<float>(aiquat.x), static_cast<float>(aiquat.y),
+    //                      static_cast<float>(aiquat.z), static_cast<float>(aiquat.w));
+    //  Matrix4 rotMat = Matrix4::fromQuat(rotation);
 
-      //Interpolate translation and generate translation transform matrix
-      aiVector3D aitranslate;
-      calcInterpolatedPos(aitranslate, animTime, animNode);
-      Matrix4 transMat = Matrix4::IDENTITY;
-      transMat.xVector.w = aitranslate.x;
-      transMat.yVector.w = aitranslate.y;
-      transMat.zVector.w = aitranslate.z;
+    //  //Interpolate translation and generate translation transform matrix
+    //  aiVector3D aitranslate;
+    //  calcInterpolatedPos(aitranslate, animTime, animNode);
+    //  Matrix4 transMat = Matrix4::IDENTITY;
+    //  transMat.xVector.w = aitranslate.x;
+    //  transMat.yVector.w = aitranslate.y;
+    //  transMat.zVector.w = aitranslate.z;
 
-      //Combine above transformations
-      Transform = transMat * rotMat * scaleMat;
-    }
-    Matrix4 globalTransform = tParent * Transform;
-    if (modelMesh->m_boneMapping.find(nodeName) != modelMesh->m_boneMapping.end()) {
-      uint32 boneIndex = modelMesh->m_boneMapping[nodeName];
-      modelMesh->m_boneInfo[boneIndex].FinalTransform =
-                               m_globalTransform *
-                               globalTransform *
-                               modelMesh->m_boneInfo[boneIndex].BoneOffset;
-    }
-    for (uint32 i = 0; i < node->mNumChildren; ++i) {
-      readNodeHierarchy(animTime, node->mChildren[i], globalTransform, modelMesh);
-    }
+    //  //Combine above transformations
+    //  Transform = transMat * rotMat * scaleMat;
+    //}
+    //Matrix4 globalTransform = tParent * Transform;
+    //if (modelMesh->m_boneMapping.find(nodeName) != modelMesh->m_boneMapping.end()) {
+    //  uint32 boneIndex = modelMesh->m_boneMapping[nodeName];
+    //  modelMesh->m_boneInfo[boneIndex].FinalTransform =
+    //                           m_globalTransform *
+    //                           globalTransform *
+    //                           modelMesh->m_boneInfo[boneIndex].BoneOffset;
+    //}
+    //for (uint32 i = 0; i < node->mNumChildren; ++i) {
+    //  readNodeHierarchy(animTime, node->mChildren[i], globalTransform, modelMesh);
+    //}
   }
+
   uint32
-  Model::findPosition(float animTime, const aiNodeAnim* nodeAnimation) {
+  findPosition(float animTime, const aiNodeAnim* nodeAnimation) {
     for (uint32 i = 0; i < nodeAnimation->mNumPositionKeys - 1; ++i) {
       if (animTime < static_cast<float>(nodeAnimation->mPositionKeys[i + 1].mTime)) {
         return i;
@@ -666,8 +834,9 @@ namespace ovEngineSDK {
     assert(0);
     return 0;
   }
+
   uint32
-  Model::findRotation(float animTime, const aiNodeAnim* nodeAnimation) {
+  findRotation(float animTime, const aiNodeAnim* nodeAnimation) {
     assert(nodeAnimation->mNumRotationKeys > 0);
     for (uint32 i = 0; i < nodeAnimation->mNumRotationKeys - 1; ++i) {
       if (animTime < static_cast<float>(nodeAnimation->mRotationKeys[i + 1].mTime)) {
@@ -677,8 +846,9 @@ namespace ovEngineSDK {
     assert(0);
     return 0;
   }
+
   uint32
-  Model::findScaling(float animTime, const aiNodeAnim* nodeAnimation) {
+  findScaling(float animTime, const aiNodeAnim* nodeAnimation) {
     assert(nodeAnimation->mNumScalingKeys > 0);
     for (uint32 i = 0; i < nodeAnimation->mNumScalingKeys - 1; ++i) {
       if (animTime < static_cast<float>(nodeAnimation->mScalingKeys[i + 1].mTime)) {
@@ -688,8 +858,9 @@ namespace ovEngineSDK {
     assert(0);
     return 0;
   }
+
   void
-  Model::calcInterpolatedPos(aiVector3D& Out,
+  calcInterpolatedPos(aiVector3D& Out,
                              float animTime,
                              const aiNodeAnim* nodeAnimation) {
     if (nodeAnimation->mNumPositionKeys == 1) {
@@ -709,8 +880,9 @@ namespace ovEngineSDK {
     aiVector3D dTime = End - Start;
     Out = Start + factor * dTime;
   }
+
   void
-  Model::calcInterpolatedRot(aiQuaternion& Out,
+  calcInterpolatedRot(aiQuaternion& Out,
                              float animTime,
                              const aiNodeAnim* nodeAnimation) {
 
@@ -730,8 +902,9 @@ namespace ovEngineSDK {
     aiQuaternion::Interpolate(Out, Start, End, factor);
     Out.Normalize();
   }
+
   void
-  Model::calcInterpolatedScale(aiVector3D& Out,
+  calcInterpolatedScale(aiVector3D& Out,
                                float animTime,
                                const aiNodeAnim* nodeAnimation) {
     if (nodeAnimation->mNumScalingKeys == 1) {

@@ -219,8 +219,7 @@ namespace ovEngineSDK {
     
     m_screenQuadDS = graphicAPI.createDepthStencilState(false, false, COMPARISON::LESS);
 
-    m_screenQuad = make_shared<Model>();
-    m_screenQuad->load("resources/models/ScreenAlignedQuad.3ds");
+    m_screenQuad = Model::load("resources/models/ScreenAlignedQuad.3ds");
 
     m_screenQuadLayout = graphicAPI.createInputLayout(m_lightProgram, lDesc);
   }

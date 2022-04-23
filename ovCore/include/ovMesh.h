@@ -4,14 +4,16 @@
 
 #include <ovPrerequisitesCore.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
 
 #include <ovVector2.h>
 #include <ovVector3.h>
 #include <ovVector4.h>
 #include <ovMatrix4.h>
+
+struct aiMesh;
 
 namespace ovEngineSDK {
   class Buffer;
@@ -70,6 +72,8 @@ namespace ovEngineSDK {
                      Vector<Vector2>& uvs);
 
    private:
+    
+
     Vector<MeshVertex>  m_vertices;
     Vector<uint32>      m_indices;
     Vector<MeshTexture> m_textures;

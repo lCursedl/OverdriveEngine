@@ -181,6 +181,8 @@
     <ClCompile Include="src\ovModel.cpp" />
     <ClCompile Include="src\ovPlugin.cpp" />
     <ClCompile Include="src\ovSceneGraph.cpp" />
+    <ClCompile Include="src\ovVHACD.cpp" />
+    <ClCompile Include="src\ovVolume.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ovActor.h" />
@@ -207,6 +209,8 @@
     <ClInclude Include="include\ovShader.h" />
     <ClInclude Include="include\ovShaderProgram.h" />
     <ClInclude Include="include\ovTexture.h" />
+    <ClInclude Include="include\ovVHACD.h" />
+    <ClInclude Include="include\ovVolume.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -18,8 +18,7 @@ GameApp::onCreate() {
 
   ImGui::init(m_windowHandle);
 
-  SPtr<Model>model = make_shared<Model>();
-  model->load("resources/models/Vela/Vela2.fbx");
+  SPtr<Model>model = Model::loadOVFile("resources/models/stormtrooper.ovFile", true);
 
   SPtr<Actor>myActor = make_shared<Actor>();
   myActor->addComponent(model);
@@ -49,8 +48,7 @@ GameApp::onCreate() {
   SPtr<SceneNode>camNode = make_shared<SceneNode>();
   camNode->setActor(camActor);
 
-  SPtr<Model>plane = make_shared<Model>();
-  plane->load("resources/models/plano.fbx");
+  SPtr<Model>plane = Model::load("resources/models/plano.fbx");
 
   SPtr<Actor>planeActor = make_shared<Actor>();
   planeActor->addComponent(plane);
@@ -65,7 +63,7 @@ GameApp::onCreate() {
   scene.addNode(camNode);
   scene.addNode(planeNode);
 
-  m_vTextures = graphicAPI.createCompressedTexture("resources/textures/Compress.png");
+  //m_vTextures = graphicAPI.createCompressedTexture("resources/textures/Compress.png");
 }
 
 void
