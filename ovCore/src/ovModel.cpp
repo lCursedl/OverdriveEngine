@@ -569,8 +569,6 @@ namespace ovEngineSDK {
     Vector<String> tokens;
     String originalLine = line;
     MeshVertex V;
-    V.Tangent = Vector3(1.f, 1.f, 1.f);
-    V.Bitangent = Vector3(1.f, 1.f, 1.f);
     MeshTexture mTexture;
     Vector<MeshVertex> meshVertices;
     Vector<uint32> meshIndices;
@@ -612,6 +610,20 @@ namespace ovEngineSDK {
             token2 = strtok_s(nextToken, ",", &token);
             V.Normal.y = std::stof(token2);
             V.Normal.z = std::stof(token);
+            //Binormals
+            token = strtok_s(nextToken2, delimiterToken, &nextToken);
+            token2 = strtok_s(token, ",", &nextToken2);
+            V.Bitangent.x = std::stof(token2);
+            token2 = strtok_s(nextToken2, ",", &token);
+            V.Bitangent.y = std::stof(token2);
+            V.Bitangent.z = std::stof(token);
+            //Tangents
+            token = strtok_s(nextToken, delimiterToken, &nextToken2);
+            token2 = strtok_s(token, ",", &nextToken);
+            V.Tangent.x = std::stof(token2);
+            token2 = strtok_s(nextToken, ",", &token);
+            V.Tangent.y = std::stof(token2);
+            V.Tangent.z = std::stof(token);
             //UVs
             token = strtok_s(nextToken2, ",", &nextToken);
             V.TexCoords.x = std::stof(token);
