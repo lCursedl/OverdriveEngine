@@ -24,7 +24,10 @@ namespace ovEngineSDK {
     createUSD() {}
 
     virtual bool
-    loadUSD(const String& fileName) { return false; }
+    loadUSD(const String& fileName) {
+      OV_UNREFERENCED_PARAMETER(fileName);
+      return false;
+    }
 
   }; 
   

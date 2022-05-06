@@ -22,7 +22,10 @@ namespace ovEngineSDK {
                    bool texture);
 
   SPtr<Mesh>
-  processMesh(SPtr<Model>& model, aiMesh* mesh, const aiScene* scene, bool texture);
+  processMesh(SPtr<Model>& model,
+              aiMesh* mesh,
+              const aiScene* scene,
+              bool texture);
 
   Vector<MeshTexture>
   loadMaterialTextures(SPtr<Model>& model,
@@ -35,6 +38,12 @@ namespace ovEngineSDK {
               String& line,
               int32& lineNumber,
               SPtr<Model>& refModel);
+
+  void
+  readNodeHierarchy(float animTime,
+                    const aiNode* node,
+                    const Matrix4 tParent,
+                    SPtr<Mesh> modelMesh);
 
   String getTexturePath(String file) {
     size_t realPos = 0;
@@ -120,7 +129,7 @@ namespace ovEngineSDK {
     timeInTicks, static_cast<float>(m_modelScene->mAnimations[0]->mDuration));
 
     for (auto& tempMesh : m_meshes) {
-      //readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, tempMesh);
+      readNodeHierarchy(animTime, m_modelScene->mRootNode, Matrix4::IDENTITY, tempMesh);
     }
     Transforms.resize(totalBones);
 
@@ -130,14 +139,6 @@ namespace ovEngineSDK {
           Transforms[j] = m_meshes[i]->m_boneInfo[j].FinalTransform;
       }
     }
-  }
-
-  void
-  Model::getModelInfo(Vector<Vector3>& vertices,
-                      Vector<Vector2I>& indices,
-                      Vector<Vector3>& normals,
-                      Vector<Vector2>& uvs) {
-    
   }
 
   int32
@@ -264,8 +265,8 @@ namespace ovEngineSDK {
 
   SPtr<Model>
   Model::createSphere(float radius, uint32 sectors, uint32 stacks) {
-    int32 sphereSectors = sectors < MIN_SPHERE_SECTOR ? MIN_SPHERE_SECTOR : sectors;
-    int32 spehereStacks = stacks < MIN_SPHERE_STACK ? MIN_SPHERE_STACK : stacks;
+    uint32 sphereSectors = sectors < MIN_SPHERE_SECTOR ? MIN_SPHERE_SECTOR : sectors;
+    uint32 spehereStacks = stacks < MIN_SPHERE_STACK ? MIN_SPHERE_STACK : stacks;
     
     float x, y, z, xy;
     float nx, ny, nz, lengthInv = 1.0f / radius;
@@ -313,7 +314,7 @@ namespace ovEngineSDK {
       k1 = i * (sphereSectors + 1);
       k2 = k1 + sphereSectors + 1;
 
-      for (int32 j = 0; j < sphereSectors; ++j, ++k1, ++k2) {
+      for (uint32 j = 0; j < sphereSectors; ++j, ++k1, ++k2) {
         if (i != 0) {
           sphereIndices.push_back(k1);
           sphereIndices.push_back(k2);
@@ -517,7 +518,7 @@ namespace ovEngineSDK {
   }
 
   SPtr<Model>
-  Model::loadOVFile(String const& path, bool notexture) {
+  Model::loadOVFile(String const& path) {
     std::ifstream infile;
     String lineBuffer;
     bool readFileOK = true;
@@ -557,13 +558,12 @@ namespace ovEngineSDK {
               String& line,
               int32& lineNumber,
               SPtr<Model>& refModel) {
-    bool parsed, unrecognizedLine = false;
+    bool parsed = false;
     char* nextToken = nullptr;
     char* token = nullptr;
     char* token2 = nullptr;
     char* nextToken2 = nullptr;
     const char* delimiterToken = " \t";
-    const char* delimiterData = ",";
     int32 currenToken = 0;
 
     Vector<String> tokens;
@@ -788,7 +788,11 @@ namespace ovEngineSDK {
   readNodeHierarchy(float animTime,
                     const aiNode* node,
                     const Matrix4 tParent,
-                    Mesh* modelMesh) {
+                    SPtr<Mesh> modelMesh) {
+    OV_UNREFERENCED_PARAMETER(animTime);
+    OV_UNREFERENCED_PARAMETER(node);
+    OV_UNREFERENCED_PARAMETER(tParent);
+    OV_UNREFERENCED_PARAMETER(modelMesh);
     //String nodeName(node->mName.data);
     //
     //Matrix4 Transform;

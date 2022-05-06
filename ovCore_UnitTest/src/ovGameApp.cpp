@@ -18,7 +18,7 @@ GameApp::onCreate() {
 
   ImGui::init(m_windowHandle);
 
-  SPtr<Model>model = Model::loadOVFile("resources/models/stormtrooper.ovFile", true);
+  SPtr<Model>model = Model::loadOVFile("resources/models/stormtrooper.ovFile");
 
   SPtr<Actor>myActor = make_shared<Actor>();
   myActor->addComponent(model);

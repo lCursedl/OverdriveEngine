@@ -202,6 +202,7 @@ namespace ovEngineSDK {
 
   bool
   InputManager::mouseMoved(const OIS::MouseEvent& arg) {
+    OV_UNREFERENCED_PARAMETER(arg);
     //const OIS::MouseState& s = arg.state;
     /*std::cout << "\nMouseMoved: Abs("
               << s.X.abs << ", " << s.Y.abs << ", " << s.Z.abs << ") Rel(" << s.X.rel
@@ -211,6 +212,7 @@ namespace ovEngineSDK {
 
   bool
   InputManager::mousePressed(const OIS::MouseEvent& arg, OIS::MouseButtonID id) {
+    OV_UNREFERENCED_PARAMETER(arg);
     //const OIS::MouseState& s = arg.state;
     /*std::cout << "\nMouse button #" << id << " pressed. Abs(" << s.X.abs << ", "
               << s.Y.abs << ", " << s.Z.abs << ") Rel(" << s.X.rel << ", " << s.Y.rel
@@ -221,6 +223,7 @@ namespace ovEngineSDK {
 
   bool
   InputManager::mouseReleased(const OIS::MouseEvent& arg, OIS::MouseButtonID id) {
+    OV_UNREFERENCED_PARAMETER(arg);
     //const OIS::MouseState& s = arg.state;
     /*std::cout << "\nMouse button #" << id << " released. Abs(" << s.X.abs << ", "
               << s.Y.abs << ", " << s.Z.abs << ") Rel(" << s.X.rel << ", " << s.Y.rel

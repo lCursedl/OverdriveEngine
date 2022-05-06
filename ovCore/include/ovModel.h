@@ -30,12 +30,6 @@ namespace ovEngineSDK {
     void
     transformBones(float delta, Vector<Matrix4>& Transforms);
 
-    void
-    getModelInfo(Vector<Vector3>& vertices,
-                 Vector<Vector2I>& indices,
-                 Vector<Vector3>& normals,
-                 Vector<Vector2>& uvs);
-
     int32
     getMeshCount();
 
@@ -58,7 +52,7 @@ namespace ovEngineSDK {
                    uint32 stacks = 1);
 
     static SPtr<Model>
-    loadOVFile(String const& path, bool notexture = false);
+    loadOVFile(String const& path);
 
    public:
     Vector<SPtr<Mesh>> m_meshes;

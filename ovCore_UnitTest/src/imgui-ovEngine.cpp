@@ -177,7 +177,7 @@ namespace ImGui {
 
     if (io.WantSetMousePos) {
       ovEngineSDK::Vector2 pos(mouse_pos_prev.x, mouse_pos_prev.y);
-      ::SetCursorPos(pos.x, pos.y);
+      ::SetCursorPos(static_cast<int32>(pos.x), static_cast<int32>(pos.y));
     }
     //Set Dear ImGui mouse position from OS position
     POINT mouse_screen_pos;

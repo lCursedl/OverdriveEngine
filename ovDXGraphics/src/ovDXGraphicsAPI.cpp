@@ -324,12 +324,12 @@ namespace ovEngineSDK {
     int32 width, height, components;
     uint8* data = stbi_load(path.c_str(), &width, &height, &components, 3);
     Vector<uint8> rData, gData, bData;
-    int32 value = width * height;
+    uint32 value = static_cast<uint32>(width * height);
     rData.resize(value);
     gData.resize(value);
     bData.resize(value);
 
-    for (uint32 i = 0; i < width * height; ++i) {
+    for (uint32 i = 0; i < value; ++i) {
       rData[i] = data[3 * i];
       /*rData[(3 * i) + 1] = data[3 * i];
       rData[(3 * i) + 2] = data[3 * i];*/

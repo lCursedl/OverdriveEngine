@@ -175,6 +175,7 @@ namespace ovEngineSDK {
                                FORMATS::E,
                                uint8*,
                                uint32 elements = 4) {
+       OV_UNREFERENCED_PARAMETER(elements);
        return nullptr;
      }
      /**
