@@ -2,6 +2,7 @@
 #include "ovCamera.h"
 #include "ovBaseInputManager.h"
 #include "ovBaseRenderer.h"
+#include <ovModel.h>
 #if OV_PLATFORM == OV_PLATFORM_WIN32
 #include <Windows.h>
 #endif // OV_PLATFORM == OV_PLATFORM_WIN32

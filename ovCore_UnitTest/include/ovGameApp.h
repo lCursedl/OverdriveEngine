@@ -1,10 +1,6 @@
 #pragma once
 #include <ovBaseApp.h>
-#include <ovVector4.h>
-#include <ovVector3.h>
-#include <ovVector2.h>
 #include <ovMatrix4.h>
-#include <ovModel.h>
 
 using namespace ovEngineSDK;
 
@@ -33,7 +29,7 @@ class GameApp : public BaseApp
   Vector<SPtr<Texture>> m_vTextures;
   bool m_showDemo = true;
 
-  struct Bones {
+  /*struct Bones {
     Matrix4 bones[MAXBONES];
-  };
+  };*/
 };
