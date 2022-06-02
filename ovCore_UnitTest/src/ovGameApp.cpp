@@ -2,6 +2,7 @@
 #include "ovCamera.h"
 #include "ovBaseInputManager.h"
 #include "ovBaseRenderer.h"
+#include "ovBaseOmniverse.h"
 #include <ovModel.h>
 #if OV_PLATFORM == OV_PLATFORM_WIN32
 #include <Windows.h>
@@ -19,19 +20,15 @@ GameApp::onCreate() {
 
   ImGui::init(m_windowHandle);
 
-  SPtr<Model>model = Model::loadOVFile("resources/models/stormtrooper.ovFile");
+  SPtr<Model>model = Model::load("resources/models/Vela/Vela2.fbx");
 
-  SPtr<Actor>myActor = make_shared<Actor>();
+  /*SPtr<Actor>*/myActor = make_shared<Actor>("Vela");
   myActor->addComponent(model);
-
+  //myActor->m_localRotation = Vector3(0.f, 1.5f, 0.f);
+  //myActor->m_localScale = Vector3(0.5f, 0.5f, 0.5f);
+  //myActor->m_localPosition = {100.f, 100.f, 100.f};
   SPtr<SceneNode>myNode = make_shared<SceneNode>();
   myNode->setActor(myActor);
-
-  SPtr<Model>box = Model::createCylinder(25.f, 25.f, 25.f);
-  SPtr<Actor>boxActor = make_shared<Actor>();
-  boxActor->addComponent(box);
-  SPtr<SceneNode>boxNode = make_shared<SceneNode>();
-  boxNode->setActor(boxActor);
 
   SPtr<Camera>cam = make_shared<Camera>();
   cam->init(Vector3(0.f, 0.f, -250.f),
@@ -43,7 +40,7 @@ GameApp::onCreate() {
                               600.f,
                               0.01f,
                               3000.f));
-  SPtr<Actor>camActor = make_shared<Actor>();
+  SPtr<Actor>camActor = make_shared<Actor>("Editor Camera");
   camActor->addComponent(cam);
 
   SPtr<SceneNode>camNode = make_shared<SceneNode>();
@@ -51,7 +48,7 @@ GameApp::onCreate() {
 
   SPtr<Model>plane = Model::load("resources/models/plano.fbx");
 
-  SPtr<Actor>planeActor = make_shared<Actor>();
+  SPtr<Actor>planeActor = make_shared<Actor>("Plane");
   planeActor->addComponent(plane);
 
   SPtr<SceneNode>planeNode = make_shared<SceneNode>();
@@ -60,11 +57,11 @@ GameApp::onCreate() {
   auto& scene = SceneGraph::instance();
 
   scene.addNode(myNode);
-  scene.addNode(boxNode);
   scene.addNode(camNode);
   scene.addNode(planeNode);
-
-  //m_vTextures = graphicAPI.createCompressedTexture("resources/textures/Compress.png");
+  g_baseOmniverse().connectFromOmni(
+    "http://localhost:8080/omniverse://127.0.0.1/Users/cursed/battledroid.usd");
+  //g_baseOmniverse().loadUSD("http://localhost:8080/omniverse://127.0.0.1/Users/cursed/battledroid.usd");
 }
 
 void
@@ -80,8 +77,10 @@ GameApp::onUpdate(float delta) {
     }
   }
   graphicAPI.updateBuffer(m_bBuffer, &cbBone);*/
+  /*myActor->m_localRotation = Vector3(myActor->m_localRotation.x ,
+                                     myActor->m_localRotation.y ,
+                                     myActor->m_localRotation.z + .0005f);*/
   m_finalTexture = g_baseRenderer().getOutputImage();
-  
   SPtr<Camera> cam = SceneGraph::instance().getActiveCamera();
   if (cam) {
     if (g_baseInput().isMouseKeyPressed(KEYSM::kRIGHT)) {
@@ -107,8 +106,6 @@ GameApp::onUpdate(float delta) {
       if (mouseX != 0 && mouseY != 0) {
         cam->rotate(Vector2(mouseX, mouseY), delta);
       }
-      cam->roll(delta);
-      cam->update(delta);
     }
   }
   ImGui::NewFrame();
@@ -136,6 +133,9 @@ GameApp::onUpdate(float delta) {
       if (ImGui::MenuItem("Details")){}
       if (ImGui::MenuItem("Viewport")){}
       if (ImGui::MenuItem("Scene")) {}
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Omniverse")) {
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Help")) {

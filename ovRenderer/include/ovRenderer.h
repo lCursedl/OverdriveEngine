@@ -28,6 +28,9 @@ namespace ovEngineSDK {
    protected:
     SPtr<Texture>
     getOutputImage()                                                  override;
+
+    void
+    setTransformCB(Matrix4 Transform)                                 override;
    private:
     
     Vector<WPtr<Model>> m_models;
@@ -60,6 +63,7 @@ namespace ovEngineSDK {
     SPtr<Texture> m_backTexture;
 
     SPtr<Buffer> m_gBufferConstant;  
+    SPtr<Buffer> m_gBufferModel;
     SPtr<Buffer> m_ssaoBufferConstant;
     SPtr<Buffer> m_blurBufferConstant;
     SPtr<Buffer> m_lightBufferConstant;

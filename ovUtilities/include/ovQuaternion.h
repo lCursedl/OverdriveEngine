@@ -29,6 +29,9 @@ namespace ovEngineSDK {
     static Quaternion
     conjugate(const Quaternion& Quat);
 
+    static Quaternion
+    fromEuler(const Vector3& Eul);
+
     Quaternion
     operator * (const Quaternion & Q) const;
 

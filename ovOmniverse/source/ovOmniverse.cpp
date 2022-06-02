@@ -46,6 +46,46 @@ namespace ovEngineSDK {
     (UsdUVTexture)
   );
 
+  SPtr<Mesh> createMeshfromGeomMesh(const UsdGeomMesh& geomMesh);
+
+  static void
+    createEmptyFolder(const String& emptyFolderPath) {
+      {
+        std::unique_lock<std::mutex> lk(gLogMutex);
+        std::cout << "Waiting to create a new folder: " << emptyFolderPath << " ...";
+      }
+
+      OmniClientResult localResult = Count_eOmniClientResult;
+
+      omniClientWait(omniClientCreateFolder(emptyFolderPath.c_str(),
+        &localResult,
+        [](void* userData,
+          OmniClientResult result) noexcept {
+            auto returnResult = static_cast<OmniClientResult*>(userData);
+            *returnResult = result;
+        }));
+
+      {
+        std::unique_lock<std::mutex> lk(gLogMutex);
+        std::cout << "finished [" << omniClientGetResultString(localResult) << "]\n";
+      }
+  }
+
+  static Vector<UsdPrim>
+  findGeomMesh() {
+    omniUsdLiveWaitForPendingUpdates();
+    Vector<UsdPrim> geomMeshes;
+    auto range = gStage->Traverse();
+    for (const auto & node : range) {
+      if ("Root" == node.GetParent().GetName()) {
+        if (node.IsA<UsdGeomMesh>()) {
+          geomMeshes.push_back(node);
+        }
+      }      
+    }
+    return geomMeshes;
+  }
+
   bool
   OmniverseOV::init() {
     omniClientSetLogCallback(logCallback);
@@ -55,15 +95,15 @@ namespace ovEngineSDK {
     }
     omniClientRegisterConnectionStatusCallback(nullptr,
                                                OmniClientConnectionStatusCallbackImpl);
-    omniUsdLiveSetDefaultEnabled(false);
-    //createUSD();
-    loadUSD("resources/models/ovEngine.usd");
+    omniUsdLiveSetDefaultEnabled(m_liveEditActive);
     return true;
   }
 
   void
   OmniverseOV::update() {
-    
+    if (m_liveEditActive) {
+      liveEdit(findGeomMesh());
+    }
   }
 
   void
@@ -157,82 +197,142 @@ namespace ovEngineSDK {
 
     {
       std::unique_lock<std::mutex> lk(gLogMutex);
-      std::cout << "Stage is not Y-up so live xform edits will be incorrect. Stage is"
-                << UsdGeomGetStageUpAxis(gStage) << "-up\n.";
+      std::cout << "Stage is not Y-up so live xform edits will be incorrect. Stage is "
+                << UsdGeomGetStageUpAxis(gStage) << "-up.\n";
     }
 
     auto range = gStage->Traverse();
     for (const auto& node : range) {
       if (node.IsA<UsdGeomMesh>()) {
         UsdPrim parent = node.GetParent();
-        if ("Root" != parent.GetName()) {
+        if ("Root" == parent.GetName()) {
           std::unique_lock<std::mutex> lk(gLogMutex);
-          std::cout << "Found UsdGeoMesh" << node.GetName() << ".\n";
-
+          std::cout << "Found UsdGeoMesh " << node.GetName() << ".\n";
+          
           UsdGeomMesh geoMesh(node);
           VtArray<GfVec3f> points;
-          VtArray<GfVec3f> normals;
-          VtVec2fArray uvs;
-          VtArray<int32> indices;
-
           UsdAttribute meshPointAttrib = geoMesh.GetPointsAttr();
           meshPointAttrib.Get(&points);
-
-          UsdAttribute meshIndexAttrib = geoMesh.GetFaceVertexIndicesAttr();
-          meshIndexAttrib.Get(&indices);
-
-          UsdAttribute meshNormalAttrib = geoMesh.GetNormalsAttr();
-          meshNormalAttrib.Get(&normals);
-
-          UsdAttribute meshUVAttrib = geoMesh.GetPrimvar(_tokens->st);
-          meshUVAttrib.Get(&uvs);
-          uint32 numPoints = points.size();
-          uint32 numIndices = indices.size();
           
-          Vector<MeshVertex> meshVertices;
-          Vector<uint32> meshIndices;
+          SPtr<Model> tempModel = make_shared<Model>();
+          tempModel->m_textureSampler = g_graphicsAPI().createSamplerState(
+            FILTER_LEVEL::FILTER_LINEAR,
+            FILTER_LEVEL::FILTER_LINEAR,
+            FILTER_LEVEL::FILTER_LINEAR,
+            false,
+            0,
+            WRAPPING::WRAP,
+            COMPARISON::NEVER);
 
-          for (int32 i = 0; i < numPoints; ++i) {
-            MeshVertex v;
-            v.Position = Vector3(points[i].data()[0], points[i].data()[1], points[i].data()[2]);
-            v.Normal = Vector3(normals[i].data()[0], normals[i].data()[1], normals[i].data()[2]);
-            v.Tangent = Vector3(1.0f, 1.0f, 1.0f);
-            v.Bitangent = Vector3(1.0f, 1.0f, 1.0f);
-            v.TexCoords = Vector2(uvs[i].data()[0], uvs[i].data()[1]);
-            meshVertices.push_back(v);
+          //GeomMesh is container and has children
+          if (0 == points.size() && !node.GetAllChildren().empty()) {
+            for (const auto& childNode : node.GetAllChildren()) {
+              if (childNode.IsA<UsdGeomMesh>()) {
+                UsdGeomMesh childGM(childNode);
+                tempModel->m_meshes.push_back(createMeshfromGeomMesh(childGM));
+              }
+            }
+          }
+          //GeomMesh is single and contains the mesh info
+          else {
+            tempModel->m_meshes.push_back(createMeshfromGeomMesh(geoMesh));
           }
 
-          for (int32 i = 0; i < numIndices; ++i) {
-            meshIndices.push_back(indices[i]);
-          }
-
-          Vector<MeshTexture> emptytextures;
-
-          MeshTexture mTexture;
-          mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(
-                                 "resources/textures/missingtexture.png");
-
-          emptytextures.push_back(mTexture);
-          emptytextures.push_back(mTexture);
-          emptytextures.push_back(mTexture);
-          emptytextures.push_back(mTexture);
-
-          SPtr<Model> model = make_shared<Model>();
-          model->addMesh(meshVertices, meshIndices, emptytextures);
-
-          SPtr<Actor>myActor = make_shared<Actor>();
-          myActor->addComponent(model);
+          SPtr<Actor>myActor = make_shared<Actor>(node.GetName().GetString());
+          myActor->addComponent(tempModel);
 
           SPtr<SceneNode>myNode = make_shared<SceneNode>();
           myNode->setActor(myActor);
-
-          
 
           SceneGraph::instance().addNode(myNode);
         }
       }
     }
+    return true;
+  }
+
+  bool
+  OmniverseOV::connectFromOmni(const String& fileName) {
+    m_liveEditActive = true;
+    omniUsdLiveSetDefaultEnabled(m_liveEditActive);
+    return loadUSD(fileName);
+  }
+
+  bool
+  OmniverseOV::connectToOmni(const String& fileName) {
+    m_liveEditActive = true;
+    omniUsdLiveSetDefaultEnabled(m_liveEditActive);
+    if (m_existingExample.empty()) {
+      if (0 != SceneGraph::instance().getActorCount()) {
+        createEmptyUSD(fileName);
+        createUSD();
+        return true;
+      }
+      else {
+        createEmptyUSD(fileName);
+        createOmniverseModel(m_destinationPath);
+        return true;
+      }
+    }
     return false;
+  }
+
+  void
+  OmniverseOV::createEmptyUSD(const String projectName) {
+    createEmptyFolder(m_destinationPath + projectName);
+    m_existingExample = m_destinationPath + projectName;
+    m_destinationPath = m_existingExample;
+  }
+
+  void
+  OmniverseOV::liveEdit(Vector<UsdPrim> primVector) {
+    omniUsdLiveWaitForPendingUpdates();
+    auto& sgraph = SceneGraph::instance();
+    for (auto& prim : primVector) {
+      UsdGeomMesh geomMesh(prim);
+      UsdGeomXformable xForm = geomMesh;
+
+      UsdGeomXformOp translateOp;
+      UsdGeomXformOp rotateOp;
+      UsdGeomXformOp scaleOp;
+
+      GfVec3d position(0);
+      GfVec3f rotZYX(0);
+      GfVec3f scale(1);
+
+      bool resetXformStack = false;
+      Vector<UsdGeomXformOp> xFormOps = xForm.GetOrderedXformOps(&resetXformStack);
+
+      for (SIZE_T i = 0; i < xFormOps.size(); ++i) {
+        switch (xFormOps[i].GetOpType()) {
+        case UsdGeomXformOp::TypeTranslate: {
+            translateOp = xFormOps[i];
+            translateOp.Get(&position);
+            break;
+          }
+        case UsdGeomXformOp::TypeRotateZYX: {
+            rotateOp = xFormOps[i];
+            translateOp.Get(&rotZYX);
+            break;
+          }
+        case UsdGeomXformOp::TypeScale: {
+            scaleOp = xFormOps[i];
+            scaleOp.Get(&scale);
+            break;
+          }
+        }
+      }
+      //Get corresponding actor in scenegraph      
+      auto tmpActor = sgraph.getActorByName(prim.GetName().GetString());
+      tmpActor->m_localPosition = { (float)position.GetArray()[0],
+                                    (float)position.GetArray()[1],
+                                    (float)position.GetArray()[2] };
+      tmpActor->m_localScale = { (float)scale.GetArray()[0],
+                                 (float)scale.GetArray()[1],
+                                 (float)scale.GetArray()[2] };
+    }
+
+    gStage->Save();
   }
 
   static void
@@ -261,7 +361,7 @@ namespace ovEngineSDK {
 
   static String
   createOmniverseModel(const String& destinationPath) {
-    String stageUrl = destinationPath + "/ovEngine.usd";
+    String stageUrl = destinationPath;
 
     {
       std::unique_lock<std::mutex> lk(gLogMutex);
@@ -275,7 +375,7 @@ namespace ovEngineSDK {
 
     gStage = UsdStage::CreateNew(stageUrl);
     if (!gStage) {
-      failNotify("Failure to create model in Omniverse", stageUrl.c_str());
+      failNotify("Failed to create model in Omniverse ", stageUrl.c_str());
       return String();
     }
 
@@ -318,5 +418,58 @@ namespace ovEngineSDK {
    omniUsdLiveWaitForPendingUpdates();
    gStage.Reset();
    omniClientShutdown();
+  }
+
+  SPtr<Mesh> createMeshfromGeomMesh(const UsdGeomMesh& geomMesh) {
+
+    VtArray<GfVec3f> points;
+    VtArray<GfVec3f> normals;
+    VtVec2fArray uvs;
+    VtArray<int32> indices;
+
+    UsdAttribute meshPointAttrib = geomMesh.GetPointsAttr();
+    meshPointAttrib.Get(&points);
+
+    UsdAttribute meshIndexAttrib = geomMesh.GetFaceVertexIndicesAttr();
+    meshIndexAttrib.Get(&indices);
+
+    UsdAttribute meshNormalAttrib = geomMesh.GetNormalsAttr();
+    meshNormalAttrib.Get(&normals);
+
+    UsdAttribute meshUVAttrib = geomMesh.GetPrimvar(_tokens->st);
+    meshUVAttrib.Get(&uvs);
+
+    uint32 numPoints = points.size();
+    uint32 numIndices = indices.size();
+
+    Vector<MeshVertex> meshVertices;
+    Vector<uint32> meshIndices;
+
+    for (int32 i = 0; i < numPoints; ++i) {
+      MeshVertex v;
+      v.Position = Vector3(points[i].data()[0], points[i].data()[1], points[i].data()[2]);
+      v.Normal = Vector3(normals[i].data()[0], normals[i].data()[1], normals[i].data()[2]);
+      v.Tangent = Vector3(1.0f, 1.0f, 1.0f);
+      v.Bitangent = Vector3(1.0f, 1.0f, 1.0f);
+      v.TexCoords = Vector2(uvs[i].data()[0], uvs[i].data()[1]);
+      meshVertices.push_back(v);
+    }
+
+    for (int32 i = 0; i < numIndices; ++i) {
+      meshIndices.push_back(indices[i]);
+    }
+
+    Vector<MeshTexture> emptytextures;
+
+    MeshTexture mTexture;
+    mTexture.TextureMesh = g_graphicsAPI().createTextureFromFile(
+                           "resources/textures/missingtexture.png");
+
+    emptytextures.push_back(mTexture);
+    emptytextures.push_back(mTexture);
+    emptytextures.push_back(mTexture);
+    emptytextures.push_back(mTexture);
+
+    return make_shared<Mesh>(meshVertices, meshIndices, emptytextures, nullptr);
   }
 }

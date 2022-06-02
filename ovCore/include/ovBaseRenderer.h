@@ -1,6 +1,7 @@
 #pragma once
 #include <ovModule.h>
 #include <ovTexture.h>
+#include <ovMatrix4.h>
 #include <ovPrerequisitesCore.h>
 
 namespace ovEngineSDK {
@@ -26,8 +27,12 @@ namespace ovEngineSDK {
    protected:
     virtual SPtr<Texture>
     getOutputImage() { return nullptr;}
+    
+    virtual void
+    setTransformCB(Matrix4 Transform) { OV_UNREFERENCED_PARAMETER(Transform); }
 
     friend class GameApp;
+    friend class Actor;
   };
 
   OV_CORE_EXPORT BaseRenderer&

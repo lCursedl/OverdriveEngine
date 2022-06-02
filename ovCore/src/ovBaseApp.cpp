@@ -14,10 +14,10 @@ namespace ovEngineSDK {
     initSystems();
     createWindow();
     g_graphicsAPI().init(m_windowHandle);    
+    BaseOmniverse::instance().init();
     onCreate();
     BaseRenderer::instance().init();
     BaseInputManager::instance().init(m_windowHandle);
-    //BaseOmniverse::instance().init();
     MSG msg = {};
 
     while (WM_QUIT != msg.message) {
@@ -54,7 +54,9 @@ namespace ovEngineSDK {
   
   void BaseApp::update() {
     g_baseInput().update();
-    onUpdate(m_deltaTime); 
+    SceneGraph::instance().update(m_deltaTime);
+    BaseOmniverse::instance().update();
+    onUpdate(m_deltaTime);
     BaseRenderer::instance().update();
   }
 
@@ -89,13 +91,13 @@ namespace ovEngineSDK {
       BaseInputManager::instance().setObject(inputBase);
       //g_baseInput().setObject(inputBase);
     }
-    /*if (m_omniPlugin.loadPlugin("ovOmniverse_d.dll")) {
+    if (m_omniPlugin.loadPlugin("ovOmniverse_d.dll")) {
       auto createOmniverse = reinterpret_cast<funcCreateBaseOmniverse>(
                              m_omniPlugin.getProcedureByName("createOmniverse"));
       BaseOmniverse::startUp();
       BaseOmniverse* omniBase = createOmniverse();
       BaseOmniverse::instance().setObject(omniBase);
-    }*/
+    }
   }
 
   void
@@ -105,7 +107,7 @@ namespace ovEngineSDK {
     SceneGraph::shutDown();
     BaseRenderer::shutDown();
     BaseInputManager::shutDown();
-    //BaseOmniverse::shutDown();
+    BaseOmniverse::shutDown();
   }
 
   void BaseApp::createWindow() {

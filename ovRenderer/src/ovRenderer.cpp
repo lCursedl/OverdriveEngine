@@ -14,7 +14,6 @@ namespace ovEngineSDK {
   struct Matrices {
     Matrix4 view;
     Matrix4 projection;
-    Vector4 objectPos;
   };
 
   struct SSAO {
@@ -87,20 +86,13 @@ namespace ovEngineSDK {
                                                      TEXTURE_BINDINGS::E::DEPTH_STENCIL,
                                                      FORMATS::kD24_S8);
 
-    Matrices mat;
-    mat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
-    mat.view = graphicAPI.matrix4Policy(LookAtMatrix(Vector3(0.f, -150.f, 0.f),
-                                                     Vector3(0.f, 0.f, -100.f),
-                                                     Vector3(0.f, 1.f, 0.f)));
-    mat.projection = graphicAPI.matrix4Policy(PerspectiveMatrix(70.f,
-                                                                m_viewportDim.x,
-                                                                m_viewportDim.y,
-                                                                0.01f,
-                                                                3000.f));
-
     m_gBufferConstant = graphicAPI.createBuffer(nullptr,
                                                 sizeof(Matrices),
                                                 BUFFER_TYPE::kCONST_BUFFER);
+
+    m_gBufferModel = graphicAPI.createBuffer(nullptr,
+                                             sizeof(Matrix4),
+                                             BUFFER_TYPE::kCONST_BUFFER);
 
     m_viewInverseBufferConstant = graphicAPI.createBuffer(nullptr,
                                                           sizeof(Matrix4),
@@ -203,7 +195,7 @@ namespace ovEngineSDK {
                                                           Vector3(0.f, 0.f, 0.f),
                                                           Vector3(0.f, 1.f, 0.f)));
 
-    lightMat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
+    //lightMat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
 
     m_shadowBufferConstant = graphicAPI.createBuffer(&lightMat,
                                                      sizeof(Matrices),
@@ -230,7 +222,7 @@ namespace ovEngineSDK {
 
     m_activeCam = SceneGraph::instance().getActiveCamera();
     Matrices mat;
-    mat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
+    //mat.objectPos = Vector4(0.f, 0.f, 0.f, 1.f);
     mat.projection = graphicAPI.matrix4Policy(m_activeCam->getProjection());
     mat.view = graphicAPI.matrix4Policy(m_activeCam->getView());
 
@@ -248,7 +240,7 @@ namespace ovEngineSDK {
                             mat.view.zVector.w,
                             1.0f);
     light.matWV = Matrix4::IDENTITY;
-    light.matWV.zVector = mat.objectPos;
+    light.matWV.zVector = Vector4(0.f, 0.f, 0.f, 1.0f);//mat.objectPos;
     light.matWV = graphicAPI.matrix4Policy(light.matWV) * mat.view;
 
     graphicAPI.updateBuffer(m_lightBufferConstant, &light);
@@ -288,6 +280,7 @@ namespace ovEngineSDK {
     graphicAPI.setDepthStencilState(m_gBufferDS);
 
     graphicAPI.setConstantBuffer(0, m_gBufferConstant, SHADER_TYPE::VERTEX_SHADER);
+    graphicAPI.setConstantBuffer(1, m_gBufferModel, SHADER_TYPE::VERTEX_SHADER);
     graphicAPI.setConstantBuffer(0, m_gBufferConstant, SHADER_TYPE::PIXEL_SHADER);
 
     
@@ -462,5 +455,13 @@ namespace ovEngineSDK {
   SPtr<Texture>
   Renderer::getOutputImage() {
     return m_outputTexture.empty() ? nullptr : m_outputTexture[0];
+  }
+  void
+  Renderer::setTransformCB(Matrix4 Transform) {
+    //g_graphicsAPI().setConstantBuffer(1, nullptr, SHADER_TYPE::VERTEX_SHADER);
+    Matrix4 TransformTrans = g_graphicsAPI().matrix4Policy(Transform);
+    g_graphicsAPI().updateBuffer(m_gBufferModel,
+                                 &TransformTrans);
+    //g_graphicsAPI().setConstantBuffer(1, m_gBufferModel, SHADER_TYPE::VERTEX_SHADER);
   }
 }

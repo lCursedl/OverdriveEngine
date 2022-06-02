@@ -153,6 +153,11 @@ namespace ovEngineSDK {
     m_meshes.push_back(make_shared<Mesh>(vertices, indices, textures, nullptr));
   }
 
+  void
+  Model::addMesh(const SPtr<Mesh> mesh) {
+    m_meshes.push_back(mesh);
+  }
+
   SPtr<Model> Model::createBox() {
     SPtr<Model> Box = make_shared<Model>();
     Vector<MeshVertex> boxVertices;

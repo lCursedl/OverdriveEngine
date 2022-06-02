@@ -67,12 +67,32 @@ namespace ovEngineSDK {
     return camera;
   }
 
+  SPtr<Actor>
+  SceneNode::getActorByName(const String& actorName) {
+    if (actorName == m_pActor->getActorName()) {
+      return m_pActor;
+    }
+    else {
+      for (auto& node : m_pChilds) {
+        auto tmpActor = node->getActorByName(actorName);
+        if (nullptr != tmpActor) {
+          if (actorName == tmpActor->getActorName()) {
+            return tmpActor;
+          }
+        }
+      }
+    }
+    return nullptr;
+  }
+
   SceneGraph::SceneGraph() {
     m_pRoot = make_shared<SceneNode>();
+    m_numActors = 0;
   }
 
   void SceneGraph::addNode(SPtr<SceneNode> node) {
     m_pRoot->addChildNode(node);
+    m_numActors = nullptr != node->m_pActor ? m_numActors + 1 : m_numActors;
   }
 
   void
@@ -117,5 +137,15 @@ namespace ovEngineSDK {
     }
 
     return modelVector;
+  }
+
+  uint32
+  SceneGraph::getActorCount() {
+    return m_numActors;
+  }
+
+  SPtr<Actor>
+  SceneGraph::getActorByName(const String& actorName) {
+    return m_pRoot->getActorByName(actorName);
   }
 }

@@ -38,6 +38,9 @@ namespace ovEngineSDK {
             const Vector<uint32> indices,
             const Vector<MeshTexture> textures);
 
+    void
+    addMesh(const SPtr<Mesh> mesh);
+
     static SPtr<Model>
     createBox();
     static SPtr<Model>

@@ -17,7 +17,6 @@
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usd/primRange.h>
-#include <pxr/usd/usdGeom/primvar.h>
 #include <pxr/usd/usdShade/input.h>
 #include <pxr/usd/usdShade/output.h>
 #include <pxr/usd/usdGeom/xform.h>
@@ -26,6 +25,7 @@
 #include <pxr/usd/usdLux/domeLight.h>
 #include <pxr/usd/usdShade/shader.h>
 #include <pxr/usd/usd/modelAPI.h>
+#include <pxr/usd/usdGeom/primvarsAPI.h>
 
 namespace ovEngineSDK {
 
@@ -38,25 +38,38 @@ namespace ovEngineSDK {
     ~OmniverseOV() = default;
 
     bool
-    init()       override;
+    init()                                                            override;
 
     void
-    update()     override;
+    update()                                                          override;
 
     void
-    createUSD()  override;
+    createUSD()                                                       override;
 
     bool
-    loadUSD(const String& fileName)                                    override;
+    loadUSD(const String& fileName)                                   override;
+
+    bool
+    connectFromOmni(const String& fileName)                           override;
+
+    bool
+    connectToOmni(const String& fileName)                             override;
+
+    void
+    createEmptyUSD(const String projectName);
+
+    void
+    liveEdit(Vector<UsdPrim> primVector);
 
     String m_existingExample;
-    String m_destinationPath = "omniverse://localhost/Users/Overdrive";
+    String m_destinationPath = "omniverse://localhost/Users/Overdrive/";
 
    protected:
 
     const uint64 kOmniClientVersion = (uint64)OMNICLIENT_VERSION_MAJOR << 48 |
                                       (uint64)OMNICLIENT_VERSION_MINOR << 32 |
                                       (uint64)OMNICLIENT_VERSION_PATCH;
+    bool m_liveEditActive = false;
   };
 
   static void

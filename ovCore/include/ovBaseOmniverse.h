@@ -29,6 +29,23 @@ namespace ovEngineSDK {
       return false;
     }
 
+    virtual bool
+    connectFromOmni(const String& fileName) {
+      OV_UNREFERENCED_PARAMETER(fileName);
+      return false;
+    }
+
+    virtual bool
+    connectToOmni(const String& fileName) {
+      OV_UNREFERENCED_PARAMETER(fileName);
+      return false;
+    }
+
+    virtual void
+    setStagePath(const String& fileName) {
+      OV_UNREFERENCED_PARAMETER(fileName);
+    }
+
   }; 
   
   OV_CORE_EXPORT BaseOmniverse&

@@ -70,6 +70,7 @@ namespace ovEngineSDK {
 
   void
   Camera::update(float delta) {
+    roll(delta);
     move(delta);
   }
 

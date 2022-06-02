@@ -30,7 +30,12 @@ namespace ovEngineSDK {
 
     void
     insertModels(Vector<SPtr<Model>>& modelsVector);
-    SPtr<Camera>getCam();
+
+    SPtr<Camera>
+    getCam();
+
+    SPtr<Actor>
+    getActorByName(const String& actorName);
   };
 
   class OV_CORE_EXPORT SceneGraph : public Module<SceneGraph>
@@ -52,7 +57,14 @@ namespace ovEngineSDK {
     Vector<SPtr<Model>>
     transferModels();
 
+    uint32
+    getActorCount();
+
+    SPtr<Actor>
+    getActorByName(const String& actorName);
+
     private:
     SPtr<SceneNode> m_pRoot;
+    uint32 m_numActors;
   };
 }
