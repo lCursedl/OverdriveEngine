@@ -205,6 +205,7 @@ namespace ovEngineSDK {
     for (const auto& node : range) {
       if (node.IsA<UsdGeomMesh>()) {
         UsdPrim parent = node.GetParent();
+        std::cout << parent.GetName() << "\n";
         if ("Root" == parent.GetName()) {
           std::unique_lock<std::mutex> lk(gLogMutex);
           std::cout << "Found UsdGeoMesh " << node.GetName() << ".\n";
@@ -426,7 +427,7 @@ namespace ovEngineSDK {
     VtArray<GfVec3f> normals;
     VtVec2fArray uvs;
     VtArray<int32> indices;
-
+    
     UsdAttribute meshPointAttrib = geomMesh.GetPointsAttr();
     meshPointAttrib.Get(&points);
 
@@ -436,8 +437,10 @@ namespace ovEngineSDK {
     UsdAttribute meshNormalAttrib = geomMesh.GetNormalsAttr();
     meshNormalAttrib.Get(&normals);
 
-    UsdAttribute meshUVAttrib = geomMesh.GetPrimvar(_tokens->st);
-    meshUVAttrib.Get(&uvs);
+    //UsdGeomPrimvarsAPI primApi = UsdGeomPrimvarsAPI::Get(gStage, geomMesh.GetPath());
+    //UsdGeomPrimvar meshUVAttrib = primApi.GetPrimvar(_tokens->st);
+    ////UsdAttribute meshUVAttrib = geomMesh.GetPrimvar(_tokens->st);
+    //meshUVAttrib.Get(&uvs);
 
     uint32 numPoints = points.size();
     uint32 numIndices = indices.size();
@@ -451,7 +454,7 @@ namespace ovEngineSDK {
       v.Normal = Vector3(normals[i].data()[0], normals[i].data()[1], normals[i].data()[2]);
       v.Tangent = Vector3(1.0f, 1.0f, 1.0f);
       v.Bitangent = Vector3(1.0f, 1.0f, 1.0f);
-      v.TexCoords = Vector2(uvs[i].data()[0], uvs[i].data()[1]);
+      v.TexCoords = Vector2(0.f, 1.f);
       meshVertices.push_back(v);
     }
 

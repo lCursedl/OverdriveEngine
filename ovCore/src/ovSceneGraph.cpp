@@ -146,6 +146,12 @@ namespace ovEngineSDK {
 
   SPtr<Actor>
   SceneGraph::getActorByName(const String& actorName) {
-    return m_pRoot->getActorByName(actorName);
+    for (auto& child : m_pRoot->m_pChilds) {
+      auto tmp = child->getActorByName(actorName);
+      if (nullptr != tmp) {
+        return tmp;
+      }
+    }
+    return nullptr;
   }
 }

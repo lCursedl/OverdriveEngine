@@ -20,15 +20,15 @@ GameApp::onCreate() {
 
   ImGui::init(m_windowHandle);
 
-  SPtr<Model>model = Model::load("resources/models/Vela/Vela2.fbx");
+  //SPtr<Model>model = Model::load("resources/models/Vela/Vela2.fbx");
 
-  /*SPtr<Actor>*/myActor = make_shared<Actor>("Vela");
-  myActor->addComponent(model);
+  /*SPtr<Actor>*///myActor = make_shared<Actor>("Vela");
+  //myActor->addComponent(model);
   //myActor->m_localRotation = Vector3(0.f, 1.5f, 0.f);
   //myActor->m_localScale = Vector3(0.5f, 0.5f, 0.5f);
   //myActor->m_localPosition = {100.f, 100.f, 100.f};
-  SPtr<SceneNode>myNode = make_shared<SceneNode>();
-  myNode->setActor(myActor);
+  //SPtr<SceneNode>myNode = make_shared<SceneNode>();
+  //myNode->setActor(myActor);
 
   SPtr<Camera>cam = make_shared<Camera>();
   cam->init(Vector3(0.f, 0.f, -250.f),
@@ -56,7 +56,7 @@ GameApp::onCreate() {
 
   auto& scene = SceneGraph::instance();
 
-  scene.addNode(myNode);
+  //scene.addNode(myNode);
   scene.addNode(camNode);
   scene.addNode(planeNode);
   g_baseOmniverse().connectFromOmni(
