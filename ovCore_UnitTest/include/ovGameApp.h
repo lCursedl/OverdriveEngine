@@ -23,6 +23,13 @@ class GameApp : public BaseApp
   onClear() override;
 
  private:
+  
+  void
+  showTreeNodes(SPtr<SceneNode> node);
+
+  void
+  showActorInfo();
+  
   Color m_color;
   SPtr<Texture> m_pBack;
   SPtr<Texture> m_finalTexture;

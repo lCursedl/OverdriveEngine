@@ -22,7 +22,7 @@ namespace ovEngineSDK {
     void
     setActor(SPtr<Actor> actor);
     void
-    addChildNode(SPtr<SceneNode> node);
+    addChildNode(SPtr<SceneNode> node, WPtr<SceneNode> parent);
     void
     update(float delta);
     void
@@ -36,6 +36,12 @@ namespace ovEngineSDK {
 
     SPtr<Actor>
     getActorByName(const String& actorName);
+
+    String
+    getName();
+
+    bool m_selected = false;
+
   };
 
   class OV_CORE_EXPORT SceneGraph : public Module<SceneGraph>
@@ -62,6 +68,11 @@ namespace ovEngineSDK {
 
     SPtr<Actor>
     getActorByName(const String& actorName);
+
+    SPtr<SceneNode>
+    getRoot();
+
+    SPtr<SceneNode> m_selectedNode;
 
     private:
     SPtr<SceneNode> m_pRoot;

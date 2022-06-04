@@ -17,6 +17,7 @@ namespace ovEngineSDK {
 
   void Actor::update(float delta) {
     //Scale
+    m_localTransform = Matrix4::IDENTITY;
     m_localTransform.xVector.x = m_localScale.x;
     m_localTransform.yVector.y = m_localScale.y;
     m_localTransform.zVector.z = m_localScale.z;

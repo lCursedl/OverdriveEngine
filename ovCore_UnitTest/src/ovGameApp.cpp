@@ -46,21 +46,22 @@ GameApp::onCreate() {
   SPtr<SceneNode>camNode = make_shared<SceneNode>();
   camNode->setActor(camActor);
 
-  SPtr<Model>plane = Model::load("resources/models/plano.fbx");
+  //SPtr<Model>plane = Model::load("resources/models/plano.fbx");
 
-  SPtr<Actor>planeActor = make_shared<Actor>("Plane");
-  planeActor->addComponent(plane);
+  //SPtr<Actor>planeActor = make_shared<Actor>("Plane");
+  //planeActor->addComponent(plane);
 
-  SPtr<SceneNode>planeNode = make_shared<SceneNode>();
-  planeNode->setActor(planeActor);
+  //SPtr<SceneNode>planeNode = make_shared<SceneNode>();
+  //planeNode->setActor(planeActor);
 
   auto& scene = SceneGraph::instance();
 
   //scene.addNode(myNode);
   scene.addNode(camNode);
-  scene.addNode(planeNode);
-  g_baseOmniverse().connectFromOmni(
-    "http://localhost:8080/omniverse://127.0.0.1/Users/cursed/battledroid.usd");
+  //scene.addNode(planeNode);
+  //g_baseOmniverse().createUSD();
+  g_baseOmniverse().loadUSD(
+    "http://localhost:8080/omniverse://127.0.0.1/Users/Overdrive/OverdriveLiveShare.usd");
   //g_baseOmniverse().loadUSD("http://localhost:8080/omniverse://127.0.0.1/Users/cursed/battledroid.usd");
 }
 
@@ -148,7 +149,7 @@ GameApp::onUpdate(float delta) {
   ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
   //Windows
   ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
-    ImGui::Text("Placeholder for scenegraph content.");
+    showTreeNodes(SceneGraph::instance().getRoot());
     ImGui::End();
   }
   ImGui::Begin("Browser", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
@@ -156,7 +157,7 @@ GameApp::onUpdate(float delta) {
     ImGui::End();
   }
   ImGui::Begin("Details", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
-    ImGui::Text("Placeholder for object details (Transform, Components, etc)");
+    showActorInfo();
     ImGui::End();
   }
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
@@ -173,4 +174,80 @@ GameApp::onRender() {
 void
 GameApp::onClear() {
   ImGui::shutDown();
+}
+
+void
+GameApp::showTreeNodes(SPtr<SceneNode> node) {
+  ImGuiTreeNodeFlags treeflags = ImGuiTreeNodeFlags_SpanFullWidth |
+                                 ImGuiTreeNodeFlags_OpenOnArrow |
+                                 ImGuiTreeNodeFlags_OpenOnDoubleClick;
+
+  bool hasChildren = 0 < node->m_pChilds.size() ? true : false;
+  if (node->m_pParent.expired()) {
+    treeflags |= ImGuiTreeNodeFlags_DefaultOpen;
+    ImGui::SetNextTreeNodeOpen(true);
+  }
+
+  if (!hasChildren) {
+    treeflags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
+  }
+
+  String actorName = "";
+
+  if (nullptr != node->m_pActor) {
+    actorName = node->m_pActor->getActorName();
+  }
+  else {
+    actorName = node->m_name;
+  }
+  bool isOpen = ImGui::TreeNodeEx(actorName.c_str(), treeflags);
+
+  if (ImGui::IsItemClicked()) {
+    node->m_selected = true;
+    auto& sgraph = SceneGraph::instance();
+    if (nullptr != sgraph.m_selectedNode) {
+      if (node != sgraph.m_selectedNode) {
+        sgraph.m_selectedNode->m_selected = false;
+      }
+      
+    }
+    sgraph.m_selectedNode = node;
+  }
+
+  if (isOpen) {
+    ImGui::AlignTextToFramePadding();
+    if (hasChildren) {
+      for (auto& childNode : node->m_pChilds) {
+        showTreeNodes(childNode);
+      }
+    }
+  }
+
+  ImGui::TreePop();
+}
+
+void
+GameApp::showActorInfo() {
+  auto& scgraph = SceneGraph::instance();
+  if (nullptr != scgraph.m_selectedNode) {
+    ImGuiTreeNodeFlags myFlags = ImGuiWindowFlags_NoTitleBar |
+                                 ImGuiWindowFlags_AlwaysVerticalScrollbar |
+                                 ImGuiWindowFlags_NoMove |
+                                 ImGuiWindowFlags_NoResize;
+    //Names
+    String nameLabel = scgraph.m_selectedNode->m_pActor->getActorName();
+    float windowWidth = ImGui::GetWindowSize().x;
+    float textWidth = ImGui::CalcTextSize(nameLabel.c_str()).x;
+
+    ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+    ImGui::Text(nameLabel.c_str());
+    ImGui::Separator();
+    //Transform
+    if (ImGui::CollapsingHeader("Transform", ImGuiWindowFlags_NoNav)) {
+      ImGui::DragFloat3("Position", &scgraph.m_selectedNode->m_pActor->m_localPosition.x);
+      ImGui::DragFloat3("Rotation", &scgraph.m_selectedNode->m_pActor->m_localRotation.x);
+      ImGui::DragFloat3("Scale", &scgraph.m_selectedNode->m_pActor->m_localScale.x);
+    }
+    ImGui::Separator();
+  }
 }

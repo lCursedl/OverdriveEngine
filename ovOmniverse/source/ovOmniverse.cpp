@@ -211,9 +211,6 @@ namespace ovEngineSDK {
           std::cout << "Found UsdGeoMesh " << node.GetName() << ".\n";
           
           UsdGeomMesh geoMesh(node);
-          VtArray<GfVec3f> points;
-          UsdAttribute meshPointAttrib = geoMesh.GetPointsAttr();
-          meshPointAttrib.Get(&points);
           
           SPtr<Model> tempModel = make_shared<Model>();
           tempModel->m_textureSampler = g_graphicsAPI().createSamplerState(
@@ -226,7 +223,7 @@ namespace ovEngineSDK {
             COMPARISON::NEVER);
 
           //GeomMesh is container and has children
-          if (0 == points.size() && !node.GetAllChildren().empty()) {
+          if (!node.GetAllChildren().empty()) {
             for (const auto& childNode : node.GetAllChildren()) {
               if (childNode.IsA<UsdGeomMesh>()) {
                 UsdGeomMesh childGM(childNode);
@@ -362,7 +359,7 @@ namespace ovEngineSDK {
 
   static String
   createOmniverseModel(const String& destinationPath) {
-    String stageUrl = destinationPath;
+    String stageUrl = destinationPath + "OverdriveLiveShare.usd";
 
     {
       std::unique_lock<std::mutex> lk(gLogMutex);
