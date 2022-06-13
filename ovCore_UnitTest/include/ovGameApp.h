@@ -34,7 +34,6 @@ class GameApp : public BaseApp
   SPtr<Texture> m_pBack;
   SPtr<Texture> m_finalTexture;
   Vector<SPtr<Texture>> m_vTextures;
-  SPtr<Actor> myActor;
   bool m_showDemo = true;
 
   /*struct Bones {

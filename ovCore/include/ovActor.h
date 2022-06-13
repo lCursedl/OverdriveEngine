@@ -2,10 +2,9 @@
 #include <ovGameObject.h>
 #include <ovComponent.h>
 #include <ovMatrix4.h>
-#include <ovQuaternion.h>
 
 namespace ovEngineSDK {
-  class OV_CORE_EXPORT Actor : public GameObject
+  class OV_CORE_EXPORT Actor : public GameObject/*, public std::enable_shared_from_this<Actor>*/
   {
    public:
     Actor(String name = "");
@@ -26,11 +25,10 @@ namespace ovEngineSDK {
     Vector3 m_localPosition;
     Vector3 m_localRotation;
     Vector3 m_localScale;
-
+    String m_omniPath;
     Matrix4 m_localTransform;
 
     Vector<SPtr<Component>> m_components;
-
   private:
     String m_actorName;
   };

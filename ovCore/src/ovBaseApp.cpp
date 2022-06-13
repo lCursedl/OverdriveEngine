@@ -14,14 +14,15 @@ namespace ovEngineSDK {
     initSystems();
     createWindow();
     g_graphicsAPI().init(m_windowHandle);    
-    BaseOmniverse::instance().init();
+    BaseInputManager::instance().init(m_windowHandle);
     onCreate();
     BaseRenderer::instance().init();
-    BaseInputManager::instance().init(m_windowHandle);
+    BaseOmniverse::instance().init();
     MSG msg = {};
 
     while (WM_QUIT != msg.message) {
-      m_deltaTime = m_appClock.getElapsedTime().asSeconds();
+      m_deltaTime = static_cast<float>(m_appClock.getElapsedTime().asMilliseconds());
+      m_appClock.restart();
       if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);

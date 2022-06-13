@@ -5,47 +5,6 @@
 
 namespace ovEngineSDK {
   
-  // Private tokens for building up SdfPaths. We recommend
-  // constructing SdfPaths via tokens, as there is a performance
-  // cost to constructing them directly via strings (effectively,
-  // a table lookup per path element). Similarly, any API which
-  // takes a token as input should use a predefined token
-  // rather than one created on the fly from a string.
-  TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    (box)
-    (Light)
-    (Looks)
-    (Root)
-    (Shader)
-    (st)
-
-    // These tokens will be reworked or replaced by the official MDL schema for USD.
-    // https://developer.nvidia.com/usd/MDLschema
-    (Material)
-    ((_module, "module"))
-    (name)
-    (out)
-    ((shaderId, "mdlMaterial"))
-    (mdl)
-
-    // Tokens used for USD Preview Surface
-    (diffuseColor)
-    (normal)
-    (file)
-    (result)
-    (varname)
-    (rgb)
-    (RAW)
-    (sRGB)
-    (surface)
-    (PrimST)
-    (UsdPreviewSurface)
-    ((UsdShaderId, "UsdPreviewSurface"))
-    ((PrimStShaderId, "UsdPrimvarReader_float2"))
-    (UsdUVTexture)
-  );
-
   SPtr<Mesh> createMeshfromGeomMesh(const UsdGeomMesh& geomMesh);
 
   static void
@@ -71,21 +30,6 @@ namespace ovEngineSDK {
       }
   }
 
-  static Vector<UsdPrim>
-  findGeomMesh() {
-    omniUsdLiveWaitForPendingUpdates();
-    Vector<UsdPrim> geomMeshes;
-    auto range = gStage->Traverse();
-    for (const auto & node : range) {
-      if ("Root" == node.GetParent().GetName()) {
-        if (node.IsA<UsdGeomMesh>()) {
-          geomMeshes.push_back(node);
-        }
-      }      
-    }
-    return geomMeshes;
-  }
-
   bool
   OmniverseOV::init() {
     omniClientSetLogCallback(logCallback);
@@ -102,7 +46,7 @@ namespace ovEngineSDK {
   void
   OmniverseOV::update() {
     if (m_liveEditActive) {
-      liveEdit(findGeomMesh());
+      liveEdit();
     }
   }
 
@@ -205,7 +149,6 @@ namespace ovEngineSDK {
     for (const auto& node : range) {
       if (node.IsA<UsdGeomMesh>()) {
         UsdPrim parent = node.GetParent();
-        std::cout << parent.GetName() << "\n";
         if ("Root" == parent.GetName()) {
           std::unique_lock<std::mutex> lk(gLogMutex);
           std::cout << "Found UsdGeoMesh " << node.GetName() << ".\n";
@@ -238,7 +181,7 @@ namespace ovEngineSDK {
 
           SPtr<Actor>myActor = make_shared<Actor>(node.GetName().GetString());
           myActor->addComponent(tempModel);
-
+          myActor->m_omniPath = node.GetPath().GetString();
           SPtr<SceneNode>myNode = make_shared<SceneNode>();
           myNode->setActor(myActor);
 
@@ -283,54 +226,109 @@ namespace ovEngineSDK {
   }
 
   void
-  OmniverseOV::liveEdit(Vector<UsdPrim> primVector) {
+  OmniverseOV::liveEdit() {
     omniUsdLiveWaitForPendingUpdates();
     auto& sgraph = SceneGraph::instance();
-    for (auto& prim : primVector) {
-      UsdGeomMesh geomMesh(prim);
-      UsdGeomXformable xForm = geomMesh;
+    for (auto& node : sgraph.getRoot()->m_pChilds) {
+      if (nullptr != node->m_pActor) {
+        if (!node->m_pActor->m_omniPath.empty()) {
+          SdfPath path(node->m_pActor->m_omniPath);
+          UsdGeomMesh geomMesh(gStage->GetPrimAtPath(path));
+          UsdGeomXformable xForm = geomMesh;
 
-      UsdGeomXformOp translateOp;
-      UsdGeomXformOp rotateOp;
-      UsdGeomXformOp scaleOp;
+          UsdGeomXformOp translateOp;
+          UsdGeomXformOp rotateOp;
+          UsdGeomXformOp scaleOp;
 
-      GfVec3d position(0);
-      GfVec3f rotZYX(0);
-      GfVec3f scale(1);
+          GfVec3d position(0);
+          GfVec3f rotZYX(0);
+          GfVec3f scale(1);
 
-      bool resetXformStack = false;
-      Vector<UsdGeomXformOp> xFormOps = xForm.GetOrderedXformOps(&resetXformStack);
-
-      for (SIZE_T i = 0; i < xFormOps.size(); ++i) {
-        switch (xFormOps[i].GetOpType()) {
-        case UsdGeomXformOp::TypeTranslate: {
-            translateOp = xFormOps[i];
-            translateOp.Get(&position);
-            break;
+          bool resetXformStack = false;
+          Vector<UsdGeomXformOp> xFormOps = xForm.GetOrderedXformOps(&resetXformStack);
+          for (SIZE_T i = 0; i < xFormOps.size(); ++i) {
+            switch (xFormOps[i].GetOpType()) {
+            case UsdGeomXformOp::TypeTranslate: {
+              translateOp = xFormOps[i];
+              translateOp.Get(&position);
+              break;
+            }
+            case UsdGeomXformOp::TypeRotateZYX: {
+              rotateOp = xFormOps[i];
+              translateOp.Get(&rotZYX);
+              break;
+            }
+            case UsdGeomXformOp::TypeScale: {
+              scaleOp = xFormOps[i];
+              scaleOp.Get(&scale);
+              break;
+            }
+            }
           }
-        case UsdGeomXformOp::TypeRotateZYX: {
-            rotateOp = xFormOps[i];
-            translateOp.Get(&rotZYX);
-            break;
-          }
-        case UsdGeomXformOp::TypeScale: {
-            scaleOp = xFormOps[i];
-            scaleOp.Get(&scale);
-            break;
-          }
+          node->m_pActor->m_localPosition = { (float)position.GetArray()[0],
+                                              (float)position.GetArray()[1],
+                                              (float)position.GetArray()[2] };
+          node->m_pActor->m_localScale = { (float)scale.GetArray()[0],
+                                           (float)scale.GetArray()[1],
+                                           (float)scale.GetArray()[2] };
         }
       }
-      //Get corresponding actor in scenegraph      
-      auto tmpActor = sgraph.getActorByName(prim.GetName().GetString());
-      tmpActor->m_localPosition = { (float)position.GetArray()[0],
-                                    (float)position.GetArray()[1],
-                                    (float)position.GetArray()[2] };
-      tmpActor->m_localScale = { (float)scale.GetArray()[0],
-                                 (float)scale.GetArray()[1],
-                                 (float)scale.GetArray()[2] };
+    }
+  }
+
+  void
+  OmniverseOV::setTransformOp(Vector3 data,
+                              OMNI_OP::E operation,
+                              OMNI_PRECISION::E precision,
+                              String omniPath) {
+    UsdGeomXformable xform(gStage->GetPrimAtPath(SdfPath(omniPath)));
+    
+
+    UsdGeomXformOp::Type op;
+    switch (operation) {
+    case ovEngineSDK::OMNI_OP::kTRANSLATE:
+      op = UsdGeomXformOp::TypeTranslate;
+      break;
+    case ovEngineSDK::OMNI_OP::kROTATE:
+      op = UsdGeomXformOp::TypeRotateZYX;
+      break;
+    case ovEngineSDK::OMNI_OP::kSCALE:
+      op = UsdGeomXformOp::TypeScale;
+      break;
     }
 
+    UsdGeomXformOp::Precision pr;
+    switch (precision) {
+    case ovEngineSDK::OMNI_PRECISION::kDOUBLE:
+      pr = UsdGeomXformOp::PrecisionDouble;
+      break;
+    case ovEngineSDK::OMNI_PRECISION::kFLOAT:
+      pr = UsdGeomXformOp::PrecisionFloat;
+      break;
+    }
+
+    bool resetXformStack = false;
+    UsdGeomXformOp xformOp;
+    Vector<UsdGeomXformOp> xFormOps = xform.GetOrderedXformOps(&resetXformStack);
+
+    if (OMNI_OP::kTRANSLATE == operation) {
+      xformOp = xFormOps[0];
+    }
+    else if (OMNI_OP::kROTATE == operation) {
+      xformOp = xFormOps[1];
+    }
+    else if (OMNI_OP::kSCALE == operation) {
+      xformOp = xFormOps[2];
+    }
+
+    SetOp(xform, xformOp, op, GfVec3d(data.x, data.y, data.z), pr);
+
     gStage->Save();
+  }
+
+  bool
+  OmniverseOV::getLiveEdit() {
+    return m_liveEditActive;
   }
 
   static void
@@ -434,9 +432,12 @@ namespace ovEngineSDK {
     UsdAttribute meshNormalAttrib = geomMesh.GetNormalsAttr();
     meshNormalAttrib.Get(&normals);
 
-    //UsdGeomPrimvarsAPI primApi = UsdGeomPrimvarsAPI::Get(gStage, geomMesh.GetPath());
-    //UsdGeomPrimvar meshUVAttrib = primApi.GetPrimvar(_tokens->st);
-    ////UsdAttribute meshUVAttrib = geomMesh.GetPrimvar(_tokens->st);
+    //UsdGeomPrimvarsAPI primApi = UsdGeomPrimvarsAPI(gStage->GetPrimAtPath(geomMesh.GetPath()));
+    ////UsdGeomPrimvar meshUVAttrib = primApi.GetPrimvar(_tokens->st);
+    //bool check = primApi.HasPrimvar(_tokens->st);
+    //check = geomMesh.HasPrimvar(_tokens->st);
+    //Vector<UsdGeomPrimvar> primVars = geomMesh.GetPrimvars();
+    //UsdGeomPrimvar meshUVAttrib = geomMesh.GetPrimvar(_tokens->st);
     //meshUVAttrib.Get(&uvs);
 
     uint32 numPoints = points.size();

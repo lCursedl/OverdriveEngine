@@ -27,9 +27,52 @@
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usdGeom/primvarsAPI.h>
 
+PXR_NAMESPACE_USING_DIRECTIVE
+
+// Private tokens for building up SdfPaths. We recommend
+  // constructing SdfPaths via tokens, as there is a performance
+  // cost to constructing them directly via strings (effectively,
+  // a table lookup per path element). Similarly, any API which
+  // takes a token as input should use a predefined token
+  // rather than one created on the fly from a string.
+  TF_DEFINE_PRIVATE_TOKENS(
+    _tokens,
+    (box)
+    (Light)
+    (Looks)
+    (Root)
+    (Shader)
+    (st)
+
+    // These tokens will be reworked or replaced by the official MDL schema for USD.
+    // https://developer.nvidia.com/usd/MDLschema
+    (Material)
+    ((_module, "module"))
+    (name)
+    (out)
+    ((shaderId, "mdlMaterial"))
+    (mdl)
+
+    // Tokens used for USD Preview Surface
+    (diffuseColor)
+    (normal)
+    (file)
+    (result)
+    (varname)
+    (rgb)
+    (RAW)
+    (sRGB)
+    (surface)
+    (PrimST)
+    (UsdPreviewSurface)
+    ((UsdShaderId, "UsdPreviewSurface"))
+    ((PrimStShaderId, "UsdPrimvarReader_float2"))
+    (UsdUVTexture)
+  );
+
 namespace ovEngineSDK {
 
-  PXR_NAMESPACE_USING_DIRECTIVE
+  #define HW_ARRAY_COUNT(array) (sizeof(array) / sizeof(array[0]))
 
   class OmniverseOV final : public BaseOmniverse
   {
@@ -59,7 +102,16 @@ namespace ovEngineSDK {
     createEmptyUSD(const String projectName);
 
     void
-    liveEdit(Vector<UsdPrim> primVector);
+    liveEdit();
+
+    void
+    setTransformOp(Vector3 data,
+                   OMNI_OP::E operation,
+                   OMNI_PRECISION::E precision,
+                   String omniPath)                                   override;
+    
+    bool
+    getLiveEdit()                                                     override;
 
     String m_existingExample;
     String m_destinationPath = "omniverse://localhost/Users/Overdrive/";
@@ -105,4 +157,21 @@ namespace ovEngineSDK {
     return pOV;
   }
 
+  class SetOp {
+   public:
+     SetOp(UsdGeomXformable& xForm,
+           UsdGeomXformOp& op,
+           UsdGeomXformOp::Type opType,
+           const GfVec3d& value,
+           const UsdGeomXformOp::Precision precision) {
+       if (!op) {
+         op = xForm.AddXformOp(opType, precision);
+       }
+
+       if (op.GetPrecision() == UsdGeomXformOp::Precision::PrecisionFloat)
+         op.Set(GfVec3f(value));
+       else
+         op.Set(value);
+     }
+  };
 }

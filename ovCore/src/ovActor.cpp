@@ -1,4 +1,5 @@
 #include "ovActor.h"
+#include <ovQuaternion.h>
 #include "ovBaseRenderer.h"
 
 namespace ovEngineSDK {
@@ -11,11 +12,13 @@ namespace ovEngineSDK {
     m_actorName = name;
   }
 
-  void Actor::addComponent(SPtr<Component> component) {
+  void
+  Actor::addComponent(SPtr<Component> component) {
     m_components.push_back(component);
   }
 
-  void Actor::update(float delta) {
+  void
+  Actor::update(float delta) {
     //Scale
     m_localTransform = Matrix4::IDENTITY;
     m_localTransform.xVector.x = m_localScale.x;
@@ -36,7 +39,8 @@ namespace ovEngineSDK {
     }
   }
 
-  void Actor::render() {
+  void
+  Actor::render() {
     g_baseRenderer().setTransformCB(m_localTransform);
     SIZE_T numComps = m_components.size();
     for (SIZE_T i = 0; i < numComps; ++i) {

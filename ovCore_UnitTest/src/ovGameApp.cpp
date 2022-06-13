@@ -20,21 +20,21 @@ GameApp::onCreate() {
 
   ImGui::init(m_windowHandle);
 
-  //SPtr<Model>model = Model::load("resources/models/Vela/Vela2.fbx");
+  /*SPtr<Model>model = Model::load("resources/models/Vela/Vela2.fbx");
 
-  /*SPtr<Actor>*///myActor = make_shared<Actor>("Vela");
-  //myActor->addComponent(model);
-  //myActor->m_localRotation = Vector3(0.f, 1.5f, 0.f);
-  //myActor->m_localScale = Vector3(0.5f, 0.5f, 0.5f);
-  //myActor->m_localPosition = {100.f, 100.f, 100.f};
-  //SPtr<SceneNode>myNode = make_shared<SceneNode>();
-  //myNode->setActor(myActor);
+  SPtr<Actor>myActor = make_shared<Actor>("Vela");
+  myActor->addComponent(model);
+  myActor->m_localRotation = Vector3(0.f, 1.5f, 0.f);
+  myActor->m_localScale = Vector3(0.5f, 0.5f, 0.5f);
+  myActor->m_localPosition = {100.f, 100.f, 100.f};
+  SPtr<SceneNode>myNode = make_shared<SceneNode>();
+  myNode->setActor(myActor);*/
 
   SPtr<Camera>cam = make_shared<Camera>();
   cam->init(Vector3(0.f, 0.f, -250.f),
             Vector3(0.f, 0.f, -1.f),
             Vector3(0.f, 1.f, 0.f),
-            0.01f,
+            .5f,
             PerspectiveMatrix(70.f,
                               800.f,
                               600.f,
@@ -46,23 +46,23 @@ GameApp::onCreate() {
   SPtr<SceneNode>camNode = make_shared<SceneNode>();
   camNode->setActor(camActor);
 
-  //SPtr<Model>plane = Model::load("resources/models/plano.fbx");
+  /*SPtr<Model>plane = Model::load("resources/models/plano.fbx");
 
-  //SPtr<Actor>planeActor = make_shared<Actor>("Plane");
-  //planeActor->addComponent(plane);
+  SPtr<Actor>planeActor = make_shared<Actor>("Plane");
+  planeActor->addComponent(plane);
 
-  //SPtr<SceneNode>planeNode = make_shared<SceneNode>();
-  //planeNode->setActor(planeActor);
+  SPtr<SceneNode>planeNode = make_shared<SceneNode>();
+  planeNode->setActor(planeActor);*/
 
   auto& scene = SceneGraph::instance();
 
   //scene.addNode(myNode);
   scene.addNode(camNode);
   //scene.addNode(planeNode);
-  //g_baseOmniverse().createUSD();
-  g_baseOmniverse().loadUSD(
-    "http://localhost:8080/omniverse://127.0.0.1/Users/Overdrive/OverdriveLiveShare.usd");
-  //g_baseOmniverse().loadUSD("http://localhost:8080/omniverse://127.0.0.1/Users/cursed/battledroid.usd");
+
+  g_baseOmniverse().connectFromOmni(
+    "omniverse://localhost/Users/Overdrive/OverdriveLiveShare.usd");
+  //g_baseOmniverse().loadUSD("omniverse://localhost/Users/Overdrive/OverdriveLiveShare.usd");
 }
 
 void
@@ -189,7 +189,7 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
   }
 
   if (!hasChildren) {
-    treeflags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
+    treeflags |= ImGuiTreeNodeFlags_Leaf;
   }
 
   String actorName = "";
@@ -200,7 +200,27 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
   else {
     actorName = node->m_name;
   }
-  bool isOpen = ImGui::TreeNodeEx(actorName.c_str(), treeflags);
+  if (ImGui::TreeNodeEx(actorName.c_str(), treeflags)) {
+    if (ImGui::IsItemClicked()) {
+      node->m_selected = true;
+      auto& sgraph = SceneGraph::instance();
+      if (nullptr != sgraph.m_selectedNode) {
+        if (node != sgraph.m_selectedNode) {
+          sgraph.m_selectedNode->m_selected = false;
+        }
+
+      }
+      sgraph.m_selectedNode = node;
+    }
+    ImGui::AlignTextToFramePadding();
+    if (hasChildren) {
+      for (auto& childNode : node->m_pChilds) {
+        showTreeNodes(childNode);
+      }
+    }
+    ImGui::TreePop();
+  }
+  /*bool isOpen = ImGui::TreeNodeEx(actorName.c_str(), treeflags);
 
   if (ImGui::IsItemClicked()) {
     node->m_selected = true;
@@ -221,21 +241,22 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
         showTreeNodes(childNode);
       }
     }
-  }
+  }*/
 
-  ImGui::TreePop();
+  
 }
 
 void
 GameApp::showActorInfo() {
   auto& scgraph = SceneGraph::instance();
   if (nullptr != scgraph.m_selectedNode) {
+    auto& tmpActor = scgraph.m_selectedNode->m_pActor;
     ImGuiTreeNodeFlags myFlags = ImGuiWindowFlags_NoTitleBar |
                                  ImGuiWindowFlags_AlwaysVerticalScrollbar |
                                  ImGuiWindowFlags_NoMove |
                                  ImGuiWindowFlags_NoResize;
     //Names
-    String nameLabel = scgraph.m_selectedNode->m_pActor->getActorName();
+    String nameLabel = tmpActor->getActorName();
     float windowWidth = ImGui::GetWindowSize().x;
     float textWidth = ImGui::CalcTextSize(nameLabel.c_str()).x;
 
@@ -243,10 +264,35 @@ GameApp::showActorInfo() {
     ImGui::Text(nameLabel.c_str());
     ImGui::Separator();
     //Transform
-    if (ImGui::CollapsingHeader("Transform", ImGuiWindowFlags_NoNav)) {
-      ImGui::DragFloat3("Position", &scgraph.m_selectedNode->m_pActor->m_localPosition.x);
-      ImGui::DragFloat3("Rotation", &scgraph.m_selectedNode->m_pActor->m_localRotation.x);
-      ImGui::DragFloat3("Scale", &scgraph.m_selectedNode->m_pActor->m_localScale.x);
+    if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+      ImGui::DragFloat3("Position", &tmpActor->m_localPosition.x);
+      if (ImGui::IsItemEdited()) {
+        if (g_baseOmniverse().getLiveEdit()) {
+          g_baseOmniverse().setTransformOp(tmpActor->m_localPosition,
+                                           OMNI_OP::kTRANSLATE,
+                                           OMNI_PRECISION::kDOUBLE,
+                                           tmpActor->m_omniPath);
+        }
+        
+      }
+      ImGui::DragFloat3("Rotation", &tmpActor->m_localRotation.x);
+      /*if (ImGui::IsItemEdited()) {
+        if (g_baseOmniverse().getLiveEdit()) {
+          g_baseOmniverse().setTransformOp(tmpActor->m_localRotation,
+                                           OMNI_OP::kROTATE,
+                                           OMNI_PRECISION::kFLOAT,
+                                           tmpActor->m_omniPath);
+        }        
+      }*/
+      ImGui::DragFloat3("Scale", &tmpActor->m_localScale.x);
+      if (ImGui::IsItemEdited()) {
+        if (g_baseOmniverse().getLiveEdit()) {
+          g_baseOmniverse().setTransformOp(tmpActor->m_localScale,
+                                           OMNI_OP::kSCALE,
+                                           OMNI_PRECISION::kFLOAT,
+                                           tmpActor->m_omniPath);
+        }        
+      }      
     }
     ImGui::Separator();
   }
