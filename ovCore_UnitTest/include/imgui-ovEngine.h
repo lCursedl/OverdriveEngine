@@ -2,8 +2,6 @@
 #ifndef IMGUI_OVENGINE_H
 #define IMGUI_OVENGINE_H
 
-
-
 namespace ovEngineSDK {
   class RasterizerState;
   class DepthStencilState;

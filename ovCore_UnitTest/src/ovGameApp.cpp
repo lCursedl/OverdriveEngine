@@ -148,20 +148,24 @@ GameApp::onUpdate(float delta) {
   //Imgui docking space for windows
   ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
   //Windows
-  ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
+  ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoNav |
+                                 ImGuiWindowFlags_NoCollapse); {
     showTreeNodes(SceneGraph::instance().getRoot());
     ImGui::End();
   }
-  ImGui::Begin("Browser", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
+  ImGui::Begin("Browser", nullptr, ImGuiWindowFlags_NoNav |
+                                   ImGuiWindowFlags_NoCollapse); {
     ImGui::Text("Placeholder for content browser.");
     ImGui::End();
   }
-  ImGui::Begin("Details", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
+  ImGui::Begin("Details", nullptr, ImGuiWindowFlags_NoNav |
+                                   ImGuiWindowFlags_NoCollapse); {
     showActorInfo();
     ImGui::End();
   }
-  ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse); {
-    ImGui::Image(&m_finalTexture, ImGui::GetWindowSize());
+  ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoNav |
+                                    ImGuiWindowFlags_NoCollapse); {
+    ImGui::Image(&m_finalTexture, ImGui::GetContentRegionAvail());
     ImGui::End();
   }
 }
@@ -185,7 +189,7 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
   bool hasChildren = 0 < node->m_pChilds.size() ? true : false;
   if (node->m_pParent.expired()) {
     treeflags |= ImGuiTreeNodeFlags_DefaultOpen;
-    ImGui::SetNextTreeNodeOpen(true);
+    ImGui::SetNextItemOpen(true);
   }
 
   if (!hasChildren) {
