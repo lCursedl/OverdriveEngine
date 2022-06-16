@@ -14,8 +14,18 @@ namespace ovEngineSDK {
    public:
     BaseApp() = default;
     virtual ~BaseApp() = default;
+
     int32
     run();
+
+    static BaseApp* baseAppPtr;
+
+    virtual void
+    resize(int32 width, int32 height) {
+      OV_UNREFERENCED_PARAMETER(width);
+      OV_UNREFERENCED_PARAMETER(height);
+    }
+
    protected:
     
     /*
@@ -71,5 +81,6 @@ namespace ovEngineSDK {
     bool m_runApp = false;
     sf::Clock m_appClock;
     float m_deltaTime;
+    bool m_systemsInit = false;
   };
 }

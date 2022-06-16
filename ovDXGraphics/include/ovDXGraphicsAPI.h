@@ -247,6 +247,9 @@ namespace ovEngineSDK {
     void
     getBackBuffer(SPtr<Texture>& tex)                                 override;
 
+    bool
+    isInitialized()                                                   override;
+
    private:
     ID3D11Device* m_device = nullptr;
     ID3D11DeviceContext* m_deviceContext = nullptr;

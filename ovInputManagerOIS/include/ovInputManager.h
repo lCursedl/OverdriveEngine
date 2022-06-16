@@ -37,6 +37,9 @@ namespace ovEngineSDK {
     void
     getMouseAxis(float& X, float& Y)                                  override;
 
+    void
+    resizeDimensions(int32 width, int32 height)                       override;
+
    private:
     
     void

@@ -45,7 +45,7 @@ namespace ovEngineSDK {
     void rotateFront(float delta);
 
     float m_step = 1.f;
-    float m_sensibility = 0.0001f;
+    float m_sensibility = 0.001f;
 
     bool m_forward = false;
     bool m_back = false;

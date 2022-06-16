@@ -7,6 +7,8 @@
 
 namespace ovEngineSDK {
   
+  BaseApp* BaseApp::baseAppPtr = nullptr;
+
   LRESULT CALLBACK WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam);
 
   int32
@@ -39,19 +41,16 @@ namespace ovEngineSDK {
   }
 
   void
-  BaseApp::onCreate() {
-  }
+  BaseApp::onCreate() {}
 
   void
-  BaseApp::onUpdate(float) {
-  }
+  BaseApp::onUpdate(float) {}
 
   void
-  BaseApp::onRender() {
-  }
+  BaseApp::onRender() {}
 
-  void BaseApp::onClear() {
-  }
+  void
+  BaseApp::onClear() {}
   
   void BaseApp::update() {
     g_baseInput().update();
@@ -68,6 +67,7 @@ namespace ovEngineSDK {
   }
 
   void BaseApp::initSystems() {
+    BaseApp::baseAppPtr = this;
     if (m_graphicPlugin.loadPlugin("ovDXGraphics_d.dll")) {
       auto createGraphicsAPI = reinterpret_cast<funCreateGraphicsAPI>(
                                m_graphicPlugin.getProcedureByName("createGraphicsAPI"));
@@ -103,6 +103,7 @@ namespace ovEngineSDK {
 
   void
   BaseApp::destroySystems() {
+    BaseApp::baseAppPtr = nullptr;
     g_graphicsAPI().shutdown();
     g_graphicsAPI().shutDown();
     SceneGraph::shutDown();
@@ -160,6 +161,26 @@ namespace ovEngineSDK {
       break;
     case WM_DESTROY:
       PostQuitMessage(0);
+      break;
+    case WM_SIZE: {
+      if (g_graphicsAPI().isInitialized()) {
+        //Get window dimensions
+        RECT rc;
+        GetClientRect(hWnd, &rc);
+        uint32 width = rc.right - rc.left;
+        uint32 height = rc.bottom - rc.top;
+        //Update child app params
+        BaseApp::baseAppPtr->resize(width, height);
+        //Update renderer params
+        BaseRenderer::instance().resize(width, height);
+        //Update graphics API params
+        g_graphicsAPI().resizeBackBuffer(width, height);        
+        //Update input params
+        BaseInputManager::instance().resizeDimensions(width, height);
+        //Re-store back buffer
+        BaseRenderer::instance().storeBackBuffer();
+      }      
+    }
       break;
     default:
       return DefWindowProc(hWnd, message, wParam, lParam);

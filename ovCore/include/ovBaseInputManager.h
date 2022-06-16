@@ -2,6 +2,7 @@
 #include <ovModule.h>
 #include <ovPrerequisitesCore.h>
 #include <SFML/Window.hpp>
+#include <ovVector2.h>
 
 using sf::WindowHandle;
 
@@ -178,6 +179,12 @@ namespace ovEngineSDK {
     FORCEINLINE void
     setObject(BaseInputManager* _api) {
       BaseInputManager::_instance() = _api;
+    }
+
+    virtual void
+    resizeDimensions(int32 width, int32 height) {
+      OV_UNREFERENCED_PARAMETER(width);
+      OV_UNREFERENCED_PARAMETER(height);
     }
 
    protected:

@@ -11,16 +11,19 @@ class GameApp : public BaseApp
   ~GameApp() = default;
 
   void
-  onCreate() override;
+  onCreate()                                                          override;
 
   void
-  onUpdate(float delta) override;
+  onUpdate(float delta)                                               override;
 
   void
-  onRender() override;
+  onRender()                                                          override;
 
   void
-  onClear() override;
+  onClear()                                                           override;
+
+  void
+  resize(int32 width, int32 height)                                   override;
 
  private:
   

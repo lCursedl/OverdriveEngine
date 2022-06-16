@@ -20,15 +20,12 @@ GameApp::onCreate() {
 
   ImGui::init(m_windowHandle);
 
-  /*SPtr<Model>model = Model::load("resources/models/Vela/Vela2.fbx");
+  SPtr<Model>model = Model::load("resources/models/Vela/Vela2.fbx");
 
   SPtr<Actor>myActor = make_shared<Actor>("Vela");
   myActor->addComponent(model);
-  myActor->m_localRotation = Vector3(0.f, 1.5f, 0.f);
-  myActor->m_localScale = Vector3(0.5f, 0.5f, 0.5f);
-  myActor->m_localPosition = {100.f, 100.f, 100.f};
   SPtr<SceneNode>myNode = make_shared<SceneNode>();
-  myNode->setActor(myActor);*/
+  myNode->setActor(myActor);
 
   SPtr<Camera>cam = make_shared<Camera>();
   cam->init(Vector3(0.f, 0.f, -250.f),
@@ -46,22 +43,22 @@ GameApp::onCreate() {
   SPtr<SceneNode>camNode = make_shared<SceneNode>();
   camNode->setActor(camActor);
 
-  /*SPtr<Model>plane = Model::load("resources/models/plano.fbx");
+  SPtr<Model>plane = Model::load("resources/models/plano.fbx");
 
   SPtr<Actor>planeActor = make_shared<Actor>("Plane");
   planeActor->addComponent(plane);
 
   SPtr<SceneNode>planeNode = make_shared<SceneNode>();
-  planeNode->setActor(planeActor);*/
+  planeNode->setActor(planeActor);
 
   auto& scene = SceneGraph::instance();
 
-  //scene.addNode(myNode);
+  scene.addNode(myNode);
   scene.addNode(camNode);
-  //scene.addNode(planeNode);
+  scene.addNode(planeNode);
 
-  g_baseOmniverse().connectFromOmni(
-    "omniverse://localhost/Users/Overdrive/OverdriveLiveShare.usd");
+  /*g_baseOmniverse().connectFromOmni(
+    "omniverse://localhost/Users/Overdrive/OverdriveLiveShare.usd");*/
   //g_baseOmniverse().loadUSD("omniverse://localhost/Users/Overdrive/OverdriveLiveShare.usd");
 }
 
@@ -178,6 +175,19 @@ GameApp::onRender() {
 void
 GameApp::onClear() {
   ImGui::shutDown();
+}
+
+void
+GameApp::resize(int32 width, int32 height) {
+  auto cam = SceneGraph::instance().getActiveCamera();
+  cam->setProjection(PerspectiveMatrix(70.f,
+                                       static_cast<float>(width),
+                                       static_cast<float>(height),
+                                       .01f,
+                                       3000.f));
+  ImGuiIO& io = ImGui::GetIO();
+  io.DisplaySize = { static_cast<float>(width), static_cast<float>(height) };
+  m_finalTexture.reset();
 }
 
 void

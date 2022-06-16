@@ -623,6 +623,12 @@ namespace ovEngineSDK {
      void getBackBuffer(SPtr<Texture>& tex) {
       OV_UNREFERENCED_PARAMETER(tex);
      }
+
+     virtual bool
+     isInitialized() { return false; }
+
+    protected:
+     bool m_initialized;
   };
 
   OV_CORE_EXPORT GraphicsAPI&

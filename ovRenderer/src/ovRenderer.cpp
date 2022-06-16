@@ -39,8 +39,9 @@ namespace ovEngineSDK {
   void
   Renderer::init() {
     auto& graphicAPI =  g_graphicsAPI();
-    graphicAPI.getBackBuffer(m_backTexture);
-    m_backBufferTextures.push_back(m_backTexture);
+    SPtr<Texture> backTexture;
+    graphicAPI.getBackBuffer(backTexture);
+    m_backBufferTextures.push_back(backTexture);
     m_viewportDim = graphicAPI.getViewportDimensions();
     //GBuffer
     m_gBufferRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
@@ -162,11 +163,12 @@ namespace ovEngineSDK {
                               TEXTURE_BINDINGS::E::SHADER_RESOURCE,
                               FORMATS::kRGBA16_FLOAT));
     //Shadow map
-    m_depthMapTexture = graphicAPI.createTexture(1024,
-                                                 1024,
-                                                 TEXTURE_BINDINGS::E::SHADER_RESOURCE |
-                                                 TEXTURE_BINDINGS::E::RENDER_TARGET,
-                                                 FORMATS::kR16_FLOAT);
+    m_shadowTextures.push_back(graphicAPI.createTexture(
+                                               1024,
+                                               1024,
+                                               TEXTURE_BINDINGS::E::SHADER_RESOURCE |
+                                               TEXTURE_BINDINGS::E::RENDER_TARGET,
+                                               FORMATS::kR16_FLOAT));
     m_shadowRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
                                                   CULL_MODE::kBACK, false, false);
     m_comparisonSampler = graphicAPI.createSamplerState(FILTER_LEVEL::FILTER_POINT,
@@ -199,9 +201,7 @@ namespace ovEngineSDK {
 
     m_shadowBufferConstant = graphicAPI.createBuffer(&lightMat,
                                                      sizeof(Matrices),
-                                                     BUFFER_TYPE::kCONST_BUFFER);    
-
-    m_shadowTextures.push_back(m_depthMapTexture);
+                                                     BUFFER_TYPE::kCONST_BUFFER);
 
     //Screen Aligned Quad
     m_screenQuadRS = graphicAPI.createRasterizerState(FILL_MODE::kSOLID,
@@ -386,7 +386,7 @@ namespace ovEngineSDK {
 
     //SHADOW MAP
     graphicAPI.setRenderTarget(1, m_shadowTextures, nullptr);
-    graphicAPI.clearRenderTarget(m_depthMapTexture, clearColor);
+    graphicAPI.clearRenderTarget(m_shadowTextures[0], clearColor);
     graphicAPI.setShaders(m_shadowProgram);
     graphicAPI.setConstantBuffer(0, m_shadowBufferConstant, SHADER_TYPE::VERTEX_SHADER);
     graphicAPI.setConstantBuffer(0, m_shadowBufferConstant, SHADER_TYPE::PIXEL_SHADER);
@@ -450,6 +450,78 @@ namespace ovEngineSDK {
     }
     graphicAPI.setRenderTarget(1, m_backBufferTextures, nullptr);
     graphicAPI.clearRenderTarget(m_backBufferTextures[0], clearColor);
+  }
+
+  void
+  Renderer::resize(int32 width, int32 height) {
+    m_viewportDim = {static_cast<float>(width), static_cast<float>(height)};
+    auto& graphicAPI = g_graphicsAPI();
+    for (int32 i = 0; i < 5; ++i) {
+      graphicAPI.setTexture(i, nullptr);
+    }
+    //Release light pass
+    m_outputTexture.clear();
+    //Release shadow pass
+    m_shadowTextures.clear();
+    //Release Blur-H
+    m_tempBlurTextures.clear();
+    //Release SSAO
+    m_ssaoTextures.clear();
+    //Release GBuffer
+    m_gBufferTextures.clear();
+    m_depthStencilTexture.reset();
+    //Release back buffer reference
+    m_backBufferTextures.clear();
+
+    for (int32 i = 0; i < 3; ++i) {
+      m_gBufferTextures.push_back(graphicAPI.createTexture(
+               static_cast<int32>(m_viewportDim.x),
+               static_cast<int32>(m_viewportDim.y),
+               TEXTURE_BINDINGS::E::RENDER_TARGET | TEXTURE_BINDINGS::E::SHADER_RESOURCE,
+               FORMATS::kRGBA16_FLOAT));
+    }
+
+    m_depthStencilTexture = graphicAPI.createTexture(static_cast<int32>(m_viewportDim.x),
+                                                     static_cast<int32>(m_viewportDim.y),
+                                                     TEXTURE_BINDINGS::E::DEPTH_STENCIL,
+                                                     FORMATS::kD24_S8);
+
+    m_ssaoTextures.push_back(graphicAPI.createTexture(
+                             static_cast<int32>(m_viewportDim.x),
+                             static_cast<int32>(m_viewportDim.y),
+                             TEXTURE_BINDINGS::E::RENDER_TARGET |
+                             TEXTURE_BINDINGS::E::SHADER_RESOURCE |
+                             TEXTURE_BINDINGS::E::UNORDERED_ACCESS,
+                             FORMATS::kRGBA16_FLOAT));
+
+    m_tempBlurTextures.push_back(graphicAPI.createTexture(
+                                 static_cast<int32>(m_viewportDim.x),
+                                 static_cast<int32>(m_viewportDim.y),
+                                 TEXTURE_BINDINGS::E::RENDER_TARGET |
+                                 TEXTURE_BINDINGS::E::SHADER_RESOURCE |
+                                 TEXTURE_BINDINGS::E::UNORDERED_ACCESS,
+                                 FORMATS::kRGBA16_FLOAT));
+
+    m_outputTexture.push_back(graphicAPI.createTexture(
+                              static_cast<int32>(m_viewportDim.x),
+                              static_cast<int32>(m_viewportDim.y),
+                              TEXTURE_BINDINGS::E::RENDER_TARGET |
+                              TEXTURE_BINDINGS::E::SHADER_RESOURCE,
+                              FORMATS::kRGBA16_FLOAT));
+
+    m_shadowTextures.push_back(graphicAPI.createTexture(
+                                          1024,
+                                          1024,
+                                          TEXTURE_BINDINGS::E::SHADER_RESOURCE |
+                                          TEXTURE_BINDINGS::E::RENDER_TARGET,
+                                          FORMATS::kR16_FLOAT));
+  }
+
+  void
+  Renderer::storeBackBuffer() {
+    SPtr<Texture> backbuffer;
+    g_graphicsAPI().getBackBuffer(backbuffer);
+    m_backBufferTextures.push_back(backbuffer);
   }
 
   SPtr<Texture>

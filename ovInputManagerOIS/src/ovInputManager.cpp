@@ -1,4 +1,5 @@
 #include "ovInputManager.h"
+#include <ovGraphicsAPI.h>
 
 namespace ovEngineSDK {
   InputManager::~InputManager() {
@@ -33,8 +34,9 @@ namespace ovEngineSDK {
               m_inputManager->createInputObject(OIS::OISMouse, true));
     m_mouse->setEventCallback(this);
     const OIS::MouseState& ms = m_mouse->getMouseState();
-    ms.width = 800;
-    ms.height = 600;
+    Vector2 windowSize = g_graphicsAPI().getViewportDimensions();
+    ms.width = static_cast<int32>(windowSize.x);
+    ms.height = static_cast<int32>(windowSize.y);
     fillKeys();
     fillMouseKeys();
   }
@@ -70,6 +72,13 @@ namespace ovEngineSDK {
     const OIS::MouseState& ms = m_mouse->getMouseState();
     X = (float)ms.X.rel;
     Y = (float)ms.Y.rel;
+  }
+
+  void
+  InputManager::resizeDimensions(int32 width, int32 height) {
+    const OIS::MouseState& ms = m_mouse->getMouseState();
+    ms.width = width;
+    ms.height = height;
   }
 
   void

@@ -14,6 +14,7 @@
 
 namespace ovEngineSDK {
   bool DXGraphicsAPI::init(void* window) {
+    m_initialized = false;
     HWND wHandle = static_cast<HWND>(window);
     if (nullptr == wHandle) {
       return false;
@@ -82,7 +83,7 @@ namespace ovEngineSDK {
         break;
     }
     if (FAILED(hr)) {
-      return false;
+      return m_initialized;
     }
 
     SPtr<DXTexture>backBuffer(new DXTexture);
@@ -93,14 +94,14 @@ namespace ovEngineSDK {
       (LPVOID*)
       &backBuffer->m_texture);
     if (FAILED(hr)) {
-      return false;
+      return m_initialized;
     }
 
     hr = m_device->CreateRenderTargetView(
       backBuffer->m_texture,
       nullptr, &backBuffer->m_rtv);
     if (FAILED(hr)) {
-      return false;
+      return m_initialized;
     }
 
     SPtr<DXTexture>depthTexture(new DXTexture);
@@ -121,7 +122,7 @@ namespace ovEngineSDK {
     descDepth.MiscFlags = 0;
     hr = m_device->CreateTexture2D(&descDepth, nullptr, &depthTexture->m_texture);
     if (FAILED(hr)) {
-      return false;
+      return m_initialized;
     }
 
     //Create depth stencil view
@@ -134,7 +135,7 @@ namespace ovEngineSDK {
       &descDSV,
       &depthTexture->m_dsv);
     if (FAILED(hr)) {
-      return false;
+      return m_initialized;
     }
 
     //Set main RTV and DSV by default
@@ -145,7 +146,9 @@ namespace ovEngineSDK {
 
     fillFormats();
 
-    return true;
+    setViewport(0, 0, width, height, 0.f, 1.f);
+    m_initialized = true;
+    return m_initialized;
   }
 
   void DXGraphicsAPI::shutdown() {
@@ -1556,6 +1559,8 @@ namespace ovEngineSDK {
 
   void DXGraphicsAPI::resizeBackBuffer(uint32 width, uint32 height) {
     m_deviceContext->OMSetRenderTargets(0, 0, 0);
+    m_backBuffer.reset();
+    m_depthStencil.reset();
     if (FAILED(m_swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0))) {
       OutputDebugStringA("Failed to resize back buffer.\n");
       return;
@@ -1607,6 +1612,8 @@ namespace ovEngineSDK {
     m_depthStencil.reset();
     m_backBuffer = backBuffer;
     m_depthStencil = depthTexture;
+
+    setViewport(0, 0, width, height, 0.f, 1.f);
   }
 
   void
@@ -1629,6 +1636,11 @@ namespace ovEngineSDK {
     if (m_backBuffer) {
       tex = m_backBuffer;
     }
+  }
+
+  bool
+  DXGraphicsAPI::isInitialized() {
+    return m_initialized;
   }
 
   HRESULT DXGraphicsAPI::compileShaderFromFile(WString fileName,

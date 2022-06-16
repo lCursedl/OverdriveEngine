@@ -18,11 +18,18 @@ namespace ovEngineSDK {
     update() {}
     virtual void
     render() {}
-
+    virtual void
+    resize(int32 width, int32 height) {
+      OV_UNREFERENCED_PARAMETER(width);
+      OV_UNREFERENCED_PARAMETER(height);
+    }
     FORCEINLINE void
     setObject(BaseRenderer* _api) {
     BaseRenderer::_instance() = _api;
     }
+
+    virtual void
+    storeBackBuffer() {}
 
    protected:
     virtual SPtr<Texture>

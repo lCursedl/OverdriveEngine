@@ -22,9 +22,16 @@ namespace ovEngineSDK {
    public:
     Renderer() = default;
     ~Renderer() = default;
-    void init() override;
-    void update() override;
-    void render() override;
+    void
+    init()                                                            override;
+    void
+    update()                                                          override;
+    void
+    render()                                                          override;
+    void
+    resize(int32 width, int32 height)                                 override;
+    void
+    storeBackBuffer()                                                 override;
    protected:
     SPtr<Texture>
     getOutputImage()                                                  override;
@@ -59,8 +66,6 @@ namespace ovEngineSDK {
     Vector<SPtr<Texture>> m_backBufferTextures;
 
     SPtr<Texture> m_depthStencilTexture;
-    SPtr<Texture> m_depthMapTexture;
-    SPtr<Texture> m_backTexture;
 
     SPtr<Buffer> m_gBufferConstant;  
     SPtr<Buffer> m_gBufferModel;
