@@ -38,6 +38,8 @@ namespace ovEngineSDK {
 
     void
     setTransformCB(Matrix4 Transform)                                 override;
+    Vector<SPtr<Texture>>
+    getDeferredTextures()                                             override;
    private:
     
     Vector<WPtr<Model>> m_models;

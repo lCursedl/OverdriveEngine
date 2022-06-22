@@ -36,8 +36,9 @@ class GameApp : public BaseApp
   Color m_color;
   SPtr<Texture> m_pBack;
   SPtr<Texture> m_finalTexture;
-  Vector<SPtr<Texture>> m_vTextures;
+  Vector<SPtr<Texture>> m_deferredTextures;
   bool m_showDemo = true;
+  bool m_showOmniWindow = false;
 
   /*struct Bones {
     Matrix4 bones[MAXBONES];

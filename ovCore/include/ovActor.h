@@ -19,6 +19,9 @@ namespace ovEngineSDK {
     void
     setActorName(const String name);
 
+    void
+    updateTransform();
+
     String
     getActorName();
 

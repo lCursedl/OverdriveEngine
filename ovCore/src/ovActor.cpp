@@ -19,20 +19,6 @@ namespace ovEngineSDK {
 
   void
   Actor::update(float delta) {
-    //Scale
-    m_localTransform = Matrix4::IDENTITY;
-    m_localTransform.xVector.x = m_localScale.x;
-    m_localTransform.yVector.y = m_localScale.y;
-    m_localTransform.zVector.z = m_localScale.z;
-    //Rotation
-    Quaternion tempQuat = Quaternion::fromEuler(m_localRotation);
-    tempQuat.normalize();
-    m_localTransform *= Matrix4::fromQuat(tempQuat);
-    //Translation
-    m_localTransform.wVector.x = m_localPosition.x;
-    m_localTransform.wVector.y = m_localPosition.y;
-    m_localTransform.wVector.z = m_localPosition.z;
-
     SIZE_T numComps = m_components.size();
     for (uint32 i = 0; i < numComps; ++i) {
       m_components[i]->update(delta);
@@ -51,6 +37,23 @@ namespace ovEngineSDK {
   void
   Actor::setActorName(const String name) {
     m_actorName = name;
+  }
+
+  void
+  Actor::updateTransform() {
+    //Scale
+    m_localTransform = Matrix4::IDENTITY;
+    m_localTransform.xVector.x = m_localScale.x;
+    m_localTransform.yVector.y = m_localScale.y;
+    m_localTransform.zVector.z = m_localScale.z;
+    //Rotation
+    Quaternion tempQuat = Quaternion::fromEuler(m_localRotation);
+    tempQuat.normalize();
+    m_localTransform *= Matrix4::fromQuat(tempQuat);
+    //Translation
+    m_localTransform.wVector.x = m_localPosition.x;
+    m_localTransform.wVector.y = m_localPosition.y;
+    m_localTransform.wVector.z = m_localPosition.z;
   }
 
   String Actor::getActorName() {

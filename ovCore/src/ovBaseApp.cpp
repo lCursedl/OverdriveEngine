@@ -17,9 +17,9 @@ namespace ovEngineSDK {
     createWindow();
     g_graphicsAPI().init(m_windowHandle);    
     BaseInputManager::instance().init(m_windowHandle);
+    BaseOmniverse::instance().init();
     onCreate();
     BaseRenderer::instance().init();
-    BaseOmniverse::instance().init();
     MSG msg = {};
 
     while (WM_QUIT != msg.message) {

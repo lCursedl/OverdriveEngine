@@ -38,6 +38,9 @@ namespace ovEngineSDK {
     virtual void
     setTransformCB(Matrix4 Transform) { OV_UNREFERENCED_PARAMETER(Transform); }
 
+    virtual Vector<SPtr<Texture>>
+    getDeferredTextures() { return Vector<SPtr<Texture>>(); }
+
     friend class GameApp;
     friend class Actor;
   };

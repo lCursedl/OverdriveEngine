@@ -77,6 +77,10 @@ namespace ovEngineSDK {
     virtual bool
     getLiveEdit() { return false; }
 
+    bool m_liveEditActive = false;
+    String m_omniversePath;
+    String m_omniverseFile;
+
   }; 
   
   OV_CORE_EXPORT BaseOmniverse&

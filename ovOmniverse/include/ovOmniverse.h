@@ -121,7 +121,6 @@ namespace ovEngineSDK {
     const uint64 kOmniClientVersion = (uint64)OMNICLIENT_VERSION_MAJOR << 48 |
                                       (uint64)OMNICLIENT_VERSION_MINOR << 32 |
                                       (uint64)OMNICLIENT_VERSION_PATCH;
-    bool m_liveEditActive = false;
   };
 
   static void

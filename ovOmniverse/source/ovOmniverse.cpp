@@ -65,10 +65,17 @@ namespace ovEngineSDK {
         SdfPath rootPrimPath = SdfPath::AbsoluteRootPath().AppendChild(_tokens->Root);
         SdfPath modelPath = rootPrimPath.AppendChild(TfToken(modelName));
         UsdGeomMesh mesh = UsdGeomMesh::Define(gStage, modelPath);
+        
         if (!mesh) {
           OutputDebugStringA("Couldn't create UsdGeoMesh\n");
           return;
         }
+        UsdGeomXformable xform(mesh);
+
+        xform.AddXformOp(UsdGeomXformOp::TypeTranslate, UsdGeomXformOp::PrecisionDouble);
+        xform.AddXformOp(UsdGeomXformOp::TypeRotateZYX, UsdGeomXformOp::PrecisionFloat);
+        xform.AddXformOp(UsdGeomXformOp::TypeScale, UsdGeomXformOp::PrecisionFloat);
+
         for (auto& inmesh : model->m_meshes) {
           String meshName("_mesh" + std::to_string(meshIndex));
           ++meshIndex;
@@ -77,7 +84,7 @@ namespace ovEngineSDK {
           if (!subMesh) {
             OutputDebugStringA("Couldn't create a sub UsdGeoMesh.\n");
           }
-          subMesh.CreateOrientationAttr(VtValue(UsdGeomTokens->rightHanded));
+          subMesh.CreateOrientationAttr(VtValue(UsdGeomTokens->leftHanded));
           Vector<Vector3> tempVertices;
           Vector<uint32> tempIndices;
           Vector<Vector3> tempNormals;
@@ -133,6 +140,9 @@ namespace ovEngineSDK {
 
   bool
   OmniverseOV::loadUSD(const String& fileName) {
+    if (fileName.empty()) {
+      return false;
+    }
     gStage = UsdStage::Open(fileName);
     if (!gStage) {
       failNotify("Failure to open stage in Omniverse: ", fileName.c_str());
@@ -271,6 +281,7 @@ namespace ovEngineSDK {
           node->m_pActor->m_localScale = { (float)scale.GetArray()[0],
                                            (float)scale.GetArray()[1],
                                            (float)scale.GetArray()[2] };
+          node->m_pActor->updateTransform();
         }
       }
     }
@@ -431,6 +442,9 @@ namespace ovEngineSDK {
 
     UsdAttribute meshNormalAttrib = geomMesh.GetNormalsAttr();
     meshNormalAttrib.Get(&normals);
+
+    /*auto tmpUVs = geomMesh.GetPrimvar(_tokens->st);
+    tmpUVs.Get(&uvs);*/
 
     //UsdGeomPrimvarsAPI primApi = UsdGeomPrimvarsAPI(gStage->GetPrimAtPath(geomMesh.GetPath()));
     ////UsdGeomPrimvar meshUVAttrib = primApi.GetPrimvar(_tokens->st);
