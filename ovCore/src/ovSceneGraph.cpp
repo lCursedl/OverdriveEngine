@@ -9,8 +9,8 @@ namespace ovEngineSDK {
   }
 
   void
-  SceneNode::addChildNode(SPtr<SceneNode> node, WPtr<SceneNode> parent) {
-    node->m_pParent = parent;
+  SceneNode::addChildNode(SPtr<SceneNode> node) {
+    node->m_pParent = weak_from_this();
     m_pChilds.push_back(node);
   }
 
@@ -103,7 +103,12 @@ namespace ovEngineSDK {
   }
 
   void SceneGraph::addNode(SPtr<SceneNode> node) {
-    m_pRoot->addChildNode(node, m_pRoot);
+    if (nullptr != m_selectedNode) {
+      m_selectedNode->addChildNode(node);
+    }
+    else {
+      m_pRoot->addChildNode(node);
+    } 
     m_numActors = nullptr != node->m_pActor ? m_numActors + 1 : m_numActors;
   }
 
@@ -166,7 +171,16 @@ namespace ovEngineSDK {
     }
     return nullptr;
   }
-  SPtr<SceneNode> SceneGraph::getRoot() {
+  SPtr<SceneNode>
+  SceneGraph::getRoot() {
     return m_pRoot;
+  }
+
+  SPtr<SceneNode>
+  SceneGraph::createEmptyActor() {
+    SPtr<SceneNode> empty = make_shared<SceneNode>();
+    empty->setActor(make_shared<Actor>());
+    empty->m_pActor->setActorName("Actor");
+    return empty;
   }
 }

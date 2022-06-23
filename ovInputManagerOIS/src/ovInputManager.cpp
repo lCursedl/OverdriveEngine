@@ -198,13 +198,14 @@ namespace ovEngineSDK {
 
   bool
   InputManager::keyPressed(const OIS::KeyEvent& arg) {
+    std::cout << "KeyPressed {" << std::hex << arg.key << std::dec << "}\n";
     m_keyState[m_keys[arg.key]] = STATUS::kPRESSED;
     return true;
   }
 
   bool
   InputManager::keyReleased(const OIS::KeyEvent& arg) {
-    //std::cout << "KeyReleased {" << std::hex << arg.key << std::dec << "}\n";
+    std::cout << "KeyReleased {" << std::hex << arg.key << std::dec << "}\n";
     m_keyState[m_keys[arg.key]] = STATUS::kRELEASED; 
     return true;
   }

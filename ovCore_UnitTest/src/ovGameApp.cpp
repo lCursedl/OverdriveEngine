@@ -75,7 +75,6 @@ GameApp::onUpdate(float delta) {
                                      myActor->m_localRotation.z + .0005f);*/
   m_finalTexture = g_baseRenderer().getOutputImage();
   m_deferredTextures = g_baseRenderer().getDeferredTextures();
-  Vector2 defSize= g_graphicsAPI().getViewportDimensions();
   SPtr<Camera> cam = SceneGraph::instance().getActiveCamera();
   if (cam) {
     if (g_baseInput().isMouseKeyPressed(KEYSM::kRIGHT)) {
@@ -103,8 +102,14 @@ GameApp::onUpdate(float delta) {
       }
     }
   }
-  ImGui::NewFrame();
+  
   ImGui::update(m_windowHandle, delta);
+}
+
+void
+GameApp::onRender() {
+  ImGui::NewFrame();
+  Vector2 defSize = g_graphicsAPI().getViewportDimensions();
   //ImGui window bar
   ImGui::BeginMainMenuBar(); {
     if (ImGui::BeginMenu("File")) {
@@ -123,10 +128,18 @@ GameApp::onUpdate(float delta) {
       if (ImGui::MenuItem("Paste", "CTRL+V")) {}
       ImGui::EndMenu();
     }
+    if (ImGui::BeginMenu("GameObject")) {
+      if (ImGui::MenuItem("Empty Actor")) {
+        auto& scene = SceneGraph::instance();
+        auto empty = scene.createEmptyActor();
+        scene.addNode(empty);
+      }
+      ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Window")) {
-      if (ImGui::MenuItem("Browser")){}
-      if (ImGui::MenuItem("Details")){}
-      if (ImGui::MenuItem("Viewport")){}
+      if (ImGui::MenuItem("Browser")) {}
+      if (ImGui::MenuItem("Details")) {}
+      if (ImGui::MenuItem("Viewport")) {}
       if (ImGui::MenuItem("Scene")) {}
       ImGui::EndMenu();
     }
@@ -144,17 +157,17 @@ GameApp::onUpdate(float delta) {
   ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
   //Windows
   ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoNav |
-                                 ImGuiWindowFlags_NoCollapse); {
+    ImGuiWindowFlags_NoCollapse); {
     const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
     if (ImGui::BeginTable("SceneList", 2, ImGuiTableFlags_BordersV |
-                                          ImGuiTableFlags_BordersOuterH |
-                                          ImGuiTableFlags_Resizable |
-                                          ImGuiTableFlags_RowBg |
-                                          ImGuiTableFlags_NoBordersInBody)) {
+      ImGuiTableFlags_BordersOuterH |
+      ImGuiTableFlags_Resizable |
+      ImGuiTableFlags_RowBg |
+      ImGuiTableFlags_NoBordersInBody)) {
       ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
       ImGui::TableSetupColumn("Type",
-                              ImGuiTableColumnFlags_WidthFixed,
-                              TEXT_BASE_WIDTH * 12.0f);
+        ImGuiTableColumnFlags_WidthFixed,
+        TEXT_BASE_WIDTH * 12.0f);
       ImGui::TableHeadersRow();
       for (auto nodes : SceneGraph::instance().getRoot()->m_pChilds) {
         showTreeNodes(nodes);
@@ -164,12 +177,12 @@ GameApp::onUpdate(float delta) {
     ImGui::End();
   }
   ImGui::Begin("Browser", nullptr, ImGuiWindowFlags_NoNav |
-                                   ImGuiWindowFlags_NoCollapse); {
+    ImGuiWindowFlags_NoCollapse); {
     ImGui::Text("Placeholder for content browser.");
     ImGui::End();
   }
   ImGui::Begin("Details", nullptr, ImGuiWindowFlags_NoNav |
-                                   ImGuiWindowFlags_NoCollapse); {
+    ImGuiWindowFlags_NoCollapse); {
     showActorInfo();
     ImGui::End();
   }
@@ -187,30 +200,10 @@ GameApp::onUpdate(float delta) {
     ImGui::End();
   }
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoNav |
-                                    ImGuiWindowFlags_NoCollapse); {
+    ImGuiWindowFlags_NoCollapse); {
     ImGui::Image(&m_finalTexture, ImGui::GetContentRegionAvail());
     ImGui::End();
   }
-  /*if (m_showOmniWindow) {
-    auto& omni = g_baseOmniverse();
-    if (ImGui::Begin("Omniverse", &m_showOmniWindow, ImGuiWindowFlags_NoNav)) {
-      ImGui::InputText("Route ", omni.m_omniversePath.c_str(),);
-      if (ImGui::Button("Create USD")) {
-        
-      }
-      if (ImGui::Button("Load USD")) {
-        
-      }
-      if (ImGui::Button("Unload USD")) {
-        
-      }
-      ImGui::End();
-    }
-  }*/
-}
-
-void
-GameApp::onRender() {
   ImGui::render(m_windowHandle);
 }
 
@@ -260,15 +253,22 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
   bool open = ImGui::TreeNodeEx(name.c_str(), flags);
 
   if (ImGui::IsItemClicked()) {
-    node->m_selected = true;
     auto& sgraph = SceneGraph::instance();
-    if (nullptr != sgraph.m_selectedNode) {
-      if (node != sgraph.m_selectedNode) {
-        sgraph.m_selectedNode->m_selected = false;
+    if (ImGui::GetIO().KeyCtrl) {
+      if (node->m_selected) {
+        node->m_selected = false;
+        sgraph.m_selectedNode = nullptr;
       }
-
     }
-    sgraph.m_selectedNode = node;
+    else {
+      node->m_selected = true;
+      if (nullptr != sgraph.m_selectedNode) {
+        if (node != sgraph.m_selectedNode) {
+          sgraph.m_selectedNode->m_selected = false;
+        }
+      }
+      sgraph.m_selectedNode = node;
+    }    
   }
 
   ImGui::TableNextColumn();

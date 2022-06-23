@@ -8,7 +8,7 @@ namespace ovEngineSDK {
   class Model;
   class Camera;
 
-  class OV_CORE_EXPORT SceneNode
+  class OV_CORE_EXPORT SceneNode : public std::enable_shared_from_this<SceneNode>
   {
    public:
     SceneNode() = default;
@@ -22,7 +22,7 @@ namespace ovEngineSDK {
     void
     setActor(SPtr<Actor> actor);
     void
-    addChildNode(SPtr<SceneNode> node, WPtr<SceneNode> parent);
+    addChildNode(SPtr<SceneNode> node);
     void
     update(float delta);
     void
@@ -72,7 +72,11 @@ namespace ovEngineSDK {
     SPtr<SceneNode>
     getRoot();
 
-    SPtr<SceneNode> m_selectedNode;
+    SPtr<SceneNode>
+    createEmptyActor();
+
+    SPtr<SceneNode>
+    m_selectedNode;    
 
     private:
     SPtr<SceneNode> m_pRoot;
