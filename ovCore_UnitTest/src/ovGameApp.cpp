@@ -237,49 +237,50 @@ void
 GameApp::showTreeNodes(SPtr<SceneNode> node) {
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
-  const bool folder = node->m_pChilds.size() > 0;
-  String name = node->m_name.empty() ? node->m_pActor->getActorName() : node->m_name;
-  if (folder) {    
-    bool open = ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
-    if (ImGui::IsItemClicked()) {
-      node->m_selected = true;
-      auto& sgraph = SceneGraph::instance();
-      if (nullptr != sgraph.m_selectedNode) {
-        if (node != sgraph.m_selectedNode) {
-          sgraph.m_selectedNode->m_selected = false;
-        }
 
+  String name = node->m_name.empty() ? node->m_pActor->getActorName() : node->m_name;
+  ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
+  //If node has childs, treat as container
+  const bool folder = node->m_pChilds.size() > 0;
+  if (folder) {
+    flags = ImGuiTreeNodeFlags_SpanFullWidth;
+  }
+  //else treat as a leaf
+  else {
+    flags = ImGuiTreeNodeFlags_Leaf |
+            ImGuiTreeNodeFlags_Bullet |
+            ImGuiTreeNodeFlags_NoTreePushOnOpen |
+            ImGuiTreeNodeFlags_SpanFullWidth;
+  }
+  //Check if node is selected
+  if (node->m_selected) {
+    flags |= ImGuiTreeNodeFlags_Selected;
+  }
+
+  bool open = ImGui::TreeNodeEx(name.c_str(), flags);
+
+  if (ImGui::IsItemClicked()) {
+    node->m_selected = true;
+    auto& sgraph = SceneGraph::instance();
+    if (nullptr != sgraph.m_selectedNode) {
+      if (node != sgraph.m_selectedNode) {
+        sgraph.m_selectedNode->m_selected = false;
       }
-      sgraph.m_selectedNode = node;
+
     }
-    ImGui::TableNextColumn();
-    ImGui::TextDisabled("--");    
+    sgraph.m_selectedNode = node;
+  }
+
+  ImGui::TableNextColumn();
+  ImGui::TextDisabled("Actor");
+  if (folder) {
     if (open) {
       for (auto childs : node->m_pChilds) {
-        showTreeNodes(childs);        
+        showTreeNodes(childs);
       }
       ImGui::TreePop();
     }
-  }
-  else {
-    ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_Leaf |
-                                    ImGuiTreeNodeFlags_Bullet |
-                                    ImGuiTreeNodeFlags_NoTreePushOnOpen |
-                                    ImGuiTreeNodeFlags_SpanFullWidth);
-    if (ImGui::IsItemClicked()) {
-      node->m_selected = true;
-      auto& sgraph = SceneGraph::instance();
-      if (nullptr != sgraph.m_selectedNode) {
-        if (node != sgraph.m_selectedNode) {
-          sgraph.m_selectedNode->m_selected = false;
-        }
-
-      }
-      sgraph.m_selectedNode = node;
-    }
-    ImGui::TableNextColumn();
-    ImGui::TextDisabled("Actor");
-  }
+  }  
 }
 
 void
