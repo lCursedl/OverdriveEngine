@@ -87,6 +87,7 @@ namespace ImGui {
     io.KeyMap[ImGuiKey_X] = ovEngineSDK::KEYS::kX;
     io.KeyMap[ImGuiKey_Y] = ovEngineSDK::KEYS::kY;
     io.KeyMap[ImGuiKey_Z] = ovEngineSDK::KEYS::kZ;
+    io.KeyMap[ImGuiKey_LeftCtrl] = ovEngineSDK::KEYS::kLCONTROL;
 
     RECT rc;
     GetClientRect(static_cast<HWND>(window), &rc);

@@ -131,7 +131,10 @@ namespace ovEngineSDK {
     if (!RegisterClassEx(&wc)) {
       return;
     }
-    RECT rc = {0, 0, 800, 600};
+
+    RECT rc;
+    SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
+
     AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, false);
     //Create window
     m_windowHandle = CreateWindow(
@@ -147,7 +150,7 @@ namespace ovEngineSDK {
       0,
       0);
 
-    ShowWindow(m_windowHandle, 1);
+    ShowWindow(m_windowHandle, SW_SHOWMAXIMIZED);
   }
 
   LRESULT CALLBACK WndProc(HWND hWnd, uint32 message, WPARAM wParam, LPARAM lParam) {
