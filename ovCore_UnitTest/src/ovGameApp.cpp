@@ -254,7 +254,7 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
 
   if (ImGui::IsItemClicked()) {
     auto& sgraph = SceneGraph::instance();
-    if (ImGui::GetIO().KeyCtrl) {
+    if (g_baseInput().isKeyPressed(ovEngineSDK::KEYS::kLCONTROL)) {
       if (node->m_selected) {
         node->m_selected = false;
         sgraph.m_selectedNode = nullptr;
@@ -269,6 +269,30 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
       }
       sgraph.m_selectedNode = node;
     }    
+  }
+  String popupName = "Node_Popup" + node->m_pActor->getActorName();
+  if (ImGui::IsItemClicked(1)) {
+    ImGui::OpenPopup(popupName.c_str());
+  }
+
+  if (ImGui::BeginPopup(popupName.c_str())) {
+    if (ImGui::BeginMenu("Add...")) {
+      if (ImGui::MenuItem("Empty")) {
+        auto& scene = SceneGraph::instance();
+        scene.createEmptyAtNode(node);
+      }
+      if (ImGui::MenuItem("Cube")) {
+
+      }
+      if (ImGui::MenuItem("Sphere")) {
+
+      }
+      ImGui::EndMenu();
+    }
+    if (ImGui::Selectable("Delete")) {
+      
+    }
+    ImGui::EndPopup();
   }
 
   ImGui::TableNextColumn();

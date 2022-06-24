@@ -183,4 +183,13 @@ namespace ovEngineSDK {
     empty->m_pActor->setActorName("Actor");
     return empty;
   }
+
+  void
+  SceneGraph::createEmptyAtNode(SPtr<SceneNode> node) {
+    SPtr<SceneNode> empty = make_shared<SceneNode>();
+    empty->setActor(make_shared<Actor>());
+    empty->m_pActor->setActorName("Actor");
+    node->m_pChilds.push_back(empty);
+    m_numActors = nullptr != node->m_pActor ? m_numActors + 1 : m_numActors;
+  }
 }

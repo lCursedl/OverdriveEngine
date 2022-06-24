@@ -75,6 +75,9 @@ namespace ovEngineSDK {
     SPtr<SceneNode>
     createEmptyActor();
 
+    void
+    createEmptyAtNode(SPtr<SceneNode> node);
+
     SPtr<SceneNode>
     m_selectedNode;    
 
