@@ -4,9 +4,10 @@ Basis for the **Overdrive Collider Generator** tool, which performs Volumetric H
 ![](/doc/images/github_flair.png)
 ## Dependencies
 ### Interface
-Dear ImGui  ([ocornut/imgui: Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies](https://github.com/ocornut/imgui))
+Dear ImGui  (https://github.com/ocornut/imgui)
 ### Graphics
-DirectX 11
-OpenGL
+DirectX 11 & OpenGL
 ### Inputs
-Object oriented Input System ([wgois/OIS: Official OIS repository. Object oriented Input System (github.com)](https://github.com/wgois/OIS))
+Object oriented Input System (https://github.com/wgois/OIS)
+### Model loading
+Open Asset Import Library (https://github.com/assimp/assimp)
