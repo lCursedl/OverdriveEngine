@@ -16,7 +16,7 @@ namespace ovEngineSDK {
 
     String m_name;
     WPtr<SceneNode> m_pParent;
-    Vector<SPtr<SceneNode>> m_pChilds;
+    UMap<int32, SPtr<SceneNode>> m_pChilds;
     SPtr<Actor> m_pActor;
 
     void
@@ -76,7 +76,13 @@ namespace ovEngineSDK {
     createEmptyActor();
 
     void
-    createEmptyAtNode(SPtr<SceneNode> node);
+    createEmptyAtNode(SPtr<SceneNode>& node);
+
+    void
+    markNodeForDelete(int32 deleteID, SPtr<SceneNode> deleteNode);
+
+    void
+    deleteMarkedNodes();
 
     SPtr<SceneNode>
     m_selectedNode;    
@@ -84,5 +90,6 @@ namespace ovEngineSDK {
     private:
     SPtr<SceneNode> m_pRoot;
     uint32 m_numActors;
+    UMap<int32, SPtr<SceneNode>> m_deleteNodes;
   };
 }

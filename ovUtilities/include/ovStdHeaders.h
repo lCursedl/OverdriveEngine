@@ -43,7 +43,6 @@
 #include <bitset>
 #include <array>
 #include <unordered_map>
-#include <unordered_set>
 /*****************************************************************************/
 /*
 * STL algorithms and functions
@@ -65,6 +64,8 @@
 #include <sstream>
 
 #include <chrono>
+
+#include <random>
 
 namespace ovEngineSDK {
   /**
@@ -121,6 +122,17 @@ namespace ovEngineSDK {
     typename P = std::less<K>,
     typename A = std::allocator<std::pair<const K, V>>>
     using Map = std::map<K, V, P, A>;
+
+  /**
+   * @brief      Associative container containing an unordered set of key-value
+   *             pairs.
+   */
+  template<typename K,
+    typename T,
+    typename H = std::hash<K>,
+    typename E = std::equal_to<K>,
+    typename A = std::allocator<std::pair<const K, T>>>
+    using UMap = std::unordered_map<K, T, H, E, A>;
 
   /**
    * @brief      Associative container containing an ordered set of elements

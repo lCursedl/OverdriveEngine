@@ -2,6 +2,7 @@
 #include "ovBaseRenderer.h"
 #include "ovBaseInputManager.h"
 #include "ovBaseOmniverse.h"
+#include "ovRandom.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
@@ -99,6 +100,7 @@ namespace ovEngineSDK {
       BaseOmniverse* omniBase = createOmniverse();
       BaseOmniverse::instance().setObject(omniBase);
     }
+    Random::startUp();
   }
 
   void

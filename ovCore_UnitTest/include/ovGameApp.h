@@ -28,7 +28,7 @@ class GameApp : public BaseApp
  private:
   
   void
-  showTreeNodes(SPtr<SceneNode> node);
+  showTreeNodes(int32 id, SPtr<SceneNode> node);
 
   void
   showActorInfo();
@@ -39,6 +39,7 @@ class GameApp : public BaseApp
   Vector<SPtr<Texture>> m_deferredTextures;
   bool m_showDemo = true;
   bool m_showOmniWindow = false;
+  String text;
 
   /*struct Bones {
     Matrix4 bones[MAXBONES];

@@ -1,6 +1,7 @@
 #include "ovSceneGraph.h"
 #include <ovModel.h>
 #include <ovCamera.h>
+#include <ovRandom.h>
 
 namespace ovEngineSDK {
   void
@@ -11,24 +12,22 @@ namespace ovEngineSDK {
   void
   SceneNode::addChildNode(SPtr<SceneNode> node) {
     node->m_pParent = weak_from_this();
-    m_pChilds.push_back(node);
+    m_pChilds.insert(std::make_pair(Random::instance().GetRandom(0, 999), node));
   }
 
   void
   SceneNode::update(float delta) {
     m_pActor->update(delta);
-    SIZE_T numChilds = m_pChilds.size();
-    for (SIZE_T i = 0; i < numChilds; ++i) {
-      m_pChilds[i]->update(delta);
+    for (auto& childs : m_pChilds) {
+      childs.second->update(delta);
     }
   }
 
   void
   SceneNode::render() {
     m_pActor->render();
-    SIZE_T numChilds = m_pChilds.size();
-    for (SIZE_T i = 0; i < numChilds; ++i) {
-      m_pChilds[i]->render();
+    for (auto& childs : m_pChilds) {
+      childs.second->render();
     }
   }
 
@@ -40,7 +39,7 @@ namespace ovEngineSDK {
         }
       }
       for (auto& childs : m_pChilds) {
-        childs->insertModels(modelsVector);
+        childs.second->insertModels(modelsVector);
       }
     }
   }
@@ -58,7 +57,7 @@ namespace ovEngineSDK {
       }
       if (!camera.get()) {
         for (auto& childs : m_pChilds) {
-          camera = childs->getCam();
+          camera = childs.second->getCam();
           if (camera.get()) {
             break;
           }
@@ -75,7 +74,7 @@ namespace ovEngineSDK {
     }
     else {
       for (auto& node : m_pChilds) {
-        auto tmpActor = node->getActorByName(actorName);
+        auto tmpActor = node.second->getActorByName(actorName);
         if (nullptr != tmpActor) {
           if (actorName == tmpActor->getActorName()) {
             return tmpActor;
@@ -114,9 +113,10 @@ namespace ovEngineSDK {
 
   void
   SceneGraph::update(float delta) {
+    deleteMarkedNodes();
     if (m_pRoot) {
-      for (auto& child : m_pRoot->m_pChilds) {
-        child->update(delta);
+      for (auto child : m_pRoot->m_pChilds) {
+        child.second->update(delta);
       }
     }
   }
@@ -125,7 +125,7 @@ namespace ovEngineSDK {
   SceneGraph::render() {
     if (m_pRoot) {
       for (auto& child : m_pRoot->m_pChilds) {
-        child->render();
+        child.second->render();
       }
     }
   }
@@ -135,7 +135,7 @@ namespace ovEngineSDK {
     SPtr<Camera> camera;
     if (m_pRoot) {
       for (auto& node : m_pRoot->m_pChilds) {
-        camera = node->getCam();
+        camera = node.second->getCam();
         if (camera.get()) {
           break;
         }
@@ -149,7 +149,7 @@ namespace ovEngineSDK {
     Vector<SPtr<Model>> modelVector;
     if (m_pRoot) {
       for (auto& node : m_pRoot->m_pChilds) {
-        node->insertModels(modelVector);
+        node.second->insertModels(modelVector);
       }
     }
 
@@ -164,7 +164,7 @@ namespace ovEngineSDK {
   SPtr<Actor>
   SceneGraph::getActorByName(const String& actorName) {
     for (auto& child : m_pRoot->m_pChilds) {
-      auto tmp = child->getActorByName(actorName);
+      auto tmp = child.second->getActorByName(actorName);
       if (nullptr != tmp) {
         return tmp;
       }
@@ -185,11 +185,40 @@ namespace ovEngineSDK {
   }
 
   void
-  SceneGraph::createEmptyAtNode(SPtr<SceneNode> node) {
+  SceneGraph::createEmptyAtNode(SPtr<SceneNode>& node) {
     SPtr<SceneNode> empty = make_shared<SceneNode>();
     empty->setActor(make_shared<Actor>());
     empty->m_pActor->setActorName("Actor");
-    node->m_pChilds.push_back(empty);
+    empty->m_pParent = node->weak_from_this();
+    node->m_pChilds.insert(std::make_pair(Random::instance().GetRandom(0, 999), empty));
     m_numActors = nullptr != node->m_pActor ? m_numActors + 1 : m_numActors;
+  }
+
+  void
+  SceneGraph::markNodeForDelete(int32 deleteID, SPtr<SceneNode> deleteNode) {
+    m_deleteNodes.insert(std::make_pair(deleteID, deleteNode));
+  }
+
+  void
+  SceneGraph::deleteMarkedNodes() {
+    SPtr<SceneNode> parent;
+    //Check for every node marked for deletion
+    for (auto node : m_deleteNodes) {
+      parent =  node.second->m_pParent.lock();
+      //If node has children
+      if (0 < node.second->m_pChilds.size()) {
+        //Pass them to its parent
+        
+        for (auto& childs : node.second->m_pChilds) {
+          childs.second->m_pParent = parent;
+          parent->m_pChilds.insert(childs);
+        }
+        node.second->m_pChilds.clear();
+      }
+      //Find the marked node in its parent and delete it
+      parent->m_pChilds[node.first].reset();
+      parent->m_pChilds.erase(node.first);
+    }
+    m_deleteNodes.clear();
   }
 }

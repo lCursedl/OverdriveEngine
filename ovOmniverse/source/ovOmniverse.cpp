@@ -240,9 +240,9 @@ namespace ovEngineSDK {
     omniUsdLiveWaitForPendingUpdates();
     auto& sgraph = SceneGraph::instance();
     for (auto& node : sgraph.getRoot()->m_pChilds) {
-      if (nullptr != node->m_pActor) {
-        if (!node->m_pActor->m_omniPath.empty()) {
-          SdfPath path(node->m_pActor->m_omniPath);
+      if (nullptr != node.second->m_pActor) {
+        if (!node.second->m_pActor->m_omniPath.empty()) {
+          SdfPath path(node.second->m_pActor->m_omniPath);
           UsdGeomMesh geomMesh(gStage->GetPrimAtPath(path));
           UsdGeomXformable xForm = geomMesh;
 
@@ -275,13 +275,13 @@ namespace ovEngineSDK {
             }
             }
           }
-          node->m_pActor->m_localPosition = { (float)position.GetArray()[0],
+          node.second->m_pActor->m_localPosition = { (float)position.GetArray()[0],
                                               (float)position.GetArray()[1],
                                               (float)position.GetArray()[2] };
-          node->m_pActor->m_localScale = { (float)scale.GetArray()[0],
+          node.second->m_pActor->m_localScale = { (float)scale.GetArray()[0],
                                            (float)scale.GetArray()[1],
                                            (float)scale.GetArray()[2] };
-          node->m_pActor->updateTransform();
+          node.second->m_pActor->updateTransform();
         }
       }
     }

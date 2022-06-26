@@ -8,6 +8,7 @@
 #include <Windows.h>
 #endif // OV_PLATFORM == OV_PLATFORM_WIN32
 #include <imgui.h>
+#include <imgui_stdlib.h>
 #include "imgui-ovEngine.h"
 
 void
@@ -160,17 +161,17 @@ GameApp::onRender() {
     ImGuiWindowFlags_NoCollapse); {
     const float TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
     if (ImGui::BeginTable("SceneList", 2, ImGuiTableFlags_BordersV |
-      ImGuiTableFlags_BordersOuterH |
-      ImGuiTableFlags_Resizable |
-      ImGuiTableFlags_RowBg |
-      ImGuiTableFlags_NoBordersInBody)) {
+                                          ImGuiTableFlags_BordersOuterH |
+                                          ImGuiTableFlags_Resizable |
+                                          ImGuiTableFlags_RowBg |
+                                          ImGuiTableFlags_NoBordersInBody)) {
       ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
       ImGui::TableSetupColumn("Type",
         ImGuiTableColumnFlags_WidthFixed,
         TEXT_BASE_WIDTH * 12.0f);
       ImGui::TableHeadersRow();
-      for (auto nodes : SceneGraph::instance().getRoot()->m_pChilds) {
-        showTreeNodes(nodes);
+      for (auto& nodes : SceneGraph::instance().getRoot()->m_pChilds) {
+        showTreeNodes(nodes.first, nodes.second);
       }
       ImGui::EndTable();
     }
@@ -178,6 +179,7 @@ GameApp::onRender() {
   }
   ImGui::Begin("Browser", nullptr, ImGuiWindowFlags_NoNav |
     ImGuiWindowFlags_NoCollapse); {
+    ImGui::InputText("Test Text", &text);
     ImGui::Text("Placeholder for content browser.");
     ImGui::End();
   }
@@ -227,11 +229,12 @@ GameApp::resize(int32 width, int32 height) {
 }
 
 void
-GameApp::showTreeNodes(SPtr<SceneNode> node) {
+GameApp::showTreeNodes(int32 id, SPtr<SceneNode> node) {
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
 
-  String name = node->m_name.empty() ? node->m_pActor->getActorName() : node->m_name;
+  String name = node->m_name.empty() ? 
+                node->m_pActor->getActorName() : node->m_name;
   ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
   //If node has childs, treat as container
   const bool folder = node->m_pChilds.size() > 0;
@@ -290,7 +293,7 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
       ImGui::EndMenu();
     }
     if (ImGui::Selectable("Delete")) {
-      
+      SceneGraph::instance().markNodeForDelete(id, node);
     }
     ImGui::EndPopup();
   }
@@ -300,7 +303,7 @@ GameApp::showTreeNodes(SPtr<SceneNode> node) {
   if (folder) {
     if (open) {
       for (auto childs : node->m_pChilds) {
-        showTreeNodes(childs);
+        showTreeNodes(childs.first, childs.second);
       }
       ImGui::TreePop();
     }

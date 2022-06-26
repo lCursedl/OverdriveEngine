@@ -180,6 +180,7 @@
     <ClCompile Include="src\ovMesh.cpp" />
     <ClCompile Include="src\ovModel.cpp" />
     <ClCompile Include="src\ovPlugin.cpp" />
+    <ClCompile Include="src\ovRandom.cpp" />
     <ClCompile Include="src\ovSceneGraph.cpp" />
     <ClCompile Include="src\ovVHACD.cpp" />
     <ClCompile Include="src\ovVolume.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="include\ovGameObject.h" />
     <ClInclude Include="include\ovPlugin.h" />
     <ClInclude Include="include\ovPrerequisitesCore.h" />
+    <ClInclude Include="include\ovRandom.h" />
     <ClInclude Include="include\ovRasterizerState.h" />
     <ClInclude Include="include\ovSamplerState.h" />
     <ClInclude Include="include\ovSceneGraph.h" />
