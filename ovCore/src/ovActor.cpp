@@ -49,7 +49,7 @@ namespace ovEngineSDK {
     //Rotation
     Quaternion tempQuat = Quaternion::fromEuler(m_localRotation);
     tempQuat.normalize();
-    m_localTransform *= Matrix4::fromQuat(tempQuat);
+    m_localTransform = m_localTransform * Matrix4::fromQuat(tempQuat);
     //Translation
     m_localTransform.wVector.x = m_localPosition.x;
     m_localTransform.wVector.y = m_localPosition.y;

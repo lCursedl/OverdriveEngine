@@ -111,7 +111,7 @@ namespace ovEngineSDK {
 
   Matrix4 Matrix4::operator*=(const Matrix4& Mat) {
     *this = *this * Mat;
-    return Matrix4();
+    return *this;
   }
 
   bool Matrix4::operator==(const Matrix4& Mat) {

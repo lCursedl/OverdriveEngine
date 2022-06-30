@@ -33,8 +33,8 @@ GameApp::onCreate() {
             Vector3(0.f, 1.f, 0.f),
             .5f,
             PerspectiveMatrix(70.f,
-                              800.f,
-                              600.f,
+                              static_cast<float>(rc.right),
+                              static_cast<float>(rc.bottom),
                               0.01f,
                               3000.f));
   SPtr<Actor>camActor = make_shared<Actor>("Editor Camera");
@@ -74,8 +74,6 @@ GameApp::onUpdate(float delta) {
   /*myActor->m_localRotation = Vector3(myActor->m_localRotation.x ,
                                      myActor->m_localRotation.y ,
                                      myActor->m_localRotation.z + .0005f);*/
-  m_finalTexture = g_baseRenderer().getOutputImage();
-  m_deferredTextures = g_baseRenderer().getDeferredTextures();
   SPtr<Camera> cam = SceneGraph::instance().getActiveCamera();
   if (cam) {
     if (g_baseInput().isMouseKeyPressed(KEYSM::kRIGHT)) {
@@ -111,6 +109,8 @@ void
 GameApp::onRender() {
   ImGui::NewFrame();
   Vector2 defSize = g_graphicsAPI().getViewportDimensions();
+  m_finalTexture = g_baseRenderer().getOutputImage();
+  m_deferredTextures = g_baseRenderer().getDeferredTextures();
   //ImGui window bar
   ImGui::BeginMainMenuBar(); {
     if (ImGui::BeginMenu("File")) {
@@ -199,6 +199,8 @@ GameApp::onRender() {
     ImGui::Image(&m_deferredTextures[3], { defSize.x * .15f, defSize.y * .15f });
     ImGui::Text("Shadows");
     ImGui::Image(&m_deferredTextures[4], { defSize.x * .15f, defSize.y * .15f });
+    /*ImGui::Text("Light");
+    ImGui::Image(&m_deferredTextures[5], { defSize.x * .15f, defSize.y * .15f });*/
     ImGui::End();
   }
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoNav |
@@ -273,8 +275,8 @@ GameApp::showTreeNodes(int32 id, SPtr<SceneNode> node) {
       sgraph.m_selectedNode = node;
     }    
   }
-  String popupName = "Node_Popup" + node->m_pActor->getActorName();
-  if (ImGui::IsItemClicked(1)) {
+  String popupName = std::to_string(id);
+  if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
     ImGui::OpenPopup(popupName.c_str());
   }
 
@@ -337,14 +339,15 @@ GameApp::showActorInfo() {
         
       }
       ImGui::DragFloat3("Rotation", &tmpActor->m_localRotation.x);
-      /*if (ImGui::IsItemEdited()) {
+      if (ImGui::IsItemEdited()) {
+        tmpActor->updateTransform();
         if (g_baseOmniverse().getLiveEdit()) {
           g_baseOmniverse().setTransformOp(tmpActor->m_localRotation,
                                            OMNI_OP::kROTATE,
                                            OMNI_PRECISION::kFLOAT,
                                            tmpActor->m_omniPath);
         }        
-      }*/
+      }
       ImGui::DragFloat3("Scale", &tmpActor->m_localScale.x);
       if (ImGui::IsItemEdited()) {
         tmpActor->updateTransform();
@@ -357,5 +360,9 @@ GameApp::showActorInfo() {
       }      
     }
     ImGui::Separator();
+    //Add Component
+    if (ImGui::Button("Add Component")) {
+
+    }
   }
 }
