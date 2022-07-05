@@ -90,13 +90,13 @@ namespace ovEngineSDK {
   Quaternion
   Quaternion::fromEuler(const Vector3& Eul) {
     Quaternion EulQuat(0.f, 0.f, 0.f, 0.f);
-    float C1 = Math::cos(Eul.y / 2.f) * Math::DEG2RAD;
-    float C2 = Math::cos(Eul.z / 2.f) * Math::DEG2RAD;
-    float C3 = Math::cos(Eul.x / 2.f) * Math::DEG2RAD;
+    float C1 = Math::cos(Eul.y / 2.f) /** Math::DEG2RAD*/;
+    float C2 = Math::cos(Eul.z / 2.f) /** Math::DEG2RAD*/;
+    float C3 = Math::cos(Eul.x / 2.f) /** Math::DEG2RAD*/;
 
-    float S1 = Math::sin(Eul.y / 2.f) * Math::DEG2RAD;
-    float S2 = Math::sin(Eul.z / 2.f) * Math::DEG2RAD;
-    float S3 = Math::sin(Eul.x / 2.f) * Math::DEG2RAD;
+    float S1 = Math::sin(Eul.y / 2.f) /** Math::DEG2RAD*/;
+    float S2 = Math::sin(Eul.z / 2.f) /** Math::DEG2RAD*/;
+    float S3 = Math::sin(Eul.x / 2.f) /** Math::DEG2RAD*/;
 
     EulQuat.w = (C1 * C2 * C3) - (S1 * S2 * S3);
     EulQuat.x = (S1 * S2 * C3) + (C1 * C2 * S3);

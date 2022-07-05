@@ -338,7 +338,7 @@ GameApp::showActorInfo() {
         }
         
       }
-      ImGui::DragFloat3("Rotation", &tmpActor->m_localRotation.x);
+      ImGui::DragFloat3("Rotation", &tmpActor->m_localRotation.x,.25f);
       if (ImGui::IsItemEdited()) {
         tmpActor->updateTransform();
         if (g_baseOmniverse().getLiveEdit()) {
