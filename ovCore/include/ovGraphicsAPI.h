@@ -479,7 +479,7 @@ namespace ovEngineSDK {
                                   SHADER_TYPE::E) {}
 
      /**
-     * @fn       void setConstantBuffer(uint32 slot, CBuffer* buffer,
+     * @fn       void setConstantBuffer(uint32 slot, SPtr<Buffer> buffer,
      *							                    SHADER_TYPE shaderType)
      * @brief    Sets the specified buffer to use for the shaders.
      * @param[in]slot Index of the constant buffer in the shader.

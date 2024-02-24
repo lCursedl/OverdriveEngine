@@ -1608,8 +1608,6 @@ namespace ovEngineSDK {
       OutputDebugStringA("Failed to create depth stencil view.\n");
       return;
     }
-    m_backBuffer.reset();
-    m_depthStencil.reset();
     m_backBuffer = backBuffer;
     m_depthStencil = depthTexture;
 
